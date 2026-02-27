@@ -15,6 +15,7 @@ model User {
 
   notes        Note[]
   notebooks    Notebook[]
+  sessions     Session[]
 
   @@map("users")
 }
@@ -52,4 +53,14 @@ model Note {
   @@index([userId])
   // optional: speed up search by title
   // @@index([userId, title])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
 }
