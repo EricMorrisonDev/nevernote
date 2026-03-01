@@ -7,6 +7,8 @@ Create/edit/delete notes (markdown)
 
 Organize with notebooks
 
+Notebooks can be organized into stacks
+
 Search notes
 
 Sync across devices
@@ -16,4 +18,4 @@ Basic authentication
 
 Tech stack:
 
- Next js, React, Typescript, Tailwind, Node, Postgres, Zod, Prisma
+ Next js, React, Typescript, Tailwind, Node, Postgres, Zod, Prisma, Quill (for rich text editing)

@@ -16,8 +16,23 @@ model User {
   notes        Note[]
   notebooks    Notebook[]
   sessions     Session[]
+  stacks       Stack[]
 
   @@map("users")
+}
+
+model Stack {
+  id        String   @id @default(uuid())
+  title     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  notebooks Notebook[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Notebook {
@@ -26,14 +41,16 @@ model Notebook {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  stackId   String?
+  stack     Stack?   @relation(fields: [stackId], references: [id], onDelete: SetNull)
+
   notes     Note[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
-  // optional: prevent duplicate notebook titles per user
-  // @@unique([userId, title])
+  @@index([stackId])
 }
 
 model Note {
