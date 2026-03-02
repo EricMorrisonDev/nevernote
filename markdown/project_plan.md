@@ -3,7 +3,7 @@ I want to build my own version of evernote. I am not going to launch this as a p
 
 Core features:
 
-Create/edit/delete notes (markdown)
+Create/edit/delete notes (rich text)
 
 Organize with notebooks
 
