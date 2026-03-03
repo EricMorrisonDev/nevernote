@@ -42,3 +42,31 @@ export async function POST(request: Request) {
         throw e
     }
 }
+
+export async function GET() {
+
+    try{
+        const user = await getCurrentUser()
+
+        if(!user){
+            return NextResponse.json(
+                {error: "User not found"},
+                {status: 401}
+            )
+        }
+
+        const stacks = await prisma.stack.findMany({
+            where: {
+                userId: user.id
+            }
+        })
+
+        return NextResponse.json(
+            {stacks: stacks},
+            {status: 200}
+        )
+
+    } catch (e) {
+        throw (e)
+    }
+}
