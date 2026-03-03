@@ -56,7 +56,7 @@ model Notebook {
 model Note {
   id          String   @id @default(uuid())
   title       String
-  content     String   // markdown
+  content     String   
   notebookId  String
   notebook    Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
 
