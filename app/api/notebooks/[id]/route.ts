@@ -70,3 +70,40 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
         throw e
     }
 }
+
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+    
+    try {
+        const { id } = await context.params
+        const validatedId = notebookIdParamsSchema.safeParse({ id })
+
+        if (!validatedId.success) {
+            return NextResponse.json(
+                { error: "Invalid notebook id", details: flattenError(validatedId.error) },
+                { status: 400 }
+            )
+        }
+
+        const user = await getCurrentUser()
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            )
+        }
+
+        await prisma.notebook.delete({
+            where: {
+                id,
+                userId: user.id
+            }
+        })
+
+        return NextResponse.json(
+            { message: "Notebook deleted" },
+            { status: 200 }
+        )
+    } catch (e) {
+        throw e
+    }
+}
