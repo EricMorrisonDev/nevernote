@@ -6,7 +6,6 @@ export const createNotebookSchema = z.object({
 })
 
 export const updateNotebookSchema = z.object({
-  id: z.string(),
   title: z.string().optional(),
   stackId: z.string().optional().nullable(),
 })
