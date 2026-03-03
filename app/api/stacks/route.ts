@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         })
 
         return NextResponse.json(
-            {stack: newStack},
+            {data: newStack},
             {status: 201}
         )
     } catch (e) {
@@ -62,7 +62,7 @@ export async function GET() {
         })
 
         return NextResponse.json(
-            {stacks: stacks},
+            {data: stacks},
             {status: 200}
         )
 
