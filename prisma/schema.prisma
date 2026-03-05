@@ -57,8 +57,8 @@ model Note {
   id          String   @id @default(uuid())
   title       String
   content     String   
-  notebookId  String
-  notebook    Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  notebookId  String?
+  notebook    Notebook? @relation(fields: [notebookId], references: [id], onDelete: SetNull)
 
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
