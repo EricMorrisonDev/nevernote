@@ -33,8 +33,6 @@ model Stack {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
-
-  @@map("stacks")
 }
 
 model Notebook {
@@ -53,8 +51,6 @@ model Notebook {
 
   @@index([userId])
   @@index([stackId])
-
-  @@map("notebooks")
 }
 
 model Note {
@@ -71,10 +67,9 @@ model Note {
   updatedAt   DateTime @updatedAt
 
   @@index([notebookId])
-  @@index([userId, title])
-  
-
-  @@map("notes")
+  @@index([userId])
+  // optional: speed up search by title
+  // @@index([userId, title])
 }
 
 model Session {
@@ -85,6 +80,4 @@ model Session {
   expiresAt DateTime
 
   @@index([userId])
-
-  @@map("session")
 }

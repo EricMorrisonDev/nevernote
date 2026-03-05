@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { updateStackSchema, stackIdParamsSchema } from "@/lib/validations/stacks";
 import { NextResponse } from "next/server";
 
@@ -18,13 +18,9 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             )
         }
 
-        const user = await getCurrentUser()
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const updatedStack = await prisma.stack.update({
             where:{
@@ -60,26 +56,11 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
             )
         }
 
-        const user = await getCurrentUser()
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 400}
-            )
-        }
-
-        const stack = await prisma.stack.findUnique({
-            where: {
-                id,
-                userId: user.id
-            }
-        })
-
-        const notebooks = stack.notebooks?
-
-
-        const result = await prisma.stack.delete({
+        const deleteResult = await prisma.stack.delete({
             where: {
                 id,
                 userId: user.id
@@ -87,7 +68,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
         })
 
         return NextResponse.json(
-            {result: result},
+            {result: deleteResult},
             {status: 200}
         )
 

@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/session"
+import { requireUser } from "@/lib/session"
 import { prisma } from "@/lib/db"
 import { updateNotebookSchema, notebookIdParamsSchema } from "@/lib/validations/notebooks"
 import { NextResponse } from "next/server"
@@ -26,14 +26,9 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
                 {status: 400}
             )
         }
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         if(validatedBody.data.stackId){
             const stackIdMatchesUser = await prisma.stack.findFirst({
@@ -84,13 +79,9 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
             )
         }
 
-        const user = await getCurrentUser()
-        if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         await prisma.notebook.delete({
             where: {

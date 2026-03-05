@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { NextResponse } from "next/server";
 import { createNoteSchema } from "@/lib/validations/notes";
 import { flattenError } from "zod/v4/core";
@@ -17,14 +17,9 @@ export async function POST(request: Request) {
             )
         }
 
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const { title, content, notebookId } = validatedBody.data
 
@@ -62,13 +57,9 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
-        const user = await getCurrentUser()
-        if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const url = new URL(request.url)
         const notebookId = url.searchParams.get('notebookId')

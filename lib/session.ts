@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/db"
+import { NextResponse } from "next/server"
 
 export const getCurrentUser = async () => {
     const cookieStore = await cookies()
@@ -26,5 +27,18 @@ export const getCurrentUser = async () => {
         }
     })
     
+    return user
+}
+
+export const requireUser = async() => {
+    const user = await getCurrentUser()
+
+    if(!user){
+        return NextResponse.json(
+            {error: "Unauthorized"},
+            {status: 401}
+        )
+    }
+
     return user
 }

@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { createNotebookSchema } from "@/lib/validations/notebooks";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db"
@@ -17,14 +17,9 @@ export async function POST(request: Request) {
             )
         }
 
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const stackId = validated.data.stackId ?? undefined
 
@@ -66,14 +61,9 @@ export async function GET (request: Request) {
 
     try{
 
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "Unauthorized"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const url = new URL(request.url)
         const stackId = url.searchParams.get('stackId') ?? undefined

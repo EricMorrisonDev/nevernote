@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { Prisma } from ".prisma/client";
-import { getCurrentUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { updateNoteSchema, noteIdParamsSchema } from "@/lib/validations/notes";
 import { NextResponse } from "next/server";
 import { flattenError } from "zod/v4/core";
@@ -28,14 +28,9 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             )
         }
 
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "User not found"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const noteIdMatchesUser = await prisma.note.findFirst({
             where: {

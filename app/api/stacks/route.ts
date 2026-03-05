@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { createStackSchema } from "@/lib/validations/stacks";
 import { NextResponse } from "next/server";
 import { flattenError } from "zod";
@@ -7,13 +7,9 @@ import { flattenError } from "zod";
 export async function POST(request: Request) {
 
     try{
-        const user = await getCurrentUser()
-        if(!user){
-            return NextResponse.json(
-                {error: "User not found"},
-                { status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const body = await request.json()
         const validated = createStackSchema.safeParse(body)
@@ -46,14 +42,9 @@ export async function POST(request: Request) {
 export async function GET() {
 
     try{
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "User not found"},
-                {status: 401}
-            )
-        }
+        const result = await requireUser()
+        if (result instanceof NextResponse) return result
+        const user = result
 
         const stacks = await prisma.stack.findMany({
             where: {
