@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { createStackSchema } from "@/lib/validations/stacks";
 import { NextResponse } from "next/server";
-import { flattenError } from "zod";
+import { requireValidation } from "@/lib/zodErrors";
 
 export async function POST(request: Request) {
 
@@ -12,14 +12,10 @@ export async function POST(request: Request) {
         const user = result
 
         const body = await request.json()
-        const validated = createStackSchema.safeParse(body)
+        const validationResult = requireValidation(createStackSchema, body)
+        if(validationResult instanceof NextResponse) return validationResult
 
-        if(!validated.success){
-            return NextResponse.json(
-                {error: "Validation failed", details: flattenError(validated.error)},
-                {status: 400}
-            )
-        }
+        const validated = validationResult
 
         const title = validated.data?.title
 
