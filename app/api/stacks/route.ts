@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { createStackSchema } from "@/lib/validations/stacks";
 import { NextResponse } from "next/server";
-import { requireValidation } from "@/lib/zodErrors";
+import { requireValidation } from "@/lib/zodValidation";
 
 export async function POST(request: Request) {
     try {
