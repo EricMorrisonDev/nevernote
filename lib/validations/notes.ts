@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const createNoteSchema = z.object({
   title: z.string(),
   content: z.string(),
-  notebookId: z.string(),
+  notebookId: z.string().optional(),
 })
 
 export const updateNoteSchema = z.object({

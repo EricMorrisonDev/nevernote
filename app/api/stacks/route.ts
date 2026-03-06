@@ -5,23 +5,19 @@ import { NextResponse } from "next/server";
 import { requireValidation } from "@/lib/zodErrors";
 
 export async function POST(request: Request) {
-
-    try{
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
-
+    try {
+        const userResult = await requireUser()
+        if(userResult instanceof NextResponse) return userResult
+        const user = userResult
+        
         const body = await request.json()
-        const validationResult = requireValidation(createStackSchema, body)
-        if(validationResult instanceof NextResponse) return validationResult
-
-        const validated = validationResult
-
-        const title = validated.data?.title
-
+        const validatedResult = requireValidation(createStackSchema, body)
+        if(validatedResult instanceof NextResponse) return validatedResult
+        const validated = validatedResult
+        
         const newStack = await prisma.stack.create({
             data: {
-                title,
+                title: validated.data.title,
                 userId: user.id
             }
         })
