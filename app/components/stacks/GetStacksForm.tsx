@@ -33,7 +33,7 @@ export function GetStacksForm () {
     }
 
     return(
-        <div>
+        <div className="w-[300px] border-1 border-white rounded-md p-2">
             {error && (
                 <p className="text-red-500">
                     {error}
