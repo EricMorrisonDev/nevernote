@@ -43,17 +43,23 @@ export function GetStacksForm () {
             disabled={isLoading}
             onClick={() => {
                 handleGetStacks()
-            }}>
+            }}
+            className="border-1 border-green-500 p-1 rounded-md">
                 Get stacks
             </button>
             
-            {stacks.length > 0 && (
-                <ul>
-                    {stacks.map((stack) => (
-                        <li key={stack.id}>{stack.title}</li>
-                    ))}
-                </ul>
-            )}
+            <div className="my-2">
+                <h4 className="mb-2">Your Stacks:</h4>
+                {stacks.length > 0 ? (
+                    <ul className="ml-2">
+                        {stacks.map((stack) => (
+                            <li key={stack.id}>{stack.title}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="italic ml-2">Stacks currently empty</p>
+                )}
+            </div>
         </div>
     )
 }

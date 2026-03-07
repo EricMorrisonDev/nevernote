@@ -33,34 +33,38 @@ export function LoginForm () {
         <form
         onSubmit={(e) => {
             handleLogin(e)
-        }}>
+        }}
+        className="">
             {error && (
                 <p className="text-red-500">{error}</p>
             )}
-            <label htmlFor="login-email">
-                email
+            <label htmlFor="login-email"
+            className="flex flex-col my-1">
+                Email
                 <input
                     id="login-email"
                     type="email"
-                    placeholder="type email here"
                     value={email}
                     onChange={(e) => {
                         setEmail(e.target.value)
-                    }} />
+                    }} 
+                    className="border-1 border-white rounded-md w-[80%] p-1"/>
             </label>
-            <label htmlFor="login-password">
-                password
+            <label htmlFor="login-password"
+            className="flex flex-col my-1">
+                Password
                 <input
                     id="login-password"
                     type="password"
-                    placeholder="type password here"
                     value={password}
                     onChange={(e) => {
                         setPassword(e.target.value)
-                    }} />
+                    }} 
+                    className="border-1 border-white rounded-md w-[80%] p-1"/>
             </label>
             <button
             type="submit"
+            className="border-1 border-white rounded-md my-2 py-1 px-2"
             >
                 Login
             </button>

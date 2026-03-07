@@ -35,14 +35,16 @@ export function CreateStackForm () {
         <form
         onSubmit={(e) => {
             handleSubmit(e)
-        }}>
+        }}
+        className="">
             { error && (
                 <p className="text-red-500">
                     {error}
                 </p>
             )}
             <label
-            htmlFor="input-title">
+            htmlFor="input-title"
+            className="flex flex-col">
                 Stack title
                 <input 
                 id="input-title"
@@ -51,11 +53,13 @@ export function CreateStackForm () {
                 onChange={(e) => {
                     setTitle(e.target.value)
                 }}
+                className="border-1 border-white p-1 my-2 rounded-md w-[80%]"
                 />
             </label>
             <button
             disabled={isLoading}
-            type="submit">
+            type="submit"
+            className="border-1 border-green-500 p-1 my-2 rounded-md">
                 Create
             </button>
         </form>

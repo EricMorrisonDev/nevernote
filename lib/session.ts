@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { prisma } from "@/lib/db"
 import { NextResponse } from "next/server"
 
-const getCurrentUser = async () => {
+export const getCurrentUser = async () => {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     const sessionId = sessionCookie?.value

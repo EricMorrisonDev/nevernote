@@ -38,11 +38,13 @@ export function SignUpForm () {
         <form
         onSubmit={(e) => {
             handleSubmit(e)
-        }}>
+        }}
+        className="">
             {error && (
                 <p className="text-red-500">{error}</p>
             )}
-            <label htmlFor="input-email">
+            <label htmlFor="input-email"
+            className="flex flex-col my-1">
                 Email
                 <input
                 id="input-email"
@@ -50,9 +52,11 @@ export function SignUpForm () {
                 value={email}
                 onChange={(e) => {
                     setEmail(e.target.value)
-                }} />
+                }}
+                className="border-1 border-white rounded-md w-[80%] p-1" />
             </label>
-            <label htmlFor="input-password">
+            <label htmlFor="input-password"
+            className="flex flex-col my-1">
                 Password
                 <input
                 id="input-password"
@@ -60,11 +64,13 @@ export function SignUpForm () {
                 value={password}
                 onChange={(e) => {
                     setPassword(e.target.value)
-                }} />
+                }}
+                className="border-1 border-white rounded-md w-[80%] p-1" />
             </label>
             <button
             type="submit"
-            disabled={isLoading}>
+            disabled={isLoading}
+            className="border-1 border-white rounded-md my-2 py-1 px-2 ">
                 Sign Up
             </button>
         </form>

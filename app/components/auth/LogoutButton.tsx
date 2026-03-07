@@ -27,6 +27,7 @@ export function LogoutButton () {
             handleLogout()
         }}
         disabled={isLoading}
+        className="border-1 border-blue-500 rounded-md p-1"
         >
             Logout
         </button>
