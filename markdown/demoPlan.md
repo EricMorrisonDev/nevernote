@@ -1,9 +1,9 @@
 
 I am planning to make code walkthrough videos for a few of this project's features. I plan to do an individual video showing myself coding each of these:
 
+- POST api for creating new stack and GET api for getting all stacks.
 - getCurrentUser() and requireUser()
-- requireValidation helper function
-- POST api for creating new stack
+- requireValidation helper function 
 
 I need a basic front end ui demo component that I can use to visually demonstrate these features working. I have set up the homepage with a login form and logout button.
 
