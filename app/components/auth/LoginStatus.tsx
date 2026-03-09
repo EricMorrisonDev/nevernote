@@ -1,14 +1,19 @@
-import "server-only"
-import { getCurrentUser } from "@/lib/session"
+"use client"
 
-export async function LoginStatus() {
-    const user = await getCurrentUser()
+import { useEffect, useState } from "react"
+
+export function LoginStatus() {
+    const [user, setUser] = useState<{ email: string } | null>(null)
+
+    useEffect(() => {
+        fetch("/api/me", { method: "GET" })
+            .then((res) => (res.ok ? res.json() : null))
+            .then(setUser)
+    }, [])
 
     if (!user) {
-        return null
+        return <p>You are not logged in!</p>
     }
 
-    return (
-        <p>You are logged in as {user.email}</p>
-    )
+    return <p>You are logged in as {user.email}</p>
 }
