@@ -4,7 +4,24 @@ import { getCurrentUser, requireUser } from "@/lib/session";
 import { NextResponse } from "next/server";
 import { createNoteSchema } from "@/lib/validations/notes";
 import { flattenError } from "zod/v4/core";
-import { handleError } from "@/lib/errorResponse";
+import { handleApiError } from "@/lib/errorResponse";
+
+async function ensureNotebookBelongsToUser(notebookid: string, userId: string) {
+
+        const match = await prisma.notebook.findFirst({
+            where: {
+                id: notebookid,
+                userId
+            }
+        })
+
+        if(!match){
+            return NextResponse.json(
+                {error: "NotebookId does not match user"},
+                {status: 400}
+            )
+        }
+}
 
 export async function POST(request: Request) {
 
@@ -35,19 +52,8 @@ export async function POST(request: Request) {
 
         // if there's a notebook id make sure it matches user
         if(notebookId){
-            const notebookMatchesUser = await prisma.notebook.findFirst({
-                where: {
-                    id: notebookId,
-                    userId: user.id
-                }
-            })
-
-            if(!notebookMatchesUser){
-                return NextResponse.json(
-                    {error: "Notebook not found"},
-                    {status: 400}
-                )
-            }
+            const result = await ensureNotebookBelongsToUser(notebookId, user.id)
+            if(result instanceof NextResponse) return result
         }
 
         // create the new note and return it
@@ -69,7 +75,7 @@ export async function POST(request: Request) {
         )
         
     } catch (e) {
-        handleError(e)
+        handleApiError(e)
     }
 }
 
@@ -83,18 +89,8 @@ export async function GET(request: Request) {
         const notebookId = url.searchParams.get('notebookId')
 
         if (notebookId) {
-            const notebookBelongsToUser = await prisma.notebook.findFirst({
-                where: {
-                    id: notebookId,
-                    userId: user.id
-                }
-            })
-            if (!notebookBelongsToUser) {
-                return NextResponse.json(
-                    { error: "Invalid notebook" },
-                    { status: 400 }
-                )
-            }
+            const result = await ensureNotebookBelongsToUser(notebookId, user.id)
+            if(result instanceof NextResponse) return result
         }
 
         const where: {userId: string, notebookId?: string} = { userId: user.id }
@@ -110,6 +106,6 @@ export async function GET(request: Request) {
             { status: 200 }
         )
     } catch (e) {
-        handleError(e)
+        handleApiError(e)
     }
 }

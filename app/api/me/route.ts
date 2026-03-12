@@ -1,23 +1,15 @@
-import { getCurrentUser } from "@/lib/session"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { requireUser } from "@/lib/session";
 
-export async function GET () {
+export async function GET() {
 
-    try {
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "User not found"},
-                {status: 401}
-            )
-        }
-
-        return NextResponse.json(
-            {data: user},
-            {status: 200}
-        )
-    } catch (e) {
-        throw (e)
+    const user = await requireUser()
+    if(user instanceof NextResponse){
+        return user
     }
+
+    return NextResponse.json(
+        {user},
+        {status: 200}
+    )
 }

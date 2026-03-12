@@ -35,6 +35,8 @@ model Stack {
 
   @@index([userId])
 
+  @@unique([id, userId])
+
   @@map("stacks")
 }
 

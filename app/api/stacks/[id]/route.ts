@@ -1,78 +1,77 @@
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
+import { requireValidation } from "@/lib/zodValidation";
+import { handleApiError } from "@/lib/errorResponse";
 import { updateStackSchema, stackIdParamsSchema } from "@/lib/validations/stacks";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }>}) {
 
     try{
+        // exract params
         const { id } = await context.params
+
+        // parse body
         const body = await request.json()
-        const validatedBody = updateStackSchema.safeParse(body)
-        const validatedId = stackIdParamsSchema.safeParse(id)
 
-        if(!validatedBody.success || !validatedId.success){
-            return NextResponse.json(
-                {error: "Request validation failed"},
-                {status: 400}
-            )
-        }
+        // validate body
+        const validateBody = requireValidation(updateStackSchema, body)
+        if(validateBody instanceof NextResponse) return validateBody
 
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
+        // validate id
+        const validateId = requireValidation(stackIdParamsSchema, { id })
+        if(validateId instanceof NextResponse) return validateId
 
+        // get user
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+
+        // update stack
         const updatedStack = await prisma.stack.update({
-            where:{
+            where: {
                 id,
                 userId: user.id
             },
             data: {
-                title: validatedBody.data.title
+                title: validateBody.data.title
             }
         })
-
+    
+        // return next response
         return NextResponse.json(
-            {updatedStack: updatedStack},
+            {data: updatedStack},
             {status: 200}
         )
+        
 
     } catch (e) {
-        throw e
+        return handleApiError(e)
     }
 }
 
 
-export async function DELETE(request: Request, context: { params: Promise<{ id: string }>}) {
+export async function DELETE(context: { params: Promise<{ id: string }>}) {
 
     try{
         const { id } = await context.params
-        const validatedId = stackIdParamsSchema.safeParse({ id })
-
-        if(!validatedId.success){
-            return NextResponse.json(
-                {error: "Request validation failed"},
-                {status: 401}
-            )
-        }
-
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
-
-        const deleteResult = await prisma.stack.delete({
+        const validateId = requireValidation(stackIdParamsSchema, { id })
+        if(validateId instanceof NextResponse) return validateId
+    
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+    
+        const result = await prisma.stack.delete({
             where: {
                 id,
                 userId: user.id
             }
         })
-
+    
         return NextResponse.json(
-            {result: deleteResult},
+            {result},
             {status: 200}
         )
-
     } catch (e) {
-        throw e
+        return handleApiError(e)
     }
 }

@@ -8,9 +8,9 @@ export const signupSchema = z
   .object({
     email: z.string().email('Invalid email address'),
     password: passwordSchema,
-    passwordConfirm: z.string(),
+    confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.passwordConfirm, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['passwordConfirm'],
   })

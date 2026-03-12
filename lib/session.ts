@@ -1,9 +1,9 @@
-import "server-only"
-import { cookies } from "next/headers"
-import { prisma } from "@/lib/db"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { prisma } from "./db";
 
-export const getCurrentUser = async () => {
+export async function getCurrentUser() {
+
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     const sessionId = sessionCookie?.value
@@ -27,11 +27,16 @@ export const getCurrentUser = async () => {
             id: session.userId
         }
     })
-    
+
+    if(!user){
+        return null
+    }
+
     return user
 }
 
-export const requireUser = async() => {
+export async function requireUser() {
+
     const user = await getCurrentUser()
 
     if(!user){

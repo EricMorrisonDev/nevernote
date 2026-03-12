@@ -9,7 +9,7 @@ export const createNoteSchema = z.object({
 export const updateNoteSchema = z.object({
   title: z.string().optional(),
   content: z.string().optional(),
-  notebookId: z.string().nullish(), // undefined = don't change, null = remove from notebook
+  notebookId: z.string().nullish(), 
 })
 
 export const noteIdParamsSchema = z.object({

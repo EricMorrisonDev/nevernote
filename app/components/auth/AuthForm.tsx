@@ -5,7 +5,7 @@ import { SignUpForm } from "./SignUpForm";
 import { LoginForm } from "./LoginForm";
 
 export function AuthForm() {
-    const [loggingIn, setLoggingIn] = useState(false)
+    const [loggingIn, setLoggingIn] = useState(true)
 
     return(
         <div className="flex flex-col w-[300px] border-1 border-white rounded-md p-2">
