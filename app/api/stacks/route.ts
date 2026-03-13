@@ -7,20 +7,18 @@ import { handleApiError } from "@/lib/errorResponse";
 
 export async function POST(request: Request) {
 
-    try { 
-        const result = await requireUser()
-        if(result instanceof NextResponse) return result
-    
-        const userId = result.id
-    
+    try {
         const body = await request.json()
         const validated = requireValidation(createStackSchema, body)
         if(validated instanceof NextResponse) return validated
     
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+    
         const newStack = await prisma.stack.create({
             data: {
                 title: validated.data.title,
-                userId
+                userId: user.id
             }
         })
     
@@ -29,14 +27,14 @@ export async function POST(request: Request) {
             {status: 201}
         )
     } catch (e) {
-        return handleApiError(e)
+       return handleApiError(e)
     }
 
 }
 
 export async function GET() {
 
-    try{
+    try {
         const user = await requireUser()
         if(user instanceof NextResponse) return user
     
@@ -53,4 +51,5 @@ export async function GET() {
     } catch (e) {
         return handleApiError(e)
     }
+
 }
