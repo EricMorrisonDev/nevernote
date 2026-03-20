@@ -3,66 +3,48 @@ import type { Prisma } from ".prisma/client";
 import { requireUser } from "@/lib/session";
 import { updateNoteSchema, noteIdParamsSchema } from "@/lib/validations/notes";
 import { NextResponse } from "next/server";
-import { flattenError } from "zod/v4/core";
+import { requireValidation } from "@/lib/zodValidation";
+import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
+
+async function ensureNoteMatchesUser(noteId: string, userId: string) {
+    const match = await prisma.note.findFirst({
+        where: {
+            id: noteId,
+            userId
+        }
+    })
+
+    if(!match){
+        return NextResponse.json(
+            {error: "Note Id does not match this user"},
+            {status: 400}
+        )
+    }
+}
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }>}) {
 
     try{
         const body = await request.json()
-        const validatedBody = updateNoteSchema.safeParse(body)
+        const validatedBody = requireValidation(updateNoteSchema, body)
+        if(validatedBody instanceof NextResponse) return validatedBody
 
         const { id } = await context.params
-        const idValidated = noteIdParamsSchema.safeParse({ id })
+        const idValidated = requireValidation(noteIdParamsSchema, id)
+        if(idValidated instanceof NextResponse) return idValidated
 
-        if(!validatedBody.success){
-            return NextResponse.json(
-                {error: "Invalid request body", details: flattenError(validatedBody.error)},
-                {status: 400}
-            )
-        }
-
-        if(!idValidated.success){
-            return NextResponse.json(
-                {error: "Invalid id", details: flattenError(idValidated.error)},
-                {status: 400}
-            )
-        }
-
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
-
-        const noteIdMatchesUser = await prisma.note.findFirst({
-            where: {
-                id,
-                userId: user.id
-            }
-        })
-
-        if(!noteIdMatchesUser){
-            return NextResponse.json(
-                {error: "Note Id does not match this user"},
-                {status: 400}
-            )
-        }
+        const user = await requireUser()
+        if (user instanceof NextResponse) return user
+        
+        const noteIdMatchesUser = await ensureNoteMatchesUser(id, user.id)
+        if(noteIdMatchesUser instanceof NextResponse) return noteIdMatchesUser
 
         if(validatedBody.data.notebookId !== undefined && validatedBody.data.notebookId !== null){
-            const matchesUser = await prisma.notebook.findFirst({
-                where: {
-                    id: validatedBody.data.notebookId,
-                    userId: user.id
-                }
-            })
-
-            if(!matchesUser){
-                return NextResponse.json(
-                    {error: "Notebook id does not match user"},
-                    {status: 400}
-                )
-            }
+            const match = ensureNotebookBelongsToUser(validatedBody.data.notebookId, user.id)
+            if(match instanceof NextResponse) return match
         }
 
-        const data: Record<string, unknown> = {}
+        const data: Prisma.NoteUncheckedUpdateInput = {}
         if(validatedBody.data.title !== undefined) data.title = validatedBody.data.title
         if(validatedBody.data.content !== undefined) data.content = validatedBody.data.content
         if(validatedBody.data.notebookId !== undefined) data.notebookId = validatedBody.data.notebookId
@@ -72,7 +54,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
                 id,
                 userId:user.id
             },
-            data: data as Prisma.NoteUncheckedUpdateInput
+            data: data
         })
 
         return NextResponse.json(

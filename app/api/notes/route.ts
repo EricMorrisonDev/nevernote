@@ -5,23 +5,7 @@ import { NextResponse } from "next/server";
 import { createNoteSchema } from "@/lib/validations/notes";
 import { handleApiError } from "@/lib/errorResponse";
 import { requireValidation } from "@/lib/zodValidation";
-
-async function ensureNotebookBelongsToUser(notebookid: string, userId: string) {
-
-        const match = await prisma.notebook.findFirst({
-            where: {
-                id: notebookid,
-                userId
-            }
-        })
-
-        if(!match){
-            return NextResponse.json(
-                {error: "NotebookId does not match user"},
-                {status: 400}
-            )
-        }
-}
+import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
 
 export async function POST(request: Request) {
 
