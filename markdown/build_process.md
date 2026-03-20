@@ -5,7 +5,7 @@
 - **Repo & tooling:** Initialize the repo (e.g. monorepo or separate frontend/backend), set up Git, add a README.
 - **Database:** Define the schema (users, notebooks, notes) and set up PostgreSQL locally (Docker or native).
 - **Prisma:** Add Prisma, point it at Postgres, create initial schema and migrations.
-- **API surface:** Decide how Next.js and Express fit together (e.g. Next.js API routes vs separate Express app, or Next.js only for API).
+
 
 ---
 
