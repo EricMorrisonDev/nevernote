@@ -1,13 +1,11 @@
 "use client"
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function GetStacksForm () {
     const [stacks, setStacks] = useState<{id: string, title: string}[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const router = useRouter()
 
     const handleGetStacks = async () => {
         setIsLoading(true)
@@ -26,7 +24,6 @@ export function GetStacksForm () {
 
             const resData = await res.json()
             setStacks(resData.data ?? [])
-            router.refresh()
         } finally {
             setIsLoading(false)
         }

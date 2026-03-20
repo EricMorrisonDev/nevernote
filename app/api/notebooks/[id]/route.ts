@@ -1,49 +1,43 @@
 import { requireUser } from "@/lib/session"
 import { prisma } from "@/lib/db"
 import { updateNotebookSchema, notebookIdParamsSchema } from "@/lib/validations/notebooks"
+import { requireValidation } from "@/lib/zodValidation"
 import { NextResponse } from "next/server"
-import { flattenError } from "zod/v4/core"
+import { handleApiError } from "@/lib/errorResponse"
 
+async function ensureStackMatchesUser(stackId: string, userId: string) {
+
+    const result = await prisma.stack.findFirst({
+        where: {
+            id: stackId,
+            userId
+        }
+    })
+
+    if(!result){
+        return NextResponse.json(
+            {error: "StackId does not match user"},
+            {status: 400}
+        )
+    }
+}
 
 export async function PUT (request: Request, context: { params: Promise<{ id: string }>}) {
     try{
         const body = await request.json()
-        const validatedBody = updateNotebookSchema.safeParse(body)
+        const validatedBody = requireValidation(updateNotebookSchema, body)
+        if(validatedBody instanceof NextResponse) return validatedBody
 
         const { id } = await context.params
-        const validatedId = notebookIdParamsSchema.safeParse({ id })
+        const validatedId = requireValidation(notebookIdParamsSchema, id)
+        if(validatedId instanceof NextResponse) return validatedId
 
-        if(!validatedBody.success){
-            return NextResponse.json(
-                {error: "Failed to validate", details: flattenError(validatedBody.error)},
-                {status: 400}
-            )
-        }
-
-        if(!validatedId.success){
-            return NextResponse.json(
-                {error: "Invalid notebook id", details: flattenError(validatedId.error)},
-                {status: 400}
-            )
-        }
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
+        const user = await requireUser()
+        if (user instanceof NextResponse) return user
 
         if(validatedBody.data.stackId){
-            const stackIdMatchesUser = await prisma.stack.findFirst({
-                where: {
-                    id: validatedBody.data.stackId,
-                    userId: user.id
-                }
-            })
-
-            if(!stackIdMatchesUser){
-                return NextResponse.json(
-                    {error: "Stack id does not match user"},
-                    {status: 400}
-                )
-            }
+            const match = ensureStackMatchesUser(validatedBody.data.stackId, user.id)
+            if(match instanceof NextResponse) return match
         }
 
         const updatedNotebook = await prisma.notebook.update({
@@ -62,7 +56,7 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
             {status: 200}
         )
     } catch (e) {
-        throw e
+        return handleApiError(e)
     }
 }
 
@@ -70,18 +64,12 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
     
     try {
         const { id } = await context.params
-        const validatedId = notebookIdParamsSchema.safeParse({ id })
+        const validatedId = requireValidation(notebookIdParamsSchema, id)
+        if(validatedId instanceof NextResponse) return validatedId
 
-        if (!validatedId.success) {
-            return NextResponse.json(
-                { error: "Invalid notebook id", details: flattenError(validatedId.error) },
-                { status: 400 }
-            )
-        }
-
-        const result = await requireUser()
-        if (result instanceof NextResponse) return result
-        const user = result
+        const user = await requireUser()
+        if (user instanceof NextResponse) return user
+        
 
         await prisma.notebook.delete({
             where: {
@@ -95,6 +83,6 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
             { status: 200 }
         )
     } catch (e) {
-        throw e
+        return handleApiError(e)
     }
 }

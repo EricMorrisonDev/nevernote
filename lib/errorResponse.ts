@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
-export const handleApiError = (err: unknown) => {
+
+export function handleApiError(err: unknown) {
+    
     console.error(err)
     return NextResponse.json(
-        {error: "Unknown server error"},
+        {error: "Unknown error occurred"},
         {status: 500}
     )
+
 }

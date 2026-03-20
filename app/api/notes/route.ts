@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/db";
 import type { Prisma } from ".prisma/client";
-import { getCurrentUser, requireUser } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { NextResponse } from "next/server";
 import { createNoteSchema } from "@/lib/validations/notes";
-import { flattenError } from "zod/v4/core";
 import { handleApiError } from "@/lib/errorResponse";
+import { requireValidation } from "@/lib/zodValidation";
 
 async function ensureNotebookBelongsToUser(notebookid: string, userId: string) {
 
@@ -28,32 +28,20 @@ export async function POST(request: Request) {
     try{
         // take request body and validate with zod schema
         const body = await request.json()
-        const validated = createNoteSchema.safeParse(body)
-
-        if(!validated.success){
-            return NextResponse.json(
-                {error: "Validation failed", details: flattenError(validated.error)},
-                {status: 400}
-            )
-        }
+        const validated = requireValidation(createNoteSchema, body)
+        if(validated instanceof NextResponse) return validated
 
         // get the current user
-        const user = await getCurrentUser()
-
-        if(!user){
-            return NextResponse.json(
-                {error: "User not found"},
-                {status: 400}
-            )
-        }
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
 
         // destructure out the data from body
         const { title, content, notebookId } = validated.data
 
         // if there's a notebook id make sure it matches user
         if(notebookId){
-            const result = await ensureNotebookBelongsToUser(notebookId, user.id)
-            if(result instanceof NextResponse) return result
+            const match = await ensureNotebookBelongsToUser(notebookId, user.id)
+            if(match instanceof NextResponse) return match
         }
 
         // create the new note and return it
@@ -75,7 +63,7 @@ export async function POST(request: Request) {
         )
         
     } catch (e) {
-        handleApiError(e)
+        return handleApiError(e)
     }
 }
 
@@ -106,6 +94,6 @@ export async function GET(request: Request) {
             { status: 200 }
         )
     } catch (e) {
-        handleApiError(e)
+        return handleApiError(e)
     }
 }

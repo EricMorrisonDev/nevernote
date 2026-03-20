@@ -27,8 +27,7 @@ export async function POST(request: Request) {
     try{
         // parse and validate req body
         const body = await request.json()
-        const validated = await requireValidation(createNotebookSchema, body)
-
+        const validated = requireValidation(createNotebookSchema, body)
         if(validated instanceof NextResponse) return validated
 
         // get user
@@ -54,12 +53,12 @@ export async function POST(request: Request) {
 
         // return the notebook
         return NextResponse.json(
-            {newNotebook},
+            {data: newNotebook},
             {status: 201}
         )
 
     } catch (e) {
-        handleApiError(e)
+        return handleApiError(e)
     }
 }
 
@@ -90,6 +89,6 @@ export async function GET (request: Request) {
             {data: notebooks}
         )
     } catch (e) {
-        throw (e)
+        return handleApiError(e)
     }
 }

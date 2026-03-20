@@ -1,19 +1,19 @@
-import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/session";
-import { createStackSchema } from "@/lib/validations/stacks";
-import { NextResponse } from "next/server";
-import { requireValidation } from "@/lib/zodValidation";
-import { handleApiError } from "@/lib/errorResponse";
+import { requireValidation } from "@/lib/zodValidation"
+import { createStackSchema } from "@/lib/validations/stacks"
+import { prisma } from "@/lib/db"
+import { NextResponse } from "next/server"
+import { handleApiError } from "@/lib/errorResponse"
+import { requireUser } from "@/lib/session"
 
 export async function POST(request: Request) {
 
-    try {
+    try{
         const body = await request.json()
         const validated = requireValidation(createStackSchema, body)
         if(validated instanceof NextResponse) return validated
     
         const user = await requireUser()
-        if(user instanceof NextResponse) return user
+        if(user instanceof NextResponse) return user 
     
         const newStack = await prisma.stack.create({
             data: {
@@ -27,14 +27,12 @@ export async function POST(request: Request) {
             {status: 201}
         )
     } catch (e) {
-       return handleApiError(e)
+        return handleApiError(e)
     }
-
 }
 
 export async function GET() {
-
-    try {
+    try{ 
         const user = await requireUser()
         if(user instanceof NextResponse) return user
     
@@ -49,7 +47,7 @@ export async function GET() {
             {status: 200}
         )
     } catch (e) {
-        return handleApiError(e)
+            handleApiError(e)
     }
-
 }
+

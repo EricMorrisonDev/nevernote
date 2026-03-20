@@ -3,14 +3,15 @@
 import { useState } from "react"
 
 export function CreateStackForm () {
-    const router = useRouter()
     const [title, setTitle] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState<string | null>(null)
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault()
         setError(null)
+        setSuccess(null)
         setIsLoading(true)
 
         try{
@@ -23,9 +24,11 @@ export function CreateStackForm () {
             if(!res.ok){
                 const data = await res.json().catch(() => null)
                 setError(data?.error ?? "Unknown error occurred");
+            } else {
+                setSuccess(`New stack: "${title}" created`)
             }
-            router.refresh()
         } finally {
+            setTitle('')
             setIsLoading(false)
         }
     }
@@ -39,6 +42,11 @@ export function CreateStackForm () {
             { error && (
                 <p className="text-red-500">
                     {error}
+                </p>
+            )}
+            { success && (
+                <p className="text-green-500">
+                    {success}
                 </p>
             )}
             <label
