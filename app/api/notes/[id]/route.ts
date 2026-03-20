@@ -5,6 +5,7 @@ import { updateNoteSchema, noteIdParamsSchema } from "@/lib/validations/notes";
 import { NextResponse } from "next/server";
 import { requireValidation } from "@/lib/zodValidation";
 import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
+import { handleApiError } from "@/lib/errorResponse";
 
 async function ensureNoteMatchesUser(noteId: string, userId: string) {
     const match = await prisma.note.findFirst({
@@ -40,7 +41,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         if(noteIdMatchesUser instanceof NextResponse) return noteIdMatchesUser
 
         if(validatedBody.data.notebookId !== undefined && validatedBody.data.notebookId !== null){
-            const match = ensureNotebookBelongsToUser(validatedBody.data.notebookId, user.id)
+            const match = await ensureNotebookBelongsToUser(validatedBody.data.notebookId, user.id)
             if(match instanceof NextResponse) return match
         }
 
@@ -63,6 +64,37 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         )
 
     } catch (e) {
-        throw e
+        return handleApiError(e)
+    }
+}
+
+// Next we set up the delete api
+
+export async function DELETE(context: { params: Promise<{ id: string}>}) {
+
+    try{
+        const { id } = await context.params
+        const validatedId = requireValidation(noteIdParamsSchema, { id })
+        if(validatedId instanceof NextResponse) return validatedId
+
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+
+        const match = await ensureNoteMatchesUser(validatedId.data.id, user.id)
+        if(match instanceof NextResponse) return match
+
+        const deletedNote = await prisma.note.delete({
+            where: {
+                id: validatedId.data.id,
+                userId: user.id
+            }
+        })
+
+        return NextResponse.json(
+            {data: deletedNote},
+            {status: 200}
+        )
+    } catch (e) {
+        return handleApiError(e)
     }
 }
