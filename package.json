@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "dotenv -e .env.test -- vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
