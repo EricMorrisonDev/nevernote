@@ -10,10 +10,12 @@ export function Workspace() {
 
     return( 
         <div>
-            <NotebooksPanel 
-                selectedNotebookId={selectedNotebookId}
-                onSelectNotebook={setSelectedNotebookId}
-            />
+            <div className="min-h-screen left-0 width-[10%]">
+                <NotebooksPanel 
+                    selectedNotebookId={selectedNotebookId}
+                    onSelectNotebook={setSelectedNotebookId}
+                />
+            </div>
             <div>
                 <LogoutButton />
             </div>
