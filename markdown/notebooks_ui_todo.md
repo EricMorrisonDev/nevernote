@@ -11,7 +11,7 @@ Goal: Build the first notebook-focused UI slice that uses existing notebook APIs
 ## Todo
 
 - [ ] **Define Notebook UI state contract**
-  - Decide where selected notebook lives (page-level state vs notebooks panel state).
+  - Selected notebook will live in page level state so that other components can access it too. 
   - Define minimal client types for API responses (`Notebook`, `ApiError`).
 
 - [ ] **Create notebooks panel component**
