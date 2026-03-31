@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const createNotebookSchema = z.object({
-  title: z.string(),
+  title: z.string().trim().min(1),
   stackId: z.string().optional().nullable(),
 })
 

@@ -1,7 +1,8 @@
 "use client"
 
-import { NotebooksPanel } from "./components/notebooks/Notebooks";
+import { NotebooksPanel } from "./components/notebooks/NotebooksPanel";
 import { useState } from "react";
+import { LogoutButton } from "./components/auth/LogoutButton";
 
 export function Workspace() {
 
@@ -9,10 +10,16 @@ export function Workspace() {
 
     return( 
         <div>
-            <NotebooksPanel 
-                selectedNotebookId={selectedNotebookId}
-                onSelectNotebook={setSelectedNotebookId}
-            />
+            <div className="min-h-screen left-0 width-[10%]">
+                <NotebooksPanel 
+                    selectedNotebookId={selectedNotebookId}
+                    onSelectNotebook={setSelectedNotebookId}
+                />
+            </div>
+            <div>
+                <LogoutButton />
+            </div>
         </div>
+        
     )
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Notebook } from "@/lib/types/api";
+import { CreateNotebook } from "./CreateNotebook";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -42,6 +43,9 @@ export function NotebooksPanel({
 
     return(
         <div>
+            <div>
+                <CreateNotebook />
+            </div>
             <div>
                 {error && (
                     <p className="text-red-400">Error occurred</p>
