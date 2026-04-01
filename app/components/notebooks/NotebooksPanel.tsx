@@ -42,7 +42,7 @@ export function NotebooksPanel({
       }, [])
 
     return(
-        <div>
+        <div className="w-[15%]">
             <div>
                 <CreateNotebook />
             </div>
@@ -50,7 +50,7 @@ export function NotebooksPanel({
                 {error && (
                     <p className="text-red-400">Error occurred</p>
                 )}
-                <ul>
+                <ul className="m-4">
                     {notebooks === null ? (
                         <p>Loading...</p>
                     ) : notebooks.length === 0 ? (

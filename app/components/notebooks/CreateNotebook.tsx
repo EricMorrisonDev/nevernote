@@ -41,7 +41,7 @@ export function CreateNotebook () {
 
     return (
         <form
-        className="flex flex-col gap-4 w-[30%] m-10 p-4 border-1 border-white rounded-md"
+        className="flex flex-col gap-4 m-4 p-4 border-1 border-white rounded-md"
         onSubmit={(e) => {
             e.preventDefault()
             handleSubmit(title)
