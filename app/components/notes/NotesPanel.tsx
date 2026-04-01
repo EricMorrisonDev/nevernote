@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Note } from "@/lib/types/api";
+import { CreateNote } from "./CreateNote";
 
 interface NotesPanelProps {
     selectedNotebookId: string;
@@ -57,6 +58,11 @@ export function NotesPanel ({
 
     return(
         <div>
+            <div>
+                <CreateNote 
+                    selectedNotebookId={selectedNotebookId}
+                />
+            </div>
             <ul>
                 {notes.length > 0 ? (
                     notes.map(note => (
