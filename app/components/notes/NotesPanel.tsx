@@ -5,8 +5,8 @@ import { Note } from "@/lib/types/api";
 import { CreateNote } from "./CreateNote";
 
 interface NotesPanelProps {
-    selectedNotebookId: string;
-    selectedNoteId: string;
+    selectedNotebookId: string | null;
+    selectedNoteId: string | null;
     onSelectNote: (id: string) => void
 }
 
@@ -24,7 +24,14 @@ export function NotesPanel ({
         const controller = new AbortController()
         const signal = controller.signal
 
-        const fetchNotes = async(selectedNotebookId: string) => {
+        const fetchNotes = async(selectedNotebookId: string | null) => {
+
+            if(!selectedNotebookId){
+                setLoading(false)
+                setError(false)
+                setNotes([])
+                return () => controller.abort()
+            }
             try {
                 setError(false)
                 setLoading(true)
@@ -57,7 +64,7 @@ export function NotesPanel ({
     }, [selectedNotebookId])
 
     return(
-        <div>
+        <div className="">
             <div>
                 <CreateNote 
                     selectedNotebookId={selectedNotebookId}

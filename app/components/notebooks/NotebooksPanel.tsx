@@ -42,7 +42,7 @@ export function NotebooksPanel({
       }, [])
 
     return(
-        <div className="w-[15%]">
+        <div className="border-r-2 border-white mr-8">
             <div>
                 <CreateNotebook />
             </div>
@@ -50,7 +50,7 @@ export function NotebooksPanel({
                 {error && (
                     <p className="text-red-400">Error occurred</p>
                 )}
-                <ul className="m-4">
+                <ul className="m-4 flex flex-col gap-4">
                     {notebooks === null ? (
                         <p>Loading...</p>
                     ) : notebooks.length === 0 ? (
@@ -59,7 +59,9 @@ export function NotebooksPanel({
                         notebooks.map((notebook) => (
                             <li key={notebook.id}>
                                 <button
-                                onClick={() => onSelectNotebook(notebook.id)}>
+                                onClick={() => onSelectNotebook(notebook.id)}
+                                className="border-1 border-white rounded-md p-1"
+                                >
                                     {notebook.title}
                                 </button>
                             </li>

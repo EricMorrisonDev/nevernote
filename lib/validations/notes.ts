@@ -3,13 +3,13 @@ import { z } from 'zod'
 export const createNoteSchema = z.object({
   title: z.string(),
   content: z.string(),
-  notebookId: z.string().optional(),
+  notebookId: z.string().min(1),
 })
 
 export const updateNoteSchema = z.object({
   title: z.string().optional(),
   content: z.string().optional(),
-  notebookId: z.string().nullish(), 
+  notebookId: z.string().optional()
 })
 
 export const noteIdParamsSchema = z.object({
@@ -17,7 +17,7 @@ export const noteIdParamsSchema = z.object({
 })
 
 export const listNotesQuerySchema = z.object({
-  notebookId: z.string().optional(),
+  notebookId: z.string().min(1).optional(),
 })
 
 

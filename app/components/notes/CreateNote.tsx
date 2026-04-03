@@ -1,7 +1,9 @@
+"use client"
+
 import { useState } from "react"
 
 interface CreateNoteProps {
-    selectedNotebookId: string
+    selectedNotebookId: string | null
 }
 
 export function CreateNote ({
@@ -51,11 +53,24 @@ export function CreateNote ({
 
     return (
         <form
+            className="border-1 border-white m-4 p-2 rounded-md flex flex-col gap-2"
             onSubmit={() => {
+                if(!selectedNotebookId){
+                    return
+                }
                 handleCreateNote(title, content, selectedNotebookId)
             }}
         >
+            <h4>Create a new Note</h4>
+            {message ? (
+                <p
+                className={error ? "text-red-500" : "text-green-500"}
+                >{message}</p>
+            ) : (
+                null
+            )}
             <input 
+                className="border-1 border-white rounded-md p-1"
                 type="text"
                 placeholder="title"
                 value={title}
@@ -64,6 +79,7 @@ export function CreateNote ({
                 }}
             />
             <input 
+                className="border-1 border-white rounded-md p-1"
                 type="text"
                 placeholder="content"
                 value={content}
@@ -74,8 +90,9 @@ export function CreateNote ({
             
             <button
                 type="submit"
+                className="border-1 border-white rounded-md p-1"
             >
-                Create
+                Create Note
             </button>
         </form>
     )

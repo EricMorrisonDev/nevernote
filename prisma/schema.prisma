@@ -64,7 +64,7 @@ model Note {
   id          String   @id @default(uuid())
   title       String
   content     String   
-  notebookId  String?
+  notebookId  String
   notebook    Notebook? @relation(fields: [notebookId], references: [id], onDelete: SetNull)
 
   userId      String

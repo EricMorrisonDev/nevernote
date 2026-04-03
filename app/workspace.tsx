@@ -12,7 +12,7 @@ export function Workspace() {
     
 
     return( 
-        <div>
+        <div className="flex min-w-screen p-8">
             <div className="min-h-screen left-0 width-[10%]">
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}

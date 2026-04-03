@@ -10,23 +10,23 @@ import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
 export async function POST(request: Request) {
 
     try{
+        // get the current user
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+        
         // take request body and validate with zod schema
         const body = await request.json()
         const validated = requireValidation(createNoteSchema, body)
         if(validated instanceof NextResponse) return validated
 
-        // get the current user
-        const user = await requireUser()
-        if(user instanceof NextResponse) return user
-
         // destructure out the data from body
         const { title, content, notebookId } = validated.data
 
         // if there's a notebook id make sure it matches user
-        if(notebookId){
-            const match = await ensureNotebookBelongsToUser(notebookId, user.id)
-            if(match instanceof NextResponse) return match
-        }
+        
+        const match = await ensureNotebookBelongsToUser(notebookId, user.id)
+        if(match instanceof NextResponse) return match
+        
 
         // create the new note and return it
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
             title,
             content,
             userId: user.id,
-            ...(notebookId ? { notebookId } : {})
+            notebookId
         }
 
         const newNote = await prisma.note.create({
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json(
             {data: newNote},
-            {status: 200}
+            {status: 201}
         )
         
     } catch (e) {

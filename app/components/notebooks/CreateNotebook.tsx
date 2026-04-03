@@ -46,15 +46,15 @@ export function CreateNotebook () {
             e.preventDefault()
             handleSubmit(title)
         }}>
+            <h4>Create A Notebook</h4>
             {message ? (
                 <p
                 className={error ? "text-red-500" : "text-green-500"}
                 >{message}</p>
             ) : (
-            <p></p>
+                null
             )
             }
-
             <input 
                 className="border-1 border-white rounded-md pl-2"
                 type="text"
