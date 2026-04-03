@@ -32,7 +32,7 @@ export function CreateNote ({
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ title, content, selectedNotebookId })
+                body: JSON.stringify({ title, content, notebookId: selectedNotebookId })
             })
 
             if(!res.ok){
