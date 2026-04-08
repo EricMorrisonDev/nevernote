@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 interface CreateNoteProps {
-    selectedNotebookId: string | null
+    selectedNotebookId: string 
 }
 
 export function CreateNote ({
@@ -21,6 +21,7 @@ export function CreateNote ({
         content: string, 
         selectedNotebookId: string
     ) => {
+        if(title.length === 0 || content.length === 0) return
 
         try{
             setLoading(true)
@@ -55,9 +56,7 @@ export function CreateNote ({
         <form
             className="border-1 border-white m-4 p-2 rounded-md flex flex-col gap-2"
             onSubmit={() => {
-                if(!selectedNotebookId){
-                    return
-                }
+                
                 handleCreateNote(title, content, selectedNotebookId)
             }}
         >

@@ -26,12 +26,8 @@ export function NotesPanel ({
 
         const fetchNotes = async(selectedNotebookId: string | null) => {
 
-            if(!selectedNotebookId){
-                setLoading(false)
-                setError(false)
-                setNotes([])
-                return () => controller.abort()
-            }
+            if(!selectedNotebookId) return
+
             try {
                 setError(false)
                 setLoading(true)
@@ -63,6 +59,12 @@ export function NotesPanel ({
         return () => controller.abort()
     }, [selectedNotebookId])
 
+    if(!selectedNotebookId){
+        return  (
+        <p>No notebook currently selected</p>
+        )
+    }
+
     return(
         <div className="">
             <div>
@@ -71,7 +73,9 @@ export function NotesPanel ({
                 />
             </div>
             <ul>
-                {notes.length > 0 ? (
+                { !selectedNotebookId ? (
+                    <p>No notebook currently selected</p>
+                ) : notes.length > 0 ? (
                     notes.map(note => (
                         <li key={note.id}>
                             <button>

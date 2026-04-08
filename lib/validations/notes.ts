@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const createNoteSchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z.string().trim().min(1),
+  content: z.string().trim().min(1),
   notebookId: z.string().min(1),
 })
 
