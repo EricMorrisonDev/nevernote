@@ -10,7 +10,6 @@ export function Workspace() {
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     
-
     return( 
         <div className="flex min-w-screen p-8">
             <div className="min-h-screen left-0 width-[10%]">

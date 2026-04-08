@@ -20,42 +20,48 @@ export function NotesPanel ({
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
 
+
+    const fetchNotes = async(selectedNotebookId: string | null, signal?: AbortSignal) => {
+
+        if(!selectedNotebookId) return
+
+        try {
+            console.log('fetching notes')
+            setError(false)
+            setLoading(true)
+            setNotes([])
+            const params = new URLSearchParams({ notebookId: selectedNotebookId })
+            const result = await fetch(`/api/notes?${params.toString()}`, {
+                signal
+            })
+            if(!result.ok){
+                throw new Error('Failed to retrieve notes')
+            }
+            const parsed = await result.json()
+            if(!Array.isArray(parsed.data)){
+                throw new Error('Invalid data type')
+            }
+            setNotes(parsed.data)
+        } catch (err) {
+            if(err instanceof DOMException && err.name === "AbortError"){
+                return
+            }
+            console.error(err)
+            setError(true)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const onCreateNote = () => {
+        fetchNotes(selectedNotebookId)
+    }
+
     useEffect(() => {
         const controller = new AbortController()
         const signal = controller.signal
 
-        const fetchNotes = async(selectedNotebookId: string | null) => {
-
-            if(!selectedNotebookId) return
-
-            try {
-                setError(false)
-                setLoading(true)
-                setNotes([])
-                const params = new URLSearchParams({ notebookId: selectedNotebookId })
-                const result = await fetch(`/api/notes?${params.toString()}`, {
-                    signal
-                })
-                if(!result.ok){
-                    throw new Error('Failed to retrieve notes')
-                }
-                const parsed = await result.json()
-                if(!Array.isArray(parsed.data)){
-                    throw new Error('Invalid data type')
-                }
-                setNotes(parsed.data)
-            } catch (err) {
-                if(err instanceof DOMException && err.name === "AbortError"){
-                    return
-                }
-                console.error(err)
-                setError(true)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchNotes(selectedNotebookId)
+        fetchNotes(selectedNotebookId, signal)
         return () => controller.abort()
     }, [selectedNotebookId])
 
@@ -70,6 +76,7 @@ export function NotesPanel ({
             <div>
                 <CreateNote 
                     selectedNotebookId={selectedNotebookId}
+                    onCreateNote={onCreateNote}
                 />
             </div>
             <ul>

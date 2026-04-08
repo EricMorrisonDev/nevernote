@@ -4,10 +4,12 @@ import { useState } from "react"
 
 interface CreateNoteProps {
     selectedNotebookId: string 
+    onCreateNote: () => void
 }
 
 export function CreateNote ({
-    selectedNotebookId
+    selectedNotebookId,
+    onCreateNote
     }: CreateNoteProps) {
 
     const [title, setTitle] = useState('')
@@ -48,6 +50,9 @@ export function CreateNote ({
             console.error(err)
         } finally {
             setLoading(false)
+            setTitle('')
+            setContent('')
+            onCreateNote()
         }
 
     }
@@ -55,8 +60,8 @@ export function CreateNote ({
     return (
         <form
             className="border-1 border-white m-4 p-2 rounded-md flex flex-col gap-2"
-            onSubmit={() => {
-                
+            onSubmit={(e) => {
+                e.preventDefault()
                 handleCreateNote(title, content, selectedNotebookId)
             }}
         >
