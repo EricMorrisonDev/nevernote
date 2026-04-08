@@ -42,7 +42,7 @@ export function NotebooksPanel({
       }, [])
 
     return(
-        <div className="border-r-2 border-white mr-8">
+        <div>
             <div>
                 <CreateNotebook />
             </div>

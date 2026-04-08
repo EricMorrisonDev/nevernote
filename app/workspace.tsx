@@ -11,8 +11,8 @@ export function Workspace() {
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     
     return( 
-        <div className="flex min-w-screen p-8">
-            <div className="min-h-screen left-0 width-[10%]">
+        <div className="flex min-w-screen p-4">
+            <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     onSelectNotebook={setSelectedNotebookId}

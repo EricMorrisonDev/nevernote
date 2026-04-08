@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export function CreateNotebook () {
 
@@ -38,6 +38,12 @@ export function CreateNotebook () {
             setTitle('')
         }
     }
+
+    useEffect(() => {
+        if(!message) return
+        const timer = window.setTimeout(() => setMessage(''), 5000)
+        return () => window.clearTimeout(timer)
+    }, [message])
 
     return (
         <form

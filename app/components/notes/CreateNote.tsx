@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface CreateNoteProps {
     selectedNotebookId: string 
@@ -56,6 +56,12 @@ export function CreateNote ({
         }
 
     }
+
+    useEffect(() => {
+        if (!message) return
+        const timer = window.setTimeout(() => setMessage(''), 5000)
+        return () => window.clearTimeout(timer)
+    }, [message])
 
     return (
         <form
