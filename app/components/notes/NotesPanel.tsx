@@ -7,13 +7,13 @@ import { CreateNote } from "./CreateNote";
 interface NotesPanelProps {
     selectedNotebookId: string | null;
     selectedNoteId: string | null;
-    onSelectNote: (id: string) => void
+    refetchKey: number
 }
 
 export function NotesPanel ({
     selectedNotebookId,
     selectedNoteId,
-    onSelectNote
+    refetchKey
     }: NotesPanelProps){
 
     const [notes, setNotes] = useState<Note[]>([])
@@ -53,17 +53,13 @@ export function NotesPanel ({
         }
     }
 
-    const onCreateNote = () => {
-        fetchNotes(selectedNotebookId)
-    }
-
     useEffect(() => {
         const controller = new AbortController()
         const signal = controller.signal
 
         fetchNotes(selectedNotebookId, signal)
         return () => controller.abort()
-    }, [selectedNotebookId])
+    }, [selectedNotebookId, refetchKey])
 
     if(!selectedNotebookId){
         return  (
