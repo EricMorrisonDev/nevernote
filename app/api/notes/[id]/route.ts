@@ -21,6 +21,8 @@ async function ensureNoteMatchesUser(noteId: string, userId: string) {
             {status: 400}
         )
     }
+
+    return match
 }
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }>}) {
@@ -31,7 +33,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         if(validatedBody instanceof NextResponse) return validatedBody
 
         const { id } = await context.params
-        const idValidated = requireValidation(noteIdParamsSchema, id)
+        const idValidated = requireValidation(noteIdParamsSchema, {id})
         if(idValidated instanceof NextResponse) return idValidated
 
         const user = await requireUser()
@@ -80,14 +82,9 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
         const user = await requireUser()
         if(user instanceof NextResponse) return user
 
-        const match = await ensureNoteMatchesUser(validatedId.data.id, user.id)
-        if(match instanceof NextResponse) return match
+        const note = await ensureNoteMatchesUser(validatedId.data.id, user.id)
+        if(note instanceof NextResponse) return note
 
-        const note = await prisma.note.findFirst({
-            where: {
-                id
-            }
-        })
 
         return NextResponse.json(
             {data: note},
@@ -110,18 +107,22 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
         const user = await requireUser()
         if(user instanceof NextResponse) return user
 
-        const match = await ensureNoteMatchesUser(validatedId.data.id, user.id)
-        if(match instanceof NextResponse) return match
-
-        const deletedNote = await prisma.note.delete({
+        const result = await prisma.note.deleteMany({
             where: {
                 id: validatedId.data.id,
                 userId: user.id
             }
         })
 
+        if(result.count === 0){
+            return NextResponse.json(
+                {error: "Note not found"},
+                {status: 404}
+            )
+        }
+
         return NextResponse.json(
-            {data: deletedNote},
+            {message: "note deleted"},
             {status: 200}
         )
     } catch (e) {
