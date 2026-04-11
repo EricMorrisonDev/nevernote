@@ -68,9 +68,39 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     }
 }
 
-// Next we set up the delete api
+// set up get specific note api
 
-export async function DELETE(context: { params: Promise<{ id: string}>}) {
+export async function GET(_request: Request, context: { params: Promise<{ id: string }>}) {
+
+    try{
+        const { id } = await context.params 
+        const validatedId = requireValidation(noteIdParamsSchema, { id })
+        if(validatedId instanceof NextResponse) return validatedId
+
+        const user = await requireUser()
+        if(user instanceof NextResponse) return user
+
+        const match = await ensureNoteMatchesUser(validatedId.data.id, user.id)
+        if(match instanceof NextResponse) return match
+
+        const note = await prisma.note.findFirst({
+            where: {
+                id
+            }
+        })
+
+        return NextResponse.json(
+            {data: note},
+            {status: 200}
+        )
+
+    } catch (e) {
+        return handleApiError(e)
+    }
+
+}
+
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string}>}) {
 
     try{
         const { id } = await context.params

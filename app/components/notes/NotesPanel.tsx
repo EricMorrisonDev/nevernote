@@ -74,10 +74,7 @@ export function NotesPanel ({
     return(
         <div className="">
             <div>
-                <CreateNote 
-                    selectedNotebookId={selectedNotebookId}
-                    onCreateNote={onCreateNote}
-                />
+                
             </div>
             <div className="pl-4">
                 <ul>
