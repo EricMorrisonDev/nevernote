@@ -5,7 +5,7 @@ import { Note } from "@/lib/types/api"
 
 interface EditNotePanelProps {
     selectedNoteId: string | null,
-    selectedNotebookId: string | null
+    selectedNotebookId: string,
     setRefetchKey: Dispatch<SetStateAction<number>>
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
@@ -29,11 +29,12 @@ export function EditNotePanel ({
     const[note, setNote] = useState<Note | null>(null)
 
     
-
+// remember to update the name of this func since it doesn't just create
     const handleCreateNote = async(
         title: string, 
         content: string, 
-        selectedNotebookId: string
+        selectedNotebookId: string,
+        selectedNoteId: string | null
     ) => {
         if(title.length === 0 || content.length === 0) return
 
@@ -42,21 +43,24 @@ export function EditNotePanel ({
             setError(false)
             setMessage('')
 
-            const res = await fetch('/api/notes', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title, content, notebookId: selectedNotebookId })
-            })
+            const url = !selectedNoteId ? '/api/notes' : `api/notes/${selectedNoteId}`
+            const method = !selectedNoteId ? "POST" : "PUT"
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ title, content, notebookId: selectedNotebookId })
+                })
 
             if(!res.ok){
-                throw new Error('Error creating note')
+                throw new Error(!selectedNoteId? 'Error creating note' : 'Error updating note')
             }
 
             const parsed = await res.json()
 
-            setMessage(`Note ${parsed.data.title} created!`)
+            setMessage(!selectedNoteId ? `Note ${parsed.data.title} created!` : `Note ${parsed.data.title} updated!`)
             
         } catch(err) {
             console.error(err)
@@ -89,7 +93,7 @@ export function EditNotePanel ({
                 className="flex flex-col w-[50vw] gap-2"
                 onSubmit={(e) => {
                     e.preventDefault()
-                    handleCreateNote(title, content, selectedNotebookId)
+                    handleCreateNote(title, content, selectedNotebookId, selectedNoteId)
                 }}
                 >
                 <label
@@ -129,6 +133,15 @@ export function EditNotePanel ({
                     >
                     Submit
                 </button>
+                <div>
+                    {message.length > 0 && (
+                        <p
+                        className="text green-500"
+                        >
+                            {message}
+                        </p>
+                    )}
+                </div>
             </form>
         </div>
     )
