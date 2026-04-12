@@ -1,12 +1,14 @@
 "use client"
 
-import { SetStateAction, useState, Dispatch } from "react"
+import { SetStateAction, useState, Dispatch, useEffect } from "react"
 import { Note } from "@/lib/types/api"
 
 interface EditNotePanelProps {
     selectedNoteId: string | null,
-    selectedNotebookId: string
+    selectedNotebookId: string | null
     setRefetchKey: Dispatch<SetStateAction<number>>
+    notes: Note[] | []
+    setNotes: Dispatch<SetStateAction<Note[] | []>>
 }
 
 
@@ -14,7 +16,9 @@ interface EditNotePanelProps {
 export function EditNotePanel ({
     selectedNoteId,
     selectedNotebookId,
-    setRefetchKey
+    setRefetchKey,
+    notes,
+    setNotes
 }: EditNotePanelProps) {
 
     const[title, setTitle] = useState('')
@@ -24,22 +28,7 @@ export function EditNotePanel ({
     const[loading, setLoading] = useState(false)
     const[note, setNote] = useState<Note | null>(null)
 
-    const fetchNote = async (id: string) => {
-
-        try{
-
-            const res = await fetch(`/api/notes/${id}`)
-            if(!res.ok) throw new Error('Error fetching note')
-
-            const parsed = await res.json()
-            setNote(parsed.data)
-
-        } catch (e) {
-            console.error(e)
-            setError(true)
-            setMessage('Error fetching note')
-        }
-    }
+    
 
     const handleCreateNote = async(
         title: string, 
@@ -79,6 +68,19 @@ export function EditNotePanel ({
         }
 
     }
+
+    useEffect(() => {
+        if(!selectedNoteId) return 
+
+        const note = notes.find(note => note.id === selectedNoteId)
+        if(!note){
+            setError(true)
+            setMessage('Note not found')
+            return
+        }
+        setTitle(note.title)
+        setContent(note.content)
+    }, [selectedNoteId])
 
     return(
 

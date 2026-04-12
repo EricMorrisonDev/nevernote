@@ -8,16 +8,19 @@ interface NotesPanelProps {
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     refetchKey: number
     notebooks: Notebook[] | null
+    notes: Note[] | []
+    setNotes: Dispatch<SetStateAction<Note[] | []>>
 }
 
 export function NotesPanel ({
     selectedNotebookId,
     setSelectedNoteId,
     refetchKey,
-    notebooks
+    notebooks,
+    notes,
+    setNotes
     }: NotesPanelProps){
 
-    const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')

@@ -2,7 +2,7 @@
 
 import { NotebooksPanel } from "./components/notebooks/NotebooksPanel";
 import { NotesPanel } from "./components/notes/NotesPanel";
-import { Notebook } from "@/lib/types/api";
+import { Notebook, Note } from "@/lib/types/api";
 import { useState } from "react";
 import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
@@ -12,6 +12,7 @@ export function Workspace() {
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     const [notebooks, setNotebooks] = useState<Notebook[] | null>(null)
+    const [notes, setNotes] = useState<Note[]>([])
     const [refetchKey, setRefetchKey] = useState(0)
     
     return( 
@@ -30,6 +31,8 @@ export function Workspace() {
                     setSelectedNoteId={setSelectedNoteId}
                     notebooks={notebooks}
                     refetchKey={refetchKey}
+                    notes={notes}
+                    setNotes={setNotes}
                 />
             </div>
             <div>
@@ -37,6 +40,8 @@ export function Workspace() {
                     selectedNoteId={selectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchKey={setRefetchKey}
+                    notes={notes}
+                    setNotes={setNotes}
                 />
             </div>
             <div
