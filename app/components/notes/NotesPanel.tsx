@@ -1,24 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { Note } from "@/lib/types/api";
-import { CreateNote } from "./CreateNote";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { Note, Notebook } from "@/lib/types/api";
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
-    selectedNoteId: string | null;
+    setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     refetchKey: number
+    notebooks: Notebook[] | null
 }
 
 export function NotesPanel ({
     selectedNotebookId,
-    selectedNoteId,
-    refetchKey
+    setSelectedNoteId,
+    refetchKey,
+    notebooks
     }: NotesPanelProps){
 
     const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
+    const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
 
 
     const fetchNotes = async(selectedNotebookId: string | null, signal?: AbortSignal) => {
@@ -57,9 +59,20 @@ export function NotesPanel ({
         const controller = new AbortController()
         const signal = controller.signal
 
+        if(selectedNotebookId && notebooks){
+            const notebook = notebooks.find(notebook => notebook.id === selectedNotebookId)
+            if(notebook){
+                setSelectedNotebookTitle(notebook.title)
+            } else {
+                setSelectedNotebookTitle('')
+            }
+        } else {
+            setSelectedNotebookTitle('')
+        }
+
         fetchNotes(selectedNotebookId, signal)
         return () => controller.abort()
-    }, [selectedNotebookId, refetchKey])
+    }, [selectedNotebookId, refetchKey, notebooks])
 
     if(!selectedNotebookId){
         return  (
@@ -69,13 +82,21 @@ export function NotesPanel ({
 
     return(
         <div className="pl-4 pt-4 w-[12vw]">
+            <div>
+                {selectedNotebookTitle.length > 0 && (
+                    <p>{selectedNotebookTitle}</p>
+                    )}
+            </div>
             <ul>
-                { !selectedNotebookId ? (
-                    <p>No notebook currently selected</p>
-                ) : notes.length > 0 ? (
+                { notes.length > 0 ? (
                     notes.map(note => (
                         <li key={note.id}>
-                            <button>
+                            <button
+                                className="border-1 border-white rounded-md w-[100px] mt-4"
+                                onClick={() => {
+                                    setSelectedNoteId(note.id)
+                                }}
+                                >
                                 {note.title}
                             </button>
                         </li>

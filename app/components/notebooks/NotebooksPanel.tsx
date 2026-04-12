@@ -1,20 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { Dispatch, useEffect, useState, SetStateAction } from "react";
 import { Notebook } from "@/lib/types/api";
 import { CreateNotebook } from "./CreateNotebook";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
     onSelectNotebook: (id: string) => void
+    notebooks: Notebook[] | null
+    setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
 }
 
 export function NotebooksPanel({
     selectedNotebookId,
-    onSelectNotebook
+    onSelectNotebook,
+    notebooks,
+    setNotebooks
 }: NotebooksPanelProps) {
 
-    const [notebooks, setNotebooks] = useState<Notebook[] | null>(null)
+    
     const [error, setError] = useState(false)
 
     useEffect(() => {
