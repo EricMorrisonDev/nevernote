@@ -68,30 +68,24 @@ export function NotesPanel ({
     }
 
     return(
-        <div className="">
-            <div>
-                
-            </div>
-            <div className="pl-4">
-                <ul>
-                    { !selectedNotebookId ? (
-                        <p>No notebook currently selected</p>
-                    ) : notes.length > 0 ? (
-                        notes.map(note => (
-                            <li key={note.id}>
-                                <button>
-                                    {note.title}
-                                </button>
-                            </li>
-                        ))
-                    ) : notes.length === 0 && loading ? (
-                        <p>Loading...</p>
-                    ) : (
-                        <p>Notebook currently empty</p>
-                    )}
-                </ul>
-            </div>
-
+        <div className="pl-4 pt-4 w-[12vw]">
+            <ul>
+                { !selectedNotebookId ? (
+                    <p>No notebook currently selected</p>
+                ) : notes.length > 0 ? (
+                    notes.map(note => (
+                        <li key={note.id}>
+                            <button>
+                                {note.title}
+                            </button>
+                        </li>
+                    ))
+                ) : notes.length === 0 && loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <p>Notebook currently empty</p>
+                )}
+            </ul>
         </div>
     )
 }

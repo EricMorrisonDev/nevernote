@@ -82,11 +82,50 @@ export function EditNotePanel ({
 
     return(
 
-        <div>
-            <form>
-                <textarea></textarea>
-                <button>
+        <div className="pt-4 pl-4">
+            <form
+                className="flex flex-col w-[50vw] gap-2"
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    handleCreateNote(title, content, selectedNotebookId)
+                }}
+                >
+                <label
+                htmlFor="title-input"
+                >
+                    Title
+                </label>
+                <input
+                className="border-1 border-white rounded-md p-1 m-2 w-[200px]"
+                    id="title-input"
+                    type="text"
+                    value={title}
+                    onChange={(e) => {
+                        setTitle(e.target.value)
+                    }}
+                />
+                <label
+                htmlFor="content-input"
+                >
+                    Content
+                </label>
+                <textarea
+                    id="content-input"
+                    className="border-1 border-white rounded-md p-1 m-2 h-[40vh]"
+                    value={content}
+                    onChange={(e) => {
+                        setContent(e.target.value)
+                    }}
 
+                    >
+                    Type your note here
+                </textarea>
+                <button
+                    className="border-1 border-white rounded-md w-[100px] mt-4"
+                    type="submit"
+                    disabled={loading}
+                    >
+                    Submit
                 </button>
             </form>
         </div>

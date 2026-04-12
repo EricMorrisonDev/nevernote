@@ -10,7 +10,7 @@ export function Workspace() {
 
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
-    const [refetchKey, setRefetchKey] = 0
+    const [refetchKey, setRefetchKey] = useState(0)
     
     return( 
         <div className="flex min-w-screen p-4">
@@ -20,11 +20,10 @@ export function Workspace() {
                     onSelectNotebook={setSelectedNotebookId}
                 />
             </div>
-            <div>
+            <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
                 <NotesPanel 
                     selectedNotebookId={selectedNotebookId}
                     selectedNoteId={selectedNoteId}
-                    onSelectNote={setSelectedNoteId}
                     refetchKey={refetchKey}
                 />
             </div>
@@ -35,7 +34,8 @@ export function Workspace() {
                     setRefetchKey={setRefetchKey}
                 />
             </div>
-            <div>
+            <div
+                className="fixed right-4 top-4">
                 <LogoutButton />
             </div>
         </div>
