@@ -85,7 +85,15 @@ export function NotesPanel ({
 
     return(
         <div className="pl-4 pt-4 w-[12vw]">
-            <div>
+            <button
+                className="border-2 border-green-500 text-green-500 rounded-md w-[100px] mt-4 "
+                onClick={() => {
+                    setSelectedNoteId(null)
+                }}>
+                New Note
+            </button>
+            <div
+            className="mt-4">
                 {selectedNotebookTitle.length > 0 && (
                     <p>{selectedNotebookTitle}</p>
                     )}

@@ -38,6 +38,7 @@ export function Workspace() {
             <div>
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
+                    setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchKey={setRefetchKey}
                     notes={notes}

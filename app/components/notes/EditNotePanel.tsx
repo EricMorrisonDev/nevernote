@@ -5,6 +5,7 @@ import { Note } from "@/lib/types/api"
 
 interface EditNotePanelProps {
     selectedNoteId: string | null,
+    setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNotebookId: string,
     setRefetchKey: Dispatch<SetStateAction<number>>
     notes: Note[] | []
@@ -18,7 +19,8 @@ export function EditNotePanel ({
     selectedNotebookId,
     setRefetchKey,
     notes,
-    setNotes
+    setNotes,
+    setSelectedNoteId
 }: EditNotePanelProps) {
 
     const[title, setTitle] = useState('')
@@ -69,11 +71,14 @@ export function EditNotePanel ({
             setTitle('')
             setContent('')
             setRefetchKey(prev => prev + 1)
+            setSelectedNoteId(null)
         }
 
     }
 
     useEffect(() => {
+        setTitle('')
+        setContent('')
         if(!selectedNoteId) return 
 
         const note = notes.find(note => note.id === selectedNoteId)
