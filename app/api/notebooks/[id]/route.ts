@@ -29,7 +29,7 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
         if(validatedBody instanceof NextResponse) return validatedBody
 
         const { id } = await context.params
-        const validatedId = requireValidation(notebookIdParamsSchema, id)
+        const validatedId = requireValidation(notebookIdParamsSchema, { id })
         if(validatedId instanceof NextResponse) return validatedId
 
         const user = await requireUser()
@@ -42,7 +42,7 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
 
         const updatedNotebook = await prisma.notebook.update({
             where: {
-                id,
+                id: validatedId.data.id,
                 userId: user.id
             },
             data: {
@@ -64,7 +64,7 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
     
     try {
         const { id } = await context.params
-        const validatedId = requireValidation(notebookIdParamsSchema, id)
+        const validatedId = requireValidation(notebookIdParamsSchema, { id })
         if(validatedId instanceof NextResponse) return validatedId
 
         const user = await requireUser()
@@ -73,7 +73,7 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
 
         await prisma.notebook.delete({
             where: {
-                id,
+                id: validatedId.data.id,
                 userId: user.id
             }
         })

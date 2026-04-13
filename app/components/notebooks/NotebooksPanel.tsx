@@ -27,10 +27,13 @@ export function NotebooksPanel({
 }: NotebooksPanelProps) {
     
     const [error, setError] = useState(false)
+    const [notebookIdToBeDeleted, setNotebookIdToBeDeleted] = useState<string | null>(null)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const fetchNotebooks = async () => {
           try{
+            setLoading(true)
             setError(false)
             const res = await fetch('/api/notebooks')
             if(!res.ok) throw new Error(`Request failed: ${res.status}`)
@@ -46,11 +49,38 @@ export function NotebooksPanel({
             console.error(e)
             setNotebooks([])
             setError(true)
+          } finally {
+            setLoading(false)
           }
         }
     
         fetchNotebooks()
       }, [refetchNotebooksKey])
+
+      const notebookPendingDeletion = notebookIdToBeDeleted && notebooks ?
+        notebooks.find(nb => nb.id === notebookIdToBeDeleted) :
+        undefined
+
+      const handleDeleteNotebook = async (notebookIdToBeDeleted: string) => {
+
+        try{
+            setLoading(true)
+            const res = await fetch(`/api/notebooks/${notebookIdToBeDeleted}`, {
+                method: "DELETE"
+            })
+
+            if(!res.ok){
+                throw new Error('Error deleting notebook')
+            }
+
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+            setRefetchNotebooksKey(prev => prev + 1)
+            setNotebookIdToBeDeleted(null)
+        }
+      }
 
     return(
         <div>
@@ -58,6 +88,17 @@ export function NotebooksPanel({
                 <CreateNotebook 
                     setRefetchNotebooksKey={setRefetchNotebooksKey}
                 />
+            </div>
+            <div>
+                {selectedNotebookId && (
+                    <button
+                        className="ml-4 border-1 border-blue-500 text-blue-500 rounded-md p-1"
+                        onClick={() => {
+                            setNotebookIdToBeDeleted(selectedNotebookId)
+                        }}
+                    >
+                        Delete Notebook ?
+                    </button>)}
             </div>
             <div>
                 {error && (
@@ -84,6 +125,40 @@ export function NotebooksPanel({
                     )}
                 </ul>
             </div>
+            {notebookIdToBeDeleted && notebookPendingDeletion && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+                    role="presentation"
+                >
+                    <div
+                        className="w-full max-w-md rounded-lg border border-white bg-neutral-950 p-6 shadow-xl"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="delete-notebook-title"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setNotebookIdToBeDeleted(null)
+                        }}
+                    >
+                        <h4 id="delete-notebook-title">Are you sure you want to delete {notebookPendingDeletion.title} ?</h4>
+                        <button
+                        className="border-1 border-white p-1 w-[100px]"
+                        onClick={() => {
+                            handleDeleteNotebook(notebookIdToBeDeleted)
+                        }}>
+                            Delete
+                        </button>
+                        <button
+                        className="border-1 border-white p-1 w-[100px]"
+                        onClick={() => {
+                            setNotebookIdToBeDeleted(null)
+                        }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
