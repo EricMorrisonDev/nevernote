@@ -76,6 +76,30 @@ export function EditNotePanel ({
 
     }
 
+    const handleDeleteNote = async (id: string) => {
+
+        try{
+            const noteTitle = title
+            setLoading(true)
+            setTitle('')
+            setContent('')
+            const res = await fetch(`/api/notes/${id}`, {
+                method: "DELETE"
+            })
+
+            if(!res.ok){
+                throw new Error('Error deleting note')
+            }
+
+            setMessage(`${noteTitle} deleted`)
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+            setSelectedNoteId(null)
+        }
+    }
+
     useEffect(() => {
         setTitle('')
         setContent('')
@@ -131,13 +155,24 @@ export function EditNotePanel ({
                     >
                     Type your note here
                 </textarea>
-                <button
-                    className="border-1 border-white rounded-md w-[100px] mt-4"
-                    type="submit"
-                    disabled={loading}
+                <div className="flex justify-between">
+                    <button
+                        className="border-1 border-white rounded-md w-[100px] mt-4"
+                        type="submit"
+                        disabled={loading}
+                        >
+                        Submit
+                    </button>
+                    {selectedNoteId && (<button
+                        className="border-1 border-red-500 text-red-500 rounded-md w-[100px] mt-4"
+                        onClick={() => {
+                            if(!selectedNoteId) return
+                            handleDeleteNote(selectedNoteId)
+                        }}
                     >
-                    Submit
-                </button>
+                        Delete
+                    </button>)}
+                </div>
                 <div>
                     {message.length > 0 && (
                         <p
