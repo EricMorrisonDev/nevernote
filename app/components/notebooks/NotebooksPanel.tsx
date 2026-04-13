@@ -97,7 +97,7 @@ export function NotebooksPanel({
                             setNotebookIdToBeDeleted(selectedNotebookId)
                         }}
                     >
-                        Delete Notebook ?
+                        Delete Notebook
                     </button>)}
             </div>
             <div>
@@ -141,21 +141,24 @@ export function NotebooksPanel({
                         }}
                     >
                         <h4 id="delete-notebook-title">Are you sure you want to delete {notebookPendingDeletion.title} ?</h4>
-                        <button
-                        className="border-1 border-white p-1 w-[100px]"
-                        onClick={() => {
-                            handleDeleteNotebook(notebookIdToBeDeleted)
-                        }}>
-                            Delete
-                        </button>
-                        <button
-                        className="border-1 border-white p-1 w-[100px]"
-                        onClick={() => {
-                            setNotebookIdToBeDeleted(null)
-                        }}
-                        >
-                            Cancel
-                        </button>
+                        <p>This will also delete all notes contained in the notebook.</p>
+                        <div className="flex justify-between mt-4">
+                            <button
+                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            onClick={() => {
+                                handleDeleteNotebook(notebookIdToBeDeleted)
+                            }}>
+                                Delete
+                            </button>
+                            <button
+                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            onClick={() => {
+                                setNotebookIdToBeDeleted(null)
+                            }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
