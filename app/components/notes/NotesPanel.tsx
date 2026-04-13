@@ -47,6 +47,7 @@ export function NotesPanel ({
                 throw new Error('Invalid data type')
             }
             setNotes(parsed.data)
+            setSelectedNoteId(parsed.data[0].id)
         } catch (err) {
             if(err instanceof DOMException && err.name === "AbortError"){
                 return

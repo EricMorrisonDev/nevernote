@@ -20,7 +20,8 @@ export function Workspace() {
             <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
-                    onSelectNotebook={setSelectedNotebookId}
+                    setSelectedNotebookId={setSelectedNotebookId}
+                    setSelectedNoteId={setSelectedNoteId}
                     notebooks={notebooks}
                     setNotebooks={setNotebooks}
                 />

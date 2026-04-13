@@ -97,6 +97,7 @@ export function EditNotePanel ({
         } finally {
             setLoading(false)
             setSelectedNoteId(null)
+            setRefetchKey(prev => prev + 1)
         }
     }
 
@@ -113,7 +114,13 @@ export function EditNotePanel ({
         }
         setTitle(note.title)
         setContent(note.content)
-    }, [selectedNoteId])
+    }, [selectedNoteId, notes])
+
+    useEffect(() => {
+        if(!message) return
+        const timer = window.setTimeout(() => setMessage(''), 5000)
+        return () => window.clearTimeout(timer)
+    }, [message])
 
     return(
 

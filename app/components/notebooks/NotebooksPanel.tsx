@@ -6,18 +6,21 @@ import { CreateNotebook } from "./CreateNotebook";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
-    onSelectNotebook: (id: string) => void
+    setSelectedNotebookId: Dispatch<SetStateAction<string | null>>
+    setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     notebooks: Notebook[] | null
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
 }
 
+
+
 export function NotebooksPanel({
     selectedNotebookId,
-    onSelectNotebook,
+    setSelectedNoteId,
+    setSelectedNotebookId,
     notebooks,
     setNotebooks
 }: NotebooksPanelProps) {
-
     
     const [error, setError] = useState(false)
 
@@ -63,7 +66,9 @@ export function NotebooksPanel({
                         notebooks.map((notebook) => (
                             <li key={notebook.id}>
                                 <button
-                                onClick={() => onSelectNotebook(notebook.id)}
+                                onClick={() => {
+                                    setSelectedNotebookId(notebook.id)
+                                }}
                                 className="border-1 border-white rounded-md p-1"
                                 >
                                     {notebook.title}
