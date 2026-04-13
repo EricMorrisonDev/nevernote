@@ -13,7 +13,8 @@ export function Workspace() {
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     const [notebooks, setNotebooks] = useState<Notebook[] | null>(null)
     const [notes, setNotes] = useState<Note[]>([])
-    const [refetchKey, setRefetchKey] = useState(0)
+    const [refetchNotesKey, setRefetchNotesKey] = useState(0)
+    const [refetchNotebooksKey, setRefetchNotebooksKey] = useState(0)
     
     return( 
         <div className="flex min-w-screen p-4">
@@ -24,14 +25,17 @@ export function Workspace() {
                     setSelectedNoteId={setSelectedNoteId}
                     notebooks={notebooks}
                     setNotebooks={setNotebooks}
+                    refetchNotebooksKey={refetchNotebooksKey}
+                    setRefetchNotebooksKey={setRefetchNotebooksKey}
                 />
             </div>
             <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
                 <NotesPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNoteId={setSelectedNoteId}
+                    selectedNoteId={selectedNoteId}
                     notebooks={notebooks}
-                    refetchKey={refetchKey}
+                    refetchNotesKey={refetchNotesKey}
                     notes={notes}
                     setNotes={setNotes}
                 />
@@ -41,7 +45,7 @@ export function Workspace() {
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
-                    setRefetchKey={setRefetchKey}
+                    setRefetchNotesKey={setRefetchNotesKey}
                     notes={notes}
                     setNotes={setNotes}
                 />

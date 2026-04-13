@@ -6,7 +6,8 @@ import { Note, Notebook } from "@/lib/types/api";
 interface NotesPanelProps {
     selectedNotebookId: string | null;
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
-    refetchKey: number
+    selectedNoteId: string | null
+    refetchNotesKey: number
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
@@ -15,7 +16,8 @@ interface NotesPanelProps {
 export function NotesPanel ({
     selectedNotebookId,
     setSelectedNoteId,
-    refetchKey,
+    selectedNoteId,
+    refetchNotesKey,
     notebooks,
     notes,
     setNotes
@@ -76,7 +78,7 @@ export function NotesPanel ({
 
         fetchNotes(selectedNotebookId, signal)
         return () => controller.abort()
-    }, [selectedNotebookId, refetchKey, notebooks])
+    }, [selectedNotebookId, refetchNotesKey, notebooks])
 
     if(!selectedNotebookId){
         return  (
@@ -104,7 +106,7 @@ export function NotesPanel ({
                     notes.map(note => (
                         <li key={note.id}>
                             <button
-                                className="border-1 border-white rounded-md w-[100px] mt-4"
+                                className={note.id === selectedNoteId ? "border-1 border-white bg-white text-black rounded-md w-[100px] mt-4" : "border-1 border-white rounded-md w-[100px] mt-4"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}

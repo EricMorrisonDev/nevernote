@@ -6,8 +6,8 @@ import { Note } from "@/lib/types/api"
 interface EditNotePanelProps {
     selectedNoteId: string | null,
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
-    selectedNotebookId: string,
-    setRefetchKey: Dispatch<SetStateAction<number>>
+    selectedNotebookId: string | null,
+    setRefetchNotesKey: Dispatch<SetStateAction<number>>
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
 }
@@ -17,7 +17,7 @@ interface EditNotePanelProps {
 export function EditNotePanel ({
     selectedNoteId,
     selectedNotebookId,
-    setRefetchKey,
+    setRefetchNotesKey,
     notes,
     setNotes,
     setSelectedNoteId
@@ -35,7 +35,7 @@ export function EditNotePanel ({
     const handleCreateNote = async(
         title: string, 
         content: string, 
-        selectedNotebookId: string,
+        selectedNotebookId: string | null,
         selectedNoteId: string | null
     ) => {
         if(title.length === 0 || content.length === 0) return
@@ -70,7 +70,7 @@ export function EditNotePanel ({
             setLoading(false)
             setTitle('')
             setContent('')
-            setRefetchKey(prev => prev + 1)
+            setRefetchNotesKey(prev => prev + 1)
             setSelectedNoteId(null)
         }
 
@@ -97,7 +97,7 @@ export function EditNotePanel ({
         } finally {
             setLoading(false)
             setSelectedNoteId(null)
-            setRefetchKey(prev => prev + 1)
+            setRefetchNotesKey(prev => prev + 1)
         }
     }
 

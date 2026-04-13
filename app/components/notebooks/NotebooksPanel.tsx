@@ -10,6 +10,8 @@ interface NotebooksPanelProps {
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     notebooks: Notebook[] | null
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
+    refetchNotebooksKey: number,
+    setRefetchNotebooksKey: Dispatch<SetStateAction<number>>
 }
 
 
@@ -18,6 +20,8 @@ export function NotebooksPanel({
     selectedNotebookId,
     setSelectedNoteId,
     setSelectedNotebookId,
+    refetchNotebooksKey,
+    setRefetchNotebooksKey,
     notebooks,
     setNotebooks
 }: NotebooksPanelProps) {
@@ -46,12 +50,14 @@ export function NotebooksPanel({
         }
     
         fetchNotebooks()
-      }, [])
+      }, [refetchNotebooksKey])
 
     return(
         <div>
             <div>
-                <CreateNotebook />
+                <CreateNotebook 
+                    setRefetchNotebooksKey={setRefetchNotebooksKey}
+                />
             </div>
             <div>
                 {error && (
@@ -69,7 +75,7 @@ export function NotebooksPanel({
                                 onClick={() => {
                                     setSelectedNotebookId(notebook.id)
                                 }}
-                                className="border-1 border-white rounded-md p-1"
+                                className={notebook.id === selectedNotebookId ? "border-1 border-white bg-white text-black rounded-md p-1" : "border-1 border-white rounded-md p-1"}
                                 >
                                     {notebook.title}
                                 </button>

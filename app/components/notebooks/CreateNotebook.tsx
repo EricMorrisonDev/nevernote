@@ -1,8 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Dispatch, SetStateAction } from "react"
 
-export function CreateNotebook () {
+interface CreateNotebookProps {
+    setRefetchNotebooksKey: Dispatch<SetStateAction<number>>
+}
+
+export function CreateNotebook ({
+    setRefetchNotebooksKey
+}: CreateNotebookProps) {
 
     const [title, setTitle] = useState('')
     const [loading, setLoading] = useState(false)
@@ -29,13 +35,13 @@ export function CreateNotebook () {
             }
 
             const payload = await result.json()
-            setMessage(`New notebook ${payload.data.title} created`)
             
         } catch (err) {
             console.error(err)
         } finally {
             setLoading(false)
             setTitle('')
+            setRefetchNotebooksKey(prev => prev + 1)
         }
     }
 
