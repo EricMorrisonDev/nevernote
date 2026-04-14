@@ -87,7 +87,7 @@ export function NotesPanel ({
     }
 
     return(
-        <div className="pl-4 pt-4 w-[12vw]">
+        <div className=" pt-4 w-[12vw]">
             <button
                 className="border-2 border-green-500 text-green-500 rounded-md w-[100px] mt-4 "
                 onClick={() => {
@@ -98,7 +98,7 @@ export function NotesPanel ({
             <div
             className="mt-4">
                 {selectedNotebookTitle.length > 0 && (
-                    <p>{selectedNotebookTitle}</p>
+                    <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
                     )}
             </div>
             <ul>
@@ -106,12 +106,18 @@ export function NotesPanel ({
                     notes.map(note => (
                         <li key={note.id}>
                             <button
-                                className={note.id === selectedNoteId ? "border-1 border-white bg-white text-black rounded-md min-w-[100px] mt-4 p-1" : "border-1 border-white bg-black rounded-md min-w-[100px] mt-4 p-1"}
+                                className={note.id === selectedNoteId ? "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[200px] w-full text-left" : "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[200px] w-full text-left"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
                                 >
-                                {note.title}
+                                    <p className="font-bold text-base">
+                                        {note.title}
+                                    </p>
+                                    <p className="text-sm">
+                                        {note.content}
+                                    </p>
+                                
                             </button>
                         </li>
                     ))
