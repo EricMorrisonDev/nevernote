@@ -124,7 +124,7 @@ export function EditNotePanel ({
 
     return(
 
-        <div className="pt-4 pl-4">
+        <div className="p-8 rounded-lg bg-black">
             <form
                 className="flex flex-col w-[50vw] gap-2"
                 onSubmit={(e) => {
@@ -132,28 +132,19 @@ export function EditNotePanel ({
                     handleCreateNote(title, content, selectedNotebookId, selectedNoteId)
                 }}
                 >
-                <label
-                htmlFor="title-input"
-                >
-                    Title
-                </label>
                 <input
-                className="border-1 border-white rounded-md p-1 m-2 w-[200px]"
+                className="text-[3rem] rounded-md p-1 m-2 outline-none"
                     id="title-input"
                     type="text"
                     value={title}
                     onChange={(e) => {
                         setTitle(e.target.value)
                     }}
+                    placeholder="title"
                 />
-                <label
-                htmlFor="content-input"
-                >
-                    Content
-                </label>
                 <textarea
                     id="content-input"
-                    className="border-1 border-white rounded-md p-1 m-2 h-[40vh]"
+                    className="border-1 border-gray-300 rounded-md p-4 m-2 h-[40vh]"
                     value={content}
                     onChange={(e) => {
                         setContent(e.target.value)

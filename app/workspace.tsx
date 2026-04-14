@@ -17,8 +17,8 @@ export function Workspace() {
     const [refetchNotebooksKey, setRefetchNotebooksKey] = useState(0)
     
     return( 
-        <div className="flex min-w-screen p-4">
-            <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
+        <div className="flex min-w-screen p-4 bg-gray-900">
+            <div className="min-h-screen left-0 width-[10%] border-r-1 border-white mr-4 p-4">
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
@@ -29,7 +29,7 @@ export function Workspace() {
                     setRefetchNotebooksKey={setRefetchNotebooksKey}
                 />
             </div>
-            <div className="min-h-screen left-0 width-[10%] border-r-2 border-white mr-4 p-4">
+            <div className="min-h-screen left-0 width-[10%] border-r-1 border-white mr-4 p-4">
                 <NotesPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNoteId={setSelectedNoteId}

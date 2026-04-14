@@ -116,7 +116,7 @@ export function NotebooksPanel({
                                 onClick={() => {
                                     setSelectedNotebookId(notebook.id)
                                 }}
-                                className={notebook.id === selectedNotebookId ? "border-1 border-white bg-white text-black rounded-md p-1" : "border-1 border-white rounded-md p-1"}
+                                className={notebook.id === selectedNotebookId ? "border-1 border-white bg-white text-black rounded-md p-1 w-[100px]" : "border-1 border-white rounded-md p-1 w-[100px]"}
                                 >
                                     {notebook.title}
                                 </button>

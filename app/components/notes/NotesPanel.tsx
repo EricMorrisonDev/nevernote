@@ -106,7 +106,7 @@ export function NotesPanel ({
                     notes.map(note => (
                         <li key={note.id}>
                             <button
-                                className={note.id === selectedNoteId ? "border-1 border-white bg-white text-black rounded-md w-[100px] mt-4" : "border-1 border-white rounded-md w-[100px] mt-4"}
+                                className={note.id === selectedNoteId ? "border-1 border-white bg-white text-black rounded-md min-w-[100px] mt-4 p-1" : "border-1 border-white bg-black rounded-md min-w-[100px] mt-4 p-1"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
