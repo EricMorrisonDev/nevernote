@@ -3,6 +3,7 @@
 import { Dispatch, useEffect, useState, SetStateAction } from "react";
 import { Notebook } from "@/lib/types/api";
 import { CreateNotebook } from "./CreateNotebook";
+import Image from "next/image"
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -111,12 +112,18 @@ export function NotebooksPanel({
                         <p>No notebooks currently.</p>
                     ) : (
                         notebooks.map((notebook) => (
-                            <li key={notebook.id}>
+                            <li key={notebook.id}
+                            className={notebook.id === selectedNotebookId ? "border-1 border-white rounded-md p-1 flex" : "flex"}>
+                                <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                    alt="Notebook icon"
+                                    width={20}
+                                    height={20}
+                                    />
                                 <button
                                 onClick={() => {
                                     setSelectedNotebookId(notebook.id)
                                 }}
-                                className={notebook.id === selectedNotebookId ? "border-1 border-white bg-white text-black rounded-md p-1 w-[100px]" : "border-1 border-white rounded-md p-1 w-[100px]"}
+                                className={"rounded-md p-1 w-[100px] text-left"}
                                 >
                                     {notebook.title}
                                 </button>
