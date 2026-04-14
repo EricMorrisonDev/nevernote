@@ -92,6 +92,18 @@ export function NotesPanel ({
         return preview
     }
 
+    const renderNoteUpdatedTime = (time: string) => {
+        const timeDiff = (new Date().getTime()) - (new Date(time).getTime())
+
+        if(timeDiff / (1000 * 60 * 60 * 24) >= 1){
+            return new Date(time).toLocaleDateString()
+        } else if (timeDiff / (1000 * 60 * 60) >= 1) {
+            return `${Math.floor(timeDiff / (1000 * 60 * 60))} hours ago`
+        } else {
+            return `${Math.floor(timeDiff / (1000 * 60))} mins ago`
+        }
+    }
+
     if(!selectedNotebookId){
         return  (
         <p>No notebook currently selected</p>
@@ -128,10 +140,12 @@ export function NotesPanel ({
                                     <p className="font-bold text-base">
                                         {note.title}
                                     </p>
-                                    <p className="text-sm">
+                                    <p className="text-sm text-gray-300">
                                         {renderNotePreview(note.content)}
                                     </p>
-                                
+                                    <p className="mt-auto text-xs text-gray-400">
+                                        {renderNoteUpdatedTime(note.updatedAt)}
+                                    </p>
                             </button>
                         </li>
                     ))

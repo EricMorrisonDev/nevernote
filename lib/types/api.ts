@@ -13,5 +13,7 @@ export interface Note {
     title: string,
     content: string,
     notebookId: string,
-    userId: string
+    userId: string,
+    createdAt: string,
+    updatedAt: string
 }
