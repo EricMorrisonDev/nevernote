@@ -80,6 +80,18 @@ export function NotesPanel ({
         return () => controller.abort()
     }, [selectedNotebookId, refetchNotesKey, notebooks])
 
+    const renderNotePreview = (content: string) => {
+        let preview = ''
+        const limit = 100;
+        const chars = content.split('')
+        if(content.length <= limit) return content
+        for(let i = 0; i < limit; i++){
+            preview += chars[i]
+        }
+        preview += '...'
+        return preview
+    }
+
     if(!selectedNotebookId){
         return  (
         <p>No notebook currently selected</p>
@@ -106,7 +118,9 @@ export function NotesPanel ({
                     notes.map(note => (
                         <li key={note.id}>
                             <button
-                                className={note.id === selectedNoteId ? "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[200px] w-full text-left" : "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[200px] w-full text-left"}
+                                className={note.id === selectedNoteId ? 
+                                    "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[200px] w-full text-left flex flex-col items-start justify-start" : 
+                                    "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[200px] w-full text-left flex flex-col items-start justify-start"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
@@ -115,7 +129,7 @@ export function NotesPanel ({
                                         {note.title}
                                     </p>
                                     <p className="text-sm">
-                                        {note.content}
+                                        {renderNotePreview(note.content)}
                                     </p>
                                 
                             </button>

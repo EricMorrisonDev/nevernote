@@ -113,18 +113,18 @@ export function NotebooksPanel({
                     ) : (
                         notebooks.map((notebook) => (
                             <li key={notebook.id}
-                            className={notebook.id === selectedNotebookId ? "border-1 border-white rounded-md p-1 flex" : "flex"}>
+                            className={notebook.id === selectedNotebookId ? "border-1 border-white rounded-md p-1" : ""}>
+                                <button
+                                onClick={() => {
+                                    setSelectedNotebookId(notebook.id)
+                                }}
+                                className={"rounded-md p-1 w-[100px] text-left flex gap-2"}
+                                >
                                 <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
                                     alt="Notebook icon"
                                     width={20}
                                     height={20}
                                     />
-                                <button
-                                onClick={() => {
-                                    setSelectedNotebookId(notebook.id)
-                                }}
-                                className={"rounded-md p-1 w-[100px] text-left"}
-                                >
                                     {notebook.title}
                                 </button>
                             </li>
