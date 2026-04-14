@@ -162,13 +162,13 @@ export function EditNotePanel ({
                         Submit
                     </button>
                     {selectedNoteId && (<button
-                        className="border-1 border-red-500 text-red-500 rounded-md w-[100px] mt-4"
+                        className="border-1 border-blue-500 text-blue-500 rounded-md w-[100px] mt-4"
                         onClick={() => {
                             if(!selectedNoteId) return
                             handleDeleteNote(selectedNoteId)
                         }}
                     >
-                        Delete
+                        Delete Note
                     </button>)}
                 </div>
                 <div>

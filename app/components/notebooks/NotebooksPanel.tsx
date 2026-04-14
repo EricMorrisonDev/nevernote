@@ -86,9 +86,7 @@ export function NotebooksPanel({
     return(
         <div>
             <div>
-                <CreateNotebook 
-                    setRefetchNotebooksKey={setRefetchNotebooksKey}
-                />
+                
             </div>
             <div>
                 {selectedNotebookId && (

@@ -111,7 +111,7 @@ export function NotesPanel ({
     }
 
     return(
-        <div className=" pt-4 w-[12vw]">
+        <div className="h-full min-h-0 flex flex-col">
             <button
                 className="border-2 border-green-500 text-green-500 rounded-md w-[100px] mt-4 "
                 onClick={() => {
@@ -125,10 +125,11 @@ export function NotesPanel ({
                     <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
                     )}
             </div>
-            <ul>
+            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
                 { notes.length > 0 ? (
                     notes.map(note => (
-                        <li key={note.id}>
+                        <li key={note.id}
+                            className="max-w-[200px]">
                             <button
                                 className={note.id === selectedNoteId ? 
                                     "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[200px] w-full text-left flex flex-col items-start justify-start" : 
