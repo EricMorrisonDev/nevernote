@@ -11,6 +11,8 @@ interface NotesPanelProps {
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
+    modalTitle: string,
+    setModalTitle: Dispatch<SetStateAction<string>>
 }
 
 export function NotesPanel ({
@@ -20,7 +22,9 @@ export function NotesPanel ({
     refetchNotesKey,
     notebooks,
     notes,
-    setNotes
+    setNotes,
+    modalTitle,
+    setModalTitle
     }: NotesPanelProps){
 
     const [loading, setLoading] = useState(true)
@@ -82,7 +86,7 @@ export function NotesPanel ({
 
     const renderNotePreview = (content: string) => {
         let preview = ''
-        const limit = 100;
+        const limit = 150;
         const chars = content.split('')
         if(content.length <= limit) return content
         for(let i = 0; i < limit; i++){
@@ -99,8 +103,10 @@ export function NotesPanel ({
             return new Date(time).toLocaleDateString()
         } else if (timeDiff / (1000 * 60 * 60) >= 1) {
             return `${Math.floor(timeDiff / (1000 * 60 * 60))} hours ago`
-        } else {
+        } else if(timeDiff / (1000 * 60) >= 1) {
             return `${Math.floor(timeDiff / (1000 * 60))} mins ago`
+        } else {
+            return 'just now'
         }
     }
 
@@ -110,38 +116,42 @@ export function NotesPanel ({
         )
     }
 
+    // remember to wire up the delete button with the new modal
+
     return(
-        <div className="h-full min-h-0 flex flex-col">
-            <button
-                className="border-2 border-green-500 text-green-500 rounded-md w-[100px] mt-4 "
-                onClick={() => {
-                    setSelectedNoteId(null)
-                }}>
-                New Note
-            </button>
-            <div
-            className="mt-4">
-                {selectedNotebookTitle.length > 0 && (
-                    <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
+        <div className="h-full w-full min-h-0 flex flex-col">
+            <div className="flex justify-between pr-6 items-end mb-2">
+                <div
+                className="mt-4">
+                    {selectedNotebookTitle.length > 0 && (
+                        <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
                     )}
+                </div>
+                <button
+                    className="border-2 border-green-500 text-green-500 rounded-md w-[100px] h-[40px]"
+                    onClick={() => {
+                        setSelectedNoteId(null)
+                    }}>
+                    New Note
+                </button>
             </div>
-            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2">
                 { notes.length > 0 ? (
                     notes.map(note => (
                         <li key={note.id}
                             className="max-w-[200px]">
                             <button
                                 className={note.id === selectedNoteId ? 
-                                    "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[200px] w-full text-left flex flex-col items-start justify-start" : 
-                                    "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[200px] w-full text-left flex flex-col items-start justify-start"}
+                                    "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start" : 
+                                    "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
                                 >
-                                    <p className="font-bold text-base">
+                                    <p className="font-bold text-base pl-2">
                                         {note.title}
                                     </p>
-                                    <p className="text-sm text-gray-300">
+                                    <p className="text-sm text-gray-300 p-2">
                                         {renderNotePreview(note.content)}
                                     </p>
                                     <p className="mt-auto text-xs text-gray-400">

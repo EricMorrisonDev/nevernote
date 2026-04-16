@@ -10,12 +10,12 @@ export function CreateNotebook ({
     setRefetchNotebooksKey
 }: CreateNotebookProps) {
 
-    const [title, setTitle] = useState('')
+    const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
 
-    const handleSubmit = async (title: string) => {
+    const handleCreateNotebook = async (title: string) => {
         try{
             setLoading(true)
             setError(false)
@@ -40,7 +40,7 @@ export function CreateNotebook ({
             console.error(err)
         } finally {
             setLoading(false)
-            setTitle('')
+            setNewNotebookTitle('')
             setRefetchNotebooksKey(prev => prev + 1)
         }
     }
@@ -67,22 +67,7 @@ export function CreateNotebook ({
                 null
             )
             }
-            <input 
-                className="border-1 border-white rounded-md pl-2"
-                type="text"
-                placeholder="title"
-                value={title}
-                onChange={(e) => {
-                    setTitle(e.target.value)
-                }}
-            />
-            <button
-                type="submit"
-                className="border-1 border-white rounded-md"
-                disabled={loading}
-            >
-                Create
-            </button>
+            
         </form>
     )
 }

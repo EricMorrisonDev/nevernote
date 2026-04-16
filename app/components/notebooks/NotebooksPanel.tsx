@@ -2,7 +2,7 @@
 
 import { Dispatch, useEffect, useState, SetStateAction } from "react";
 import { Notebook } from "@/lib/types/api";
-import { CreateNotebook } from "./CreateNotebook";
+import { Modal } from "../Modal";
 import Image from "next/image"
 
 interface NotebooksPanelProps {
@@ -13,8 +13,18 @@ interface NotebooksPanelProps {
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
     refetchNotebooksKey: number,
     setRefetchNotebooksKey: Dispatch<SetStateAction<number>>
+    modalOpen: boolean,
+    setModalOpen: Dispatch<SetStateAction<boolean>>
+    modalTitle: string,
+    setModalTitle: Dispatch<SetStateAction<string>>
 }
 
+type ModalType = "delete" | "create-notebook" | "create-stack" | null;
+
+type ModalContext = {
+    notebookId?: string,
+    notebookName?: string,
+}
 
 
 export function NotebooksPanel({
@@ -24,12 +34,136 @@ export function NotebooksPanel({
     refetchNotebooksKey,
     setRefetchNotebooksKey,
     notebooks,
-    setNotebooks
+    setNotebooks,
+    modalOpen,
+    setModalOpen,
+    modalTitle,
+    setModalTitle
 }: NotebooksPanelProps) {
     
     const [error, setError] = useState(false)
     const [notebookIdToBeDeleted, setNotebookIdToBeDeleted] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
+    const [modalType, setModalType] = useState<ModalType>(null)
+    const [modalContext, setModalContext] = useState<ModalContext>()
+    const [newNotebookTitle, setNewNotebookTitle] = useState('')
+    const [newStackTitle, setNewStackTitle] = useState('')
+
+    const openModal = (type: Exclude<ModalType, null>, context: ModalContext = {}) => {
+        setModalOpen(true)
+        setModalType(type)
+        setModalContext(context)
+        setModalTitle(type)
+    }
+
+    const closeModal = () => {
+        setModalOpen(false)
+        setModalType(null)
+        setModalContext({})
+        setModalTitle('')
+    }
+
+    const renderModalContent = () => {
+        switch (modalType) {
+            case "delete":
+                return (
+                    <>
+                        <h4 id="delete-notebook-title">Are you sure you want to delete {notebookPendingDeletion?.title} ?</h4>
+                        <p>This will also delete all notes contained in the notebook.</p>
+                        <div className="flex justify-between mt-4">
+                            <button
+                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            onClick={() => {
+                                handleDeleteNotebook(notebookIdToBeDeleted)
+                            }}>
+                                Delete
+                            </button>
+                            <button
+                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            onClick={() => {
+                                setNotebookIdToBeDeleted(null)
+                                closeModal()
+                            }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </>
+                )
+            case "create-notebook":
+                return (
+                    <form
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        handleCreateNotebook(newNotebookTitle)
+                    }}
+                        >
+                        <h4>Name your new notebook</h4>
+                        <input 
+                            className="border-1 border-white rounded-md pl-2"
+                            type="text"
+                            placeholder="title"
+                            value={newNotebookTitle}
+                            onChange={(e) => {
+                                setNewNotebookTitle(e.target.value)
+                            }}
+                        />
+                        <div className="flex justify-between mt-4">
+                            <button
+                                type="submit"
+                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                disabled={loading}
+                                >
+                                Create
+                            </button>
+                            <button
+                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                onClick={() => {
+                                    closeModal()
+                                }}
+                                >
+                                    Cancel
+                            </button>
+                        </div>
+                    </form>
+                )
+                // come back and finish this
+            case "create-stack":
+                return (
+                    <form
+                        >
+                        <h4>Name your new stack</h4>
+                        <input 
+                            className="border-1 border-white rounded-md pl-2"
+                            type="text"
+                            placeholder="title"
+                            value={newStackTitle}
+                            onChange={(e) => {
+                                setNewStackTitle(e.target.value)
+                            }}
+                        />
+                        <div className="flex justify-between mt-4">
+                            <button
+                                type="submit"
+                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                disabled={loading}
+                                >
+                                Create
+                            </button>
+                            <button
+                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                onClick={() => {
+                                    closeModal()
+                                }}
+                                >
+                                    Cancel
+                            </button>
+                        </div>
+                    </form>
+                )
+        }
+    }
+
 
     useEffect(() => {
         const fetchNotebooks = async () => {
@@ -62,7 +196,9 @@ export function NotebooksPanel({
         notebooks.find(nb => nb.id === notebookIdToBeDeleted) :
         undefined
 
-      const handleDeleteNotebook = async (notebookIdToBeDeleted: string) => {
+    const handleDeleteNotebook = async (notebookIdToBeDeleted: string | null) => {
+
+        if(!notebookIdToBeDeleted) return
 
         try{
             setLoading(true)
@@ -80,20 +216,75 @@ export function NotebooksPanel({
             setLoading(false)
             setRefetchNotebooksKey(prev => prev + 1)
             setNotebookIdToBeDeleted(null)
+            setSelectedNotebookId(null)
+            setModalOpen(false)
         }
-      }
+    }
+
+    const initializeEmptyNote = async() => {
+
+        try{
+
+        } catch (e) {
+
+        }
+    }
+
+    const handleCreateNotebook = async (title: string) => {
+        try{
+            setLoading(true)
+            setError(false)
+
+            const result = await fetch('/api/notebooks', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title })
+            })
+
+            if(!result.ok){
+                setError(true)
+                
+            }
+            
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+            setNewNotebookTitle('')
+            setRefetchNotebooksKey(prev => prev + 1)
+            closeModal()
+        }
+    }
 
     return(
         <div>
-            <div>
-                
-            </div>
-            <div>
+            <div className="flex flex-col gap-2 px-4">
+                <button
+                    className="border-1 border-green-500 text-green-500 p-1 rounded-md"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        openModal("create-stack")
+                    }}
+                >
+                    + Stack
+                </button>
+                <button
+                    className="border-1 border-green-500 text-green-500 p-1 rounded-md"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        openModal("create-notebook")
+                    }}
+                >
+                    + Notebook
+                </button>
                 {selectedNotebookId && (
                     <button
-                        className="ml-4 border-1 border-blue-500 text-blue-500 rounded-md p-1"
+                        className="border-1 border-blue-500 text-blue-500 rounded-md p-1"
                         onClick={() => {
                             setNotebookIdToBeDeleted(selectedNotebookId)
+                            openModal("delete")
                         }}
                     >
                         Delete Notebook
@@ -130,43 +321,13 @@ export function NotebooksPanel({
                     )}
                 </ul>
             </div>
-            {notebookIdToBeDeleted && notebookPendingDeletion && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-                    role="presentation"
+                <Modal
+                    modalOpen={modalOpen}
+                    setModalOpen={setModalOpen}
+                    title={modalTitle}
                 >
-                    <div
-                        className="w-full max-w-md rounded-lg border border-white bg-neutral-950 p-6 shadow-xl"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="delete-notebook-title"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setNotebookIdToBeDeleted(null)
-                        }}
-                    >
-                        <h4 id="delete-notebook-title">Are you sure you want to delete {notebookPendingDeletion.title} ?</h4>
-                        <p>This will also delete all notes contained in the notebook.</p>
-                        <div className="flex justify-between mt-4">
-                            <button
-                            className="border-1 border-white p-1 w-[100px] rounded-md"
-                            onClick={() => {
-                                handleDeleteNotebook(notebookIdToBeDeleted)
-                            }}>
-                                Delete
-                            </button>
-                            <button
-                            className="border-1 border-white p-1 w-[100px] rounded-md"
-                            onClick={() => {
-                                setNotebookIdToBeDeleted(null)
-                            }}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    {renderModalContent()}
+                </Modal>
         </div>
     )
 }

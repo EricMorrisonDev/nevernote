@@ -10,6 +10,8 @@ interface EditNotePanelProps {
     setRefetchNotesKey: Dispatch<SetStateAction<number>>
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
+    modalTitle: string,
+    setModalTitle: Dispatch<SetStateAction<string>>
 }
 
 
@@ -20,7 +22,9 @@ export function EditNotePanel ({
     setRefetchNotesKey,
     notes,
     setNotes,
-    setSelectedNoteId
+    setSelectedNoteId,
+    modalTitle,
+    setModalTitle
 }: EditNotePanelProps) {
 
     const[title, setTitle] = useState('')
