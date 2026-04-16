@@ -149,7 +149,7 @@ export function NotesPanel ({
                                 }}
                                 >
                                     <p className="font-bold text-base pl-2">
-                                        {note.title}
+                                        {note.title.trim().length === 0 ? 'Untitled' : note.title}
                                     </p>
                                     <p className="text-sm text-gray-300 p-2">
                                         {renderNotePreview(note.content)}

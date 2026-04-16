@@ -3,6 +3,7 @@
 import { Dispatch, useEffect, useState, SetStateAction } from "react";
 import { Notebook } from "@/lib/types/api";
 import { Modal } from "../Modal";
+import { initializeNote } from "@/app/lib/InitializeNote";
 import Image from "next/image"
 
 interface NotebooksPanelProps {
@@ -221,21 +222,12 @@ export function NotebooksPanel({
         }
     }
 
-    const initializeEmptyNote = async() => {
-
-        try{
-
-        } catch (e) {
-
-        }
-    }
-
     const handleCreateNotebook = async (title: string) => {
         try{
             setLoading(true)
             setError(false)
 
-            const result = await fetch('/api/notebooks', {
+            const res = await fetch('/api/notebooks', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -243,11 +235,15 @@ export function NotebooksPanel({
                 body: JSON.stringify({ title })
             })
 
-            if(!result.ok){
+            if(!res.ok){
                 setError(true)
-                
             }
-            
+
+            const parsed = await res.json()
+            const newNotebookId = parsed.data.id
+
+            initializeNote("", "", newNotebookId)
+            setSelectedNotebookId(newNotebookId)
         } catch (err) {
             console.error(err)
         } finally {
@@ -255,6 +251,7 @@ export function NotebooksPanel({
             setNewNotebookTitle('')
             setRefetchNotebooksKey(prev => prev + 1)
             closeModal()
+            
         }
     }
 
