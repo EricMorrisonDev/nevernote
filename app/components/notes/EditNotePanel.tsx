@@ -36,24 +36,20 @@ export function EditNotePanel ({
 
     
 // remember to update the name of this func since it doesn't just create
-    const handleCreateNote = async(
+    const handleEditNote = async(
         title: string, 
         content: string, 
         selectedNotebookId: string | null,
         selectedNoteId: string | null
     ) => {
-        if(title.length === 0 || content.length === 0) return
 
         try{
             setLoading(true)
             setError(false)
             setMessage('')
 
-            const url = !selectedNoteId ? '/api/notes' : `api/notes/${selectedNoteId}`
-            const method = !selectedNoteId ? "POST" : "PUT"
-
-                const res = await fetch(url, {
-                    method,
+                const res = await fetch(`api/notes/${selectedNoteId}`, {
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -61,21 +57,18 @@ export function EditNotePanel ({
                 })
 
             if(!res.ok){
-                throw new Error(!selectedNoteId? 'Error creating note' : 'Error updating note')
+                throw new Error('Error updating note')
             }
 
             const parsed = await res.json()
 
-            setMessage(!selectedNoteId ? `Note ${parsed.data.title} created!` : `Note ${parsed.data.title} updated!`)
+            setMessage(`Note ${parsed.data.title} updated!`)
             
         } catch(err) {
             console.error(err)
         } finally {
             setLoading(false)
-            setTitle('')
-            setContent('')
             setRefetchNotesKey(prev => prev + 1)
-            setSelectedNoteId(null)
         }
 
     }
@@ -133,7 +126,7 @@ export function EditNotePanel ({
                 className="flex flex-col w-[50vw] gap-2"
                 onSubmit={(e) => {
                     e.preventDefault()
-                    handleCreateNote(title, content, selectedNotebookId, selectedNoteId)
+                    handleEditNote(title, content, selectedNotebookId, selectedNoteId)
                 }}
                 >
                 <input
