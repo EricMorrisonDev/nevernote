@@ -165,7 +165,7 @@ export function EditNotePanel ({
                     >
                     Type your note here
                 </textarea>
-                <div className="">
+                <div className="flex justify-end w-full">
                     {selectedNoteId && (<button
                         className="border-1 border-blue-500 text-blue-500 rounded-md w-[100px] mt-4"
                         onClick={() => {
