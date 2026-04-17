@@ -3,17 +3,8 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
+import type { RefetchReason, RefetchNotesState } from "@/app/lib/types";
 
-type RefetchReason =
-    | "notebook-change"
-    | "note-updated"
-    | "note-created"
-    | "note-deleted"
-
-type RefetchNotesState = {
-    key: number
-    reason: RefetchReason
-    }
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
@@ -106,9 +97,9 @@ export function NotesPanel ({
             setSelectedNotebookTitle('')
         }
 
-        fetchNotes(selectedNotebookId, signal)
+        fetchNotes(selectedNotebookId, refetchNotes, signal)
         return () => controller.abort()
-    }, [selectedNotebookId, refetchNotesKey, notebooks])
+    }, [selectedNotebookId, refetchNotes, notebooks])
 
     const renderNotePreview = (content: string) => {
         let preview = ''
@@ -157,7 +148,7 @@ export function NotesPanel ({
                     className="border-2 border-green-500 text-green-500 rounded-md w-[100px] h-[40px]"
                     onClick={() => {
                         initializeNote(selectedNotebookId)
-                        setRefetchNotesKey(prev => prev + 1)
+                        setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
                     }}>
                     + Note
                 </button>

@@ -2,12 +2,15 @@
 
 import { SetStateAction, useState, Dispatch, useEffect } from "react"
 import { Note } from "@/lib/types/api"
+import type { RefetchReason, RefetchNotesState } from "@/app/lib/types"
+
 
 interface EditNotePanelProps {
     selectedNoteId: string | null,
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNotebookId: string | null,
-    setRefetchNotesKey: Dispatch<SetStateAction<number>>
+    refetchNotes: RefetchNotesState,
+    setRefetchNotes: Dispatch<SetStateAction<RefetchNotesState>>
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
     modalTitle: string,
@@ -19,7 +22,8 @@ interface EditNotePanelProps {
 export function EditNotePanel ({
     selectedNoteId,
     selectedNotebookId,
-    setRefetchNotesKey,
+    refetchNotes,
+    setRefetchNotes,
     notes,
     setNotes,
     setSelectedNoteId,
@@ -67,7 +71,7 @@ export function EditNotePanel ({
             console.error(err)
         } finally {
             setLoading(false)
-            setRefetchNotesKey(prev => prev + 1)
+            setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-updated"}))
         }
 
     }
@@ -93,7 +97,7 @@ export function EditNotePanel ({
         } finally {
             setLoading(false)
             setSelectedNoteId(null)
-            setRefetchNotesKey(prev => prev + 1)
+            setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-deleted"}))
         }
     }
 
@@ -125,14 +129,9 @@ export function EditNotePanel ({
                 className="flex flex-col w-[50vw] gap-2"
                 onSubmit={(e) => {
                     e.preventDefault()
-                    handleEditNote(title, content, selectedNotebookId, selectedNoteId)
-                }}
-                onBlur={() => {
-                    if(!selectedNoteId || loading) return
-                    // update this later to only save if an actual change was made.
-                    // right now it will always save whenever a user clicks away.
                     handleEditNote(title, content, selectedNotebookId, selectedNoteId )
                 }}
+                
                 >
                 <input
                 className="text-[3rem] rounded-md p-1 m-2 outline-none"
@@ -141,6 +140,12 @@ export function EditNotePanel ({
                     value={title}
                     onChange={(e) => {
                         setTitle(e.target.value)
+                    }}
+                    onBlur={() => {
+                        if(!selectedNoteId || loading) return
+                        // update this later to only save if an actual change was made.
+                        // right now it will always save whenever a user clicks away.
+                        handleEditNote(title, content, selectedNotebookId, selectedNoteId )
                     }}
                     placeholder="title"
                 />
@@ -151,18 +156,16 @@ export function EditNotePanel ({
                     onChange={(e) => {
                         setContent(e.target.value)
                     }}
-
+                    onBlur={() => {
+                        if(!selectedNoteId || loading) return
+                        // update this later to only save if an actual change was made.
+                        // right now it will always save whenever a user clicks away.
+                        handleEditNote(title, content, selectedNotebookId, selectedNoteId )
+                    }}
                     >
                     Type your note here
                 </textarea>
-                <div className="flex justify-between">
-                    <button
-                        className="border-1 border-white rounded-md w-[100px] mt-4"
-                        type="submit"
-                        disabled={loading}
-                        >
-                        Submit
-                    </button>
+                <div className="">
                     {selectedNoteId && (<button
                         className="border-1 border-blue-500 text-blue-500 rounded-md w-[100px] mt-4"
                         onClick={() => {
