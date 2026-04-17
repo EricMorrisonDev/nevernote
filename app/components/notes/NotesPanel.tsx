@@ -146,8 +146,8 @@ export function NotesPanel ({
                 </div>
                 <button
                     className="border-2 border-green-500 text-green-500 rounded-md w-[100px] h-[40px]"
-                    onClick={() => {
-                        initializeNote(selectedNotebookId)
+                    onClick={async () => {
+                        await initializeNote(selectedNotebookId)
                         setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
                     }}>
                     + Note
