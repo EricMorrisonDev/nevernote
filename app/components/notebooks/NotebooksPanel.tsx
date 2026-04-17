@@ -9,6 +9,7 @@ import Image from "next/image"
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
     setSelectedNotebookId: Dispatch<SetStateAction<string | null>>
+    setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     notebooks: Notebook[] | null
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
     refetchNotebooksKey: number,
@@ -26,6 +27,7 @@ export function NotebooksPanel({
     setSelectedNotebookId,
     refetchNotebooksKey,
     setRefetchNotebooksKey,
+    setSelectedNoteId,
     notebooks,
     setNotebooks,
     modalOpen,
@@ -231,7 +233,9 @@ export function NotebooksPanel({
             const parsed = await res.json()
             const newNotebookId = parsed.data.id
 
-            initializeNote(newNotebookId)
+            const result = await initializeNote(newNotebookId)
+            const newNoteId = result?.id
+            if(newNoteId) setSelectedNoteId(newNoteId)
             setSelectedNotebookId(newNotebookId)
         } catch (err) {
             console.error(err)

@@ -126,8 +126,10 @@ export function NotesPanel ({
                 <button
                     className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                     onClick={async () => {
-                        await initializeNote(selectedNotebookId)
+                        const result = await initializeNote(selectedNotebookId)
                         setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
+                        const newNoteId = result?.id
+                        if(newNoteId) setSelectedNoteId(newNoteId)
                     }}>
                     + Note
                 </button>

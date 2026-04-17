@@ -31,6 +31,7 @@ export function Workspace() {
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
+                    setSelectedNoteId={setSelectedNoteId}
                     notebooks={notebooks}
                     setNotebooks={setNotebooks}
                     refetchNotebooksKey={refetchNotebooksKey}
@@ -63,7 +64,7 @@ export function Workspace() {
                 />
             </div>
             <div
-                className="fixed right-4 bottom-4">
+                className="fixed right-8 top-8">
                 <LogoutButton />
             </div>
         </div>

@@ -122,7 +122,7 @@ export function EditNotePanel ({
                 
                 >
                 <input
-                className="text-[3rem] rounded-xl bg-transparent p-1 m-2 outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                className="text-[3rem] rounded-xl bg-transparent p-1 m-2 outline-none placeholder:text-muted"
                     id="title-input"
                     type="text"
                     value={title}
@@ -139,7 +139,7 @@ export function EditNotePanel ({
                 />
                 <textarea
                     id="content-input"
-                    className="border border-border bg-background rounded-xl p-4 m-2 h-[40vh] text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring/40"
+                    className="border border-border bg-background rounded-xl p-4 m-2 flex-1 min-h-0 text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring/40"
                     value={content}
                     onChange={(e) => {
                         setContent(e.target.value)
