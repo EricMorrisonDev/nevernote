@@ -17,5 +17,5 @@ export function LoginStatus() {
         return <p className="text-red-500">You are not logged in !</p>
     }
 
-    return <p className="text-green-500">You are logged in as {user.email}</p>
+    return <p className="text-accent">You are logged in as {user.email}</p>
 }

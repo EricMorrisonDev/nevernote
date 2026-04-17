@@ -32,9 +32,11 @@ export function CreateNotebook ({
             if(!result.ok){
                 setError(true)
                 setMessage('Failed to create notebook')
+                return
             }
 
-            const payload = await result.json()
+            await result.json()
+            setMessage('Notebook created')
             
         } catch (err) {
             console.error(err)
@@ -53,21 +55,40 @@ export function CreateNotebook ({
 
     return (
         <form
-        className="flex flex-col gap-4 m-4 p-4 border-1 border-white rounded-md"
+        className="m-4 flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4"
         onSubmit={(e) => {
             e.preventDefault()
-            handleSubmit(title)
+            if (!newNotebookTitle.trim()) return
+            handleCreateNotebook(newNotebookTitle.trim())
         }}>
             <h4>Create A Notebook</h4>
             {message ? (
                 <p
-                className={error ? "text-red-500" : "text-green-500"}
+                className={error ? "text-red-500" : "text-accent"}
                 >{message}</p>
             ) : (
                 null
             )
             }
-            
+            <label htmlFor="create-notebook-title" className="flex flex-col gap-2 text-sm text-muted">
+                Notebook title
+                <input
+                    id="create-notebook-title"
+                    type="text"
+                    value={newNotebookTitle}
+                    onChange={(e) => setNewNotebookTitle(e.target.value)}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                    placeholder="My notebook"
+                    disabled={loading}
+                />
+            </label>
+            <button
+                type="submit"
+                disabled={loading || newNotebookTitle.trim().length === 0}
+                className="rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50"
+            >
+                Create
+            </button>
         </form>
     )
 }

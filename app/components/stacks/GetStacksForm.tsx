@@ -30,7 +30,7 @@ export function GetStacksForm () {
     }
 
     return(
-        <div className="w-[300px] border-1 border-white rounded-md p-2">
+        <div className="w-[300px] rounded-2xl border border-border bg-surface p-4 shadow-sm">
             {error && (
                 <p className="text-red-500">
                     {error}
@@ -41,7 +41,7 @@ export function GetStacksForm () {
             onClick={() => {
                 handleGetStacks()
             }}
-            className="border-1 border-green-500 p-1 rounded-md">
+            className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50">
                 Get stacks
             </button>
             

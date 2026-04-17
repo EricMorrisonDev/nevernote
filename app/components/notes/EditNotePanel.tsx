@@ -2,19 +2,15 @@
 
 import { SetStateAction, useState, Dispatch, useEffect } from "react"
 import { Note } from "@/lib/types/api"
-import type { RefetchReason, RefetchNotesState } from "@/app/lib/types"
+import type { RefetchNotesState } from "@/app/lib/types"
 
 
 interface EditNotePanelProps {
     selectedNoteId: string | null,
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNotebookId: string | null,
-    refetchNotes: RefetchNotesState,
     setRefetchNotes: Dispatch<SetStateAction<RefetchNotesState>>
     notes: Note[] | []
-    setNotes: Dispatch<SetStateAction<Note[] | []>>
-    modalTitle: string,
-    setModalTitle: Dispatch<SetStateAction<string>>
 }
 
 
@@ -22,21 +18,15 @@ interface EditNotePanelProps {
 export function EditNotePanel ({
     selectedNoteId,
     selectedNotebookId,
-    refetchNotes,
     setRefetchNotes,
     notes,
-    setNotes,
     setSelectedNoteId,
-    modalTitle,
-    setModalTitle
 }: EditNotePanelProps) {
 
     const[title, setTitle] = useState('')
     const[content, setContent] = useState('')
-    const[error, setError] = useState(false)
     const[message, setMessage] = useState('')
     const[loading, setLoading] = useState(false)
-    const[note, setNote] = useState<Note | null>(null)
 
     
     const handleEditNote = async(
@@ -48,7 +38,6 @@ export function EditNotePanel ({
 
         try{
             setLoading(true)
-            setError(false)
             setMessage('')
 
                 const res = await fetch(`api/notes/${selectedNoteId}`, {
@@ -63,7 +52,7 @@ export function EditNotePanel ({
                 throw new Error('Error updating note')
             }
 
-            const parsed = await res.json()
+            void (await res.json())
 
            
             
@@ -108,7 +97,6 @@ export function EditNotePanel ({
 
         const note = notes.find(note => note.id === selectedNoteId)
         if(!note){
-            setError(true)
             setMessage('Note not found')
             return
         }
@@ -124,9 +112,9 @@ export function EditNotePanel ({
 
     return(
 
-        <div className="p-8 rounded-lg bg-black">
+        <div className="h-full min-h-0 flex flex-col p-8 rounded-2xl border border-border bg-surface">
             <form
-                className="flex flex-col w-[50vw] gap-2"
+                className="h-full min-h-0 flex flex-col"
                 onSubmit={(e) => {
                     e.preventDefault()
                     handleEditNote(title, content, selectedNotebookId, selectedNoteId )
@@ -134,7 +122,7 @@ export function EditNotePanel ({
                 
                 >
                 <input
-                className="text-[3rem] rounded-md p-1 m-2 outline-none"
+                className="text-[3rem] rounded-xl bg-transparent p-1 m-2 outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                     id="title-input"
                     type="text"
                     value={title}
@@ -151,7 +139,7 @@ export function EditNotePanel ({
                 />
                 <textarea
                     id="content-input"
-                    className="border-1 border-gray-300 rounded-md p-4 m-2 h-[40vh]"
+                    className="border border-border bg-background rounded-xl p-4 m-2 h-[40vh] text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring/40"
                     value={content}
                     onChange={(e) => {
                         setContent(e.target.value)
@@ -167,7 +155,7 @@ export function EditNotePanel ({
                 </textarea>
                 <div className="flex justify-end w-full">
                     {selectedNoteId && (<button
-                        className="border-1 border-blue-500 text-blue-500 rounded-md w-[100px] mt-4"
+                        className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:border-accent hover:text-accent w-[120px] mt-4"
                         onClick={() => {
                             if(!selectedNoteId) return
                             handleDeleteNote(selectedNoteId)
@@ -176,15 +164,11 @@ export function EditNotePanel ({
                         Delete Note
                     </button>)}
                 </div>
-                {/* <div>
-                    {message.length > 0 && (
-                        <p
-                        className="text green-500"
-                        >
-                            {message}
-                        </p>
-                    )}
-                </div> */}
+                {/* {message.length > 0 && (
+                    <p className="px-2 text-sm text-muted">
+                        {message}
+                    </p>
+                )} */}
             </form>
         </div>
     )

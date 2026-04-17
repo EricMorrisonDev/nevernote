@@ -8,7 +8,7 @@ export function AuthForm() {
     const [loggingIn, setLoggingIn] = useState(true)
 
     return(
-        <div className="flex flex-col w-[300px] border-1 border-white rounded-md p-2">
+        <div className="flex w-[300px] flex-col rounded-2xl border border-border bg-surface p-4 shadow-sm">
             <div>
                 {loggingIn ? (
                     <LoginForm/>
@@ -24,7 +24,7 @@ export function AuthForm() {
                 onClick={() => {
                     setLoggingIn(prev => !prev)
                 }}
-                className="w-[50%] border-1 border-white rounded-md">
+                className="w-[50%] rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:border-accent hover:text-accent">
                     {loggingIn ? "Sign up" : "Log in"}
                 </button>
             </div>

@@ -14,7 +14,6 @@ export function CreateNote ({
 
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
-    const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
     const [message, setMessage] = useState('')
 
@@ -26,7 +25,6 @@ export function CreateNote ({
         if(title.length === 0 || content.length === 0) return
 
         try{
-            setLoading(true)
             setError(false)
             setMessage('')
 
@@ -49,7 +47,6 @@ export function CreateNote ({
         } catch(err) {
             console.error(err)
         } finally {
-            setLoading(false)
             setTitle('')
             setContent('')
             onCreateNote()
@@ -65,7 +62,7 @@ export function CreateNote ({
 
     return (
         <form
-            className="border-1 border-white m-4 p-2 rounded-md flex flex-col gap-2"
+            className="m-4 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4"
             onSubmit={(e) => {
                 e.preventDefault()
                 handleCreateNote(title, content, selectedNotebookId)
@@ -74,13 +71,13 @@ export function CreateNote ({
             <h4>Create a new Note</h4>
             {message ? (
                 <p
-                className={error ? "text-red-500" : "text-green-500"}
+                className={error ? "text-red-500" : "text-accent"}
                 >{message}</p>
             ) : (
                 null
             )}
             <input 
-                className="border-1 border-white rounded-md p-1"
+                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                 type="text"
                 placeholder="title"
                 value={title}
@@ -89,7 +86,7 @@ export function CreateNote ({
                 }}
             />
             <input 
-                className="border-1 border-white rounded-md p-1"
+                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                 type="text"
                 placeholder="content"
                 value={content}
@@ -100,7 +97,7 @@ export function CreateNote ({
             
             <button
                 type="submit"
-                className="border-1 border-white rounded-md p-1"
+                className="rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15"
             >
                 Create Note
             </button>

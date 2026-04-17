@@ -9,7 +9,6 @@ import Image from "next/image"
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
     setSelectedNotebookId: Dispatch<SetStateAction<string | null>>
-    setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     notebooks: Notebook[] | null
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
     refetchNotebooksKey: number,
@@ -24,7 +23,6 @@ type ModalType = "delete" | "create-notebook" | "create-stack" | null;
 
 export function NotebooksPanel({
     selectedNotebookId,
-    setSelectedNoteId,
     setSelectedNotebookId,
     refetchNotebooksKey,
     setRefetchNotebooksKey,
@@ -64,14 +62,14 @@ export function NotebooksPanel({
                         <p>This will also delete all notes contained in the notebook.</p>
                         <div className="flex justify-between mt-4">
                             <button
-                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            className="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 hover:bg-red-500/15 w-[110px]"
                             onClick={() => {
                                 handleDeleteNotebook(notebookIdToBeDeleted)
                             }}>
                                 Delete
                             </button>
                             <button
-                            className="border-1 border-white p-1 w-[100px] rounded-md"
+                            className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-2 w-[110px]"
                             onClick={() => {
                                 setNotebookIdToBeDeleted(null)
                                 closeModal()
@@ -92,7 +90,7 @@ export function NotebooksPanel({
                         >
                         <h4>Name your new notebook</h4>
                         <input 
-                            className="border-1 border-white rounded-md pl-2"
+                            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                             type="text"
                             placeholder="title"
                             value={newNotebookTitle}
@@ -103,13 +101,13 @@ export function NotebooksPanel({
                         <div className="flex justify-between mt-4">
                             <button
                                 type="submit"
-                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 w-[110px]"
                                 disabled={loading}
                                 >
                                 Create
                             </button>
                             <button
-                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-2 w-[110px]"
                                 onClick={() => {
                                     closeModal()
                                 }}
@@ -126,7 +124,7 @@ export function NotebooksPanel({
                         >
                         <h4>Name your new stack</h4>
                         <input 
-                            className="border-1 border-white rounded-md pl-2"
+                            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                             type="text"
                             placeholder="title"
                             value={newStackTitle}
@@ -137,13 +135,13 @@ export function NotebooksPanel({
                         <div className="flex justify-between mt-4">
                             <button
                                 type="submit"
-                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 w-[110px]"
                                 disabled={loading}
                                 >
                                 Create
                             </button>
                             <button
-                                className="border-1 border-white p-1 w-[100px] rounded-md"
+                                className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-2 w-[110px]"
                                 onClick={() => {
                                     closeModal()
                                 }}
@@ -182,7 +180,7 @@ export function NotebooksPanel({
         }
     
         fetchNotebooks()
-      }, [refetchNotebooksKey])
+      }, [refetchNotebooksKey, setNotebooks])
 
       const notebookPendingDeletion = notebookIdToBeDeleted && notebooks ?
         notebooks.find(nb => nb.id === notebookIdToBeDeleted) :
@@ -250,7 +248,7 @@ export function NotebooksPanel({
         <div>
             <div className="flex flex-col gap-2 px-4">
                 <button
-                    className="border-1 border-green-500 text-green-500 p-1 rounded-md"
+                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                     onClick={(e) => {
                         e.preventDefault()
                         openModal("create-stack")
@@ -259,7 +257,7 @@ export function NotebooksPanel({
                     + Stack
                 </button>
                 <button
-                    className="border-1 border-green-500 text-green-500 p-1 rounded-md"
+                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                     onClick={(e) => {
                         e.preventDefault()
                         openModal("create-notebook")
@@ -269,7 +267,7 @@ export function NotebooksPanel({
                 </button>
                 {selectedNotebookId && (
                     <button
-                        className="border-1 border-blue-500 text-blue-500 rounded-md p-1"
+                        className="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 hover:bg-red-500/15"
                         onClick={() => {
                             setNotebookIdToBeDeleted(selectedNotebookId)
                             openModal("delete")
@@ -290,12 +288,12 @@ export function NotebooksPanel({
                     ) : (
                         notebooks.map((notebook) => (
                             <li key={notebook.id}
-                            className={notebook.id === selectedNotebookId ? "border-1 border-white rounded-md p-1" : ""}>
+                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : ""}>
                                 <button
                                 onClick={() => {
                                     setSelectedNotebookId(notebook.id)
                                 }}
-                                className={"rounded-md p-1 w-[100px] text-left flex gap-2"}
+                                className={"rounded-md p-1 w-[100px] text-left flex gap-2 text-foreground hover:text-accent"}
                                 >
                                 <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
                                     alt="Notebook icon"

@@ -25,7 +25,7 @@ export function LogoutButton () {
             handleLogout()
         }}
         disabled={isLoading}
-        className="border-1 border-blue-500 rounded-md p-1"
+        className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:border-accent hover:text-accent"
         >
             Logout
         </button>

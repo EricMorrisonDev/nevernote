@@ -26,12 +26,11 @@ export function Workspace() {
       })
     
     return( 
-        <div className="flex min-w-screen p-4 bg-gray-900 h-screen overflow-hidden">
-            <div className="h-full min-h-0 left-0 w-[15%] border-r-1 border-white mr-4 p-4">
+        <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
+            <div className="h-full min-h-0 left-0 w-[15%] border-r border-border mr-4 p-4">
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
-                    setSelectedNoteId={setSelectedNoteId}
                     notebooks={notebooks}
                     setNotebooks={setNotebooks}
                     refetchNotebooksKey={refetchNotebooksKey}
@@ -52,20 +51,15 @@ export function Workspace() {
                     setRefetchNotes={setRefetchNotes}
                     notes={notes}
                     setNotes={setNotes}
-                    modalTitle={modalTitle}
-                    setModalTitle={setModalTitle}
                 />
             </div>
-            <div>
+            <div className="flex-1 min-h-0 h-full flex flex-col">
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchNotes={setRefetchNotes}
                     notes={notes}
-                    setNotes={setNotes}
-                    modalTitle={modalTitle}
-                    setModalTitle={setModalTitle}
                 />
             </div>
             <div

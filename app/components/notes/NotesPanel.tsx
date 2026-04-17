@@ -3,7 +3,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
-import type { RefetchReason, RefetchNotesState } from "@/app/lib/types";
+import type { RefetchNotesState } from "@/app/lib/types";
 
 
 interface NotesPanelProps {
@@ -15,8 +15,6 @@ interface NotesPanelProps {
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
-    modalTitle: string,
-    setModalTitle: Dispatch<SetStateAction<string>>
 }
 
 export function NotesPanel ({
@@ -28,59 +26,10 @@ export function NotesPanel ({
     notebooks,
     notes,
     setNotes,
-    modalTitle,
-    setModalTitle
     }: NotesPanelProps){
 
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
-
-
-    const fetchNotes = async(
-        selectedNotebookId: string | null, 
-        refetchNotes: RefetchNotesState,
-        signal?: AbortSignal,
-        ) => {
-
-        if(!selectedNotebookId) return
-
-        try {
-            console.log('fetching notes')
-            setError(false)
-            setLoading(true)
-            setNotes([])
-            const params = new URLSearchParams({ notebookId: selectedNotebookId })
-            const result = await fetch(`/api/notes?${params.toString()}`, {
-                signal
-            })
-            if(!result.ok){
-                throw new Error('Failed to retrieve notes')
-            }
-            const parsed = await result.json()
-            if(!Array.isArray(parsed.data)){
-                throw new Error('Invalid data type')
-            }
-            setNotes(parsed.data)
-
-            if(notes.length === 0){
-                throw new Error('Notes array empty')
-            }
-
-            if(refetchNotes.reason === "notebook-change"){
-                setSelectedNoteId(parsed.data[0].id)
-            }
-            
-        } catch (err) {
-            if(err instanceof DOMException && err.name === "AbortError"){
-                return
-            }
-            console.error(err)
-            setError(true)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const refetchReason = refetchNotes.reason
 
     useEffect(() => {
         const controller = new AbortController()
@@ -97,9 +46,39 @@ export function NotesPanel ({
             setSelectedNotebookTitle('')
         }
 
-        fetchNotes(selectedNotebookId, refetchNotes, signal)
+        if (!selectedNotebookId) {
+            return () => controller.abort()
+        }
+
+        ;(async () => {
+            try {
+                setNotes([])
+                const params = new URLSearchParams({ notebookId: selectedNotebookId })
+                const result = await fetch(`/api/notes?${params.toString()}`, {
+                    signal,
+                })
+                if (!result.ok) {
+                    throw new Error('Failed to retrieve notes')
+                }
+                const parsed = await result.json()
+                if (!Array.isArray(parsed.data)) {
+                    throw new Error('Invalid data type')
+                }
+                setNotes(parsed.data)
+
+                if (refetchReason === 'notebook-change') {
+                    setSelectedNoteId(parsed.data[0]?.id ?? null)
+                }
+            } catch (err) {
+                if (err instanceof DOMException && err.name === 'AbortError') {
+                    return
+                }
+                console.error(err)
+            }
+        })()
+
         return () => controller.abort()
-    }, [selectedNotebookId, refetchNotes, notebooks])
+    }, [selectedNotebookId, refetchNotes.key, refetchReason, notebooks, setNotes, setSelectedNoteId])
 
     const renderNotePreview = (content: string) => {
         let preview = ''
@@ -129,7 +108,7 @@ export function NotesPanel ({
 
     if(!selectedNotebookId){
         return  (
-        <p>No notebook currently selected</p>
+        <p className="text-muted">No notebook currently selected</p>
         )
     }
 
@@ -145,7 +124,7 @@ export function NotesPanel ({
                     )}
                 </div>
                 <button
-                    className="border-2 border-green-500 text-green-500 rounded-md w-[100px] h-[40px]"
+                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                     onClick={async () => {
                         await initializeNote(selectedNotebookId)
                         setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
@@ -160,8 +139,8 @@ export function NotesPanel ({
                             className="max-w-[200px]">
                             <button
                                 className={note.id === selectedNoteId ? 
-                                    "bg-black border-1 border-white rounded-md p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2" : 
-                                    "bg-black rounded-md min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2"}
+                                    "bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2" : 
+                                    "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
@@ -169,10 +148,10 @@ export function NotesPanel ({
                                     <p className="font-bold text-base pl-2">
                                         {note.title.trim().length === 0 ? 'Untitled' : note.title}
                                     </p>
-                                    <p className="text-sm text-gray-300 p-2">
+                                    <p className="text-sm text-muted p-2">
                                         {renderNotePreview(note.content)}
                                     </p>
-                                    <p className="mt-auto text-xs text-gray-400">
+                                    <p className="mt-auto text-xs text-muted/80">
                                         {renderNoteUpdatedTime(note.updatedAt)}
                                     </p>
                             </button>

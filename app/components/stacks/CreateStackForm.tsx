@@ -38,14 +38,14 @@ export function CreateStackForm () {
         onSubmit={(e) => {
             handleSubmit(e)
         }}
-        className="w-[300px] border-1 border-white rounded-md p-2">
+        className="w-[300px] rounded-2xl border border-border bg-surface p-4 shadow-sm">
             { error && (
                 <p className="text-red-500">
                     {error}
                 </p>
             )}
             { success && (
-                <p className="text-green-500">
+                <p className="text-accent">
                     {success}
                 </p>
             )}
@@ -60,13 +60,13 @@ export function CreateStackForm () {
                 onChange={(e) => {
                     setTitle(e.target.value)
                 }}
-                className="border-1 border-white p-1 my-2 rounded-md w-[80%]"
+                className="my-2 w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                 />
             </label>
             <button
             disabled={isLoading}
             type="submit"
-            className="border-1 border-green-500 p-1 my-2 rounded-md">
+            className="my-2 rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50">
                 Create
             </button>
         </form>
