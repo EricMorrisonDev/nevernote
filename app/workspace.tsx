@@ -13,10 +13,17 @@ export function Workspace() {
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
     const [notebooks, setNotebooks] = useState<Notebook[] | null>(null)
     const [notes, setNotes] = useState<Note[]>([])
-    const [refetchNotesKey, setRefetchNotesKey] = useState(0)
     const [refetchNotebooksKey, setRefetchNotebooksKey] = useState(0)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalTitle, setModalTitle] = useState('')
+    const [refetchNotes, setRefetchNotes] = useState({
+        key: 0,
+        reason: "notebook-change" as
+          | "notebook-change"
+          | "note-updated"
+          | "note-created"
+          | "note-deleted",
+      })
     
     return( 
         <div className="flex min-w-screen p-4 bg-gray-900 h-screen overflow-hidden">
@@ -41,8 +48,8 @@ export function Workspace() {
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNoteId={selectedNoteId}
                     notebooks={notebooks}
-                    setRefetchNotesKey={setRefetchNotesKey}
-                    refetchNotesKey={refetchNotesKey}
+                    refetchNotes={refetchNotes}
+                    setRefetchNotes={setRefetchNotes}
                     notes={notes}
                     setNotes={setNotes}
                     modalTitle={modalTitle}
@@ -62,7 +69,7 @@ export function Workspace() {
                 />
             </div>
             <div
-                className="fixed right-4 top-4">
+                className="fixed right-4 bottom-4">
                 <LogoutButton />
             </div>
         </div>

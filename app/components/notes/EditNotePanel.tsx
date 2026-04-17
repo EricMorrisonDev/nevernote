@@ -35,7 +35,6 @@ export function EditNotePanel ({
     const[note, setNote] = useState<Note | null>(null)
 
     
-// remember to update the name of this func since it doesn't just create
     const handleEditNote = async(
         title: string, 
         content: string, 
@@ -62,7 +61,7 @@ export function EditNotePanel ({
 
             const parsed = await res.json()
 
-            setMessage(`Note ${parsed.data.title} updated!`)
+           
             
         } catch(err) {
             console.error(err)
@@ -128,6 +127,12 @@ export function EditNotePanel ({
                     e.preventDefault()
                     handleEditNote(title, content, selectedNotebookId, selectedNoteId)
                 }}
+                onBlur={() => {
+                    if(!selectedNoteId || loading) return
+                    // update this later to only save if an actual change was made.
+                    // right now it will always save whenever a user clicks away.
+                    handleEditNote(title, content, selectedNotebookId, selectedNoteId )
+                }}
                 >
                 <input
                 className="text-[3rem] rounded-md p-1 m-2 outline-none"
@@ -168,7 +173,7 @@ export function EditNotePanel ({
                         Delete Note
                     </button>)}
                 </div>
-                <div>
+                {/* <div>
                     {message.length > 0 && (
                         <p
                         className="text green-500"
@@ -176,7 +181,7 @@ export function EditNotePanel ({
                             {message}
                         </p>
                     )}
-                </div>
+                </div> */}
             </form>
         </div>
     )

@@ -4,12 +4,23 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 
+type RefetchReason =
+    | "notebook-change"
+    | "note-updated"
+    | "note-created"
+    | "note-deleted"
+
+type RefetchNotesState = {
+    key: number
+    reason: RefetchReason
+    }
+
 interface NotesPanelProps {
     selectedNotebookId: string | null;
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNoteId: string | null
-    refetchNotesKey: number
-    setRefetchNotesKey: Dispatch<SetStateAction<number>>
+    refetchNotes: RefetchNotesState,
+    setRefetchNotes: Dispatch<SetStateAction<RefetchNotesState>>
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
@@ -21,8 +32,8 @@ export function NotesPanel ({
     selectedNotebookId,
     setSelectedNoteId,
     selectedNoteId,
-    refetchNotesKey,
-    setRefetchNotesKey,
+    refetchNotes,
+    setRefetchNotes,
     notebooks,
     notes,
     setNotes,
@@ -35,7 +46,11 @@ export function NotesPanel ({
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
 
 
-    const fetchNotes = async(selectedNotebookId: string | null, signal?: AbortSignal) => {
+    const fetchNotes = async(
+        selectedNotebookId: string | null, 
+        refetchNotes: RefetchNotesState,
+        signal?: AbortSignal,
+        ) => {
 
         if(!selectedNotebookId) return
 
@@ -56,7 +71,15 @@ export function NotesPanel ({
                 throw new Error('Invalid data type')
             }
             setNotes(parsed.data)
-            setSelectedNoteId(parsed.data[0].id)
+
+            if(notes.length === 0){
+                throw new Error('Notes array empty')
+            }
+
+            if(refetchNotes.reason === "notebook-change"){
+                setSelectedNoteId(parsed.data[0].id)
+            }
+            
         } catch (err) {
             if(err instanceof DOMException && err.name === "AbortError"){
                 return
@@ -139,15 +162,15 @@ export function NotesPanel ({
                     + Note
                 </button>
             </div>
-            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2">
-                { notes.length > 0 ? (
+            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2 gap-4 content-start">
+                { notes.length > 0 && (
                     notes.map(note => (
                         <li key={note.id}
                             className="max-w-[200px]">
                             <button
                                 className={note.id === selectedNoteId ? 
-                                    "bg-black border-1 border-white rounded-md mt-4 p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start" : 
-                                    "bg-black rounded-md min-w-[100px] mt-4 p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start"}
+                                    "bg-black border-1 border-white rounded-md p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2" : 
+                                    "bg-black rounded-md min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
                                 }}
@@ -164,10 +187,6 @@ export function NotesPanel ({
                             </button>
                         </li>
                     ))
-                ) : notes.length === 0 && loading ? (
-                    <p>Loading...</p>
-                ) : (
-                    <p>Notebook currently empty</p>
                 )}
             </ul>
         </div>
