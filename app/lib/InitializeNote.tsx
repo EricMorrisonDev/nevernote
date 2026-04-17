@@ -2,8 +2,6 @@
 import type { Note } from "@/lib/types/api"
 
 export const initializeNote = async(
-    title: string,
-    content: string,
     notebookId: string
 ) => {
 
@@ -13,7 +11,7 @@ export const initializeNote = async(
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({title, content, notebookId})
+            body: JSON.stringify({title: "", content: "", notebookId})
         })
 
         if(!res.ok){

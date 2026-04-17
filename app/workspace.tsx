@@ -41,6 +41,7 @@ export function Workspace() {
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNoteId={selectedNoteId}
                     notebooks={notebooks}
+                    setRefetchNotesKey={setRefetchNotesKey}
                     refetchNotesKey={refetchNotesKey}
                     notes={notes}
                     setNotes={setNotes}

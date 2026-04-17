@@ -2,12 +2,14 @@
 
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
+import { initializeNote } from "@/app/lib/InitializeNote";
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNoteId: string | null
     refetchNotesKey: number
+    setRefetchNotesKey: Dispatch<SetStateAction<number>>
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
@@ -20,6 +22,7 @@ export function NotesPanel ({
     setSelectedNoteId,
     selectedNoteId,
     refetchNotesKey,
+    setRefetchNotesKey,
     notebooks,
     notes,
     setNotes,
@@ -130,9 +133,10 @@ export function NotesPanel ({
                 <button
                     className="border-2 border-green-500 text-green-500 rounded-md w-[100px] h-[40px]"
                     onClick={() => {
-                        setSelectedNoteId(null)
+                        initializeNote(selectedNotebookId)
+                        setRefetchNotesKey(prev => prev + 1)
                     }}>
-                    New Note
+                    + Note
                 </button>
             </div>
             <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2">

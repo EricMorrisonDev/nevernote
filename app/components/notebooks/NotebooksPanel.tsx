@@ -22,12 +22,6 @@ interface NotebooksPanelProps {
 
 type ModalType = "delete" | "create-notebook" | "create-stack" | null;
 
-type ModalContext = {
-    notebookId?: string,
-    notebookName?: string,
-}
-
-
 export function NotebooksPanel({
     selectedNotebookId,
     setSelectedNoteId,
@@ -46,21 +40,18 @@ export function NotebooksPanel({
     const [notebookIdToBeDeleted, setNotebookIdToBeDeleted] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [modalType, setModalType] = useState<ModalType>(null)
-    const [modalContext, setModalContext] = useState<ModalContext>()
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [newStackTitle, setNewStackTitle] = useState('')
 
-    const openModal = (type: Exclude<ModalType, null>, context: ModalContext = {}) => {
+    const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
         setModalType(type)
-        setModalContext(context)
         setModalTitle(type)
     }
 
     const closeModal = () => {
         setModalOpen(false)
         setModalType(null)
-        setModalContext({})
         setModalTitle('')
     }
 
@@ -242,7 +233,7 @@ export function NotebooksPanel({
             const parsed = await res.json()
             const newNotebookId = parsed.data.id
 
-            initializeNote("", "", newNotebookId)
+            initializeNote(newNotebookId)
             setSelectedNotebookId(newNotebookId)
         } catch (err) {
             console.error(err)
