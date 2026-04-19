@@ -6,7 +6,7 @@ import { handleApiError } from "@/lib/errorResponse"
 import { requireUser } from "@/lib/session"
 
 export async function POST(request: Request) {
-
+    // Need to update this so that an array of notebooks must be included
     try{
         const body = await request.json()
         const validated = requireValidation(createStackSchema, body)
