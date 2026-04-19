@@ -1,7 +1,7 @@
 "use client"
 
 import { Dispatch, useEffect, useState, SetStateAction } from "react";
-import { Notebook } from "@/lib/types/api";
+import type { Notebook, Stack } from "@/lib/types/api";
 import { Modal } from "../Modal";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import Image from "next/image"
@@ -42,6 +42,7 @@ export function NotebooksPanel({
     const [modalType, setModalType] = useState<ModalType>(null)
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [newStackTitle, setNewStackTitle] = useState('')
+    const [stacks, setStacks] = useState<Stack[]>([])
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -156,33 +157,56 @@ export function NotebooksPanel({
         }
     }
 
+    const fetchNotebooks = async () => {
+      try{
+        const res = await fetch('/api/notebooks')
+        if(!res.ok) throw new Error(`Request failed: ${res.status}`)
+        const parsed = await res.json()
+        const list = parsed.data
 
-    useEffect(() => {
-        const fetchNotebooks = async () => {
-          try{
-            setLoading(true)
-            setError(false)
-            const res = await fetch('/api/notebooks')
-            if(!res.ok) throw new Error(`Request failed: ${res.status}`)
-            const parsed = await res.json()
-            const list = parsed.data
-    
-            if(Array.isArray(list)){
-              setNotebooks(list)
-            } else {
-              throw new Error('Invalid data type received')
-            }
-          } catch (e) {
-            console.error(e)
-            setNotebooks([])
-            setError(true)
-          } finally {
-            setLoading(false)
-          }
+        if(Array.isArray(list)){
+          setNotebooks(list)
+        } else {
+          throw new Error('Invalid data type received')
         }
-    
-        fetchNotebooks()
-      }, [refetchNotebooksKey, setNotebooks])
+      } catch (e) {
+        console.error(e)
+        setNotebooks([])
+      }
+    }
+
+    const fetchStacks = async() => {
+        
+        try{
+            const res = await fetch('/api/stacks')
+
+            if(!res.ok){
+                throw new Error('Error fetching stacks')
+            }
+
+            const stacks = await res.json()
+            if(Array.isArray(stacks.data)){
+                setStacks(stacks.data)
+            }
+        } catch (e) {
+            console.error(e)
+            setStacks([])
+        }
+    }
+
+    // we are refactoring this to invoke both fetchStacks and fetchNotebooks with Promise.all()
+    useEffect(() => {
+        const run = async() => {
+            try {
+                setLoading(true)
+                await Promise.all([fetchNotebooks(), fetchStacks()])
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        void run()
+      }, [refetchNotebooksKey])
 
       const notebookPendingDeletion = notebookIdToBeDeleted && notebooks ?
         notebooks.find(nb => nb.id === notebookIdToBeDeleted) :

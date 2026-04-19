@@ -113,7 +113,7 @@ export function EditNotePanel ({
     return(
 
         <div className="h-full min-h-0 flex flex-col p-8 rounded-2xl border border-border bg-surface">
-            <form
+            {selectedNoteId && (<form
                 className="h-full min-h-0 flex flex-col"
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -169,7 +169,7 @@ export function EditNotePanel ({
                         {message}
                     </p>
                 )} */}
-            </form>
+            </form>)}
         </div>
     )
 }
