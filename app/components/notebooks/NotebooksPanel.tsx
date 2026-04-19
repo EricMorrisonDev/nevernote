@@ -305,10 +305,32 @@ export function NotebooksPanel({
                     </button>)}
             </div>
             <div>
+                {stacks.length > 0 && (
+                    <ul className="m-4 flex flex-col gap-4"
+                        aria-labelledby="stacks-list"
+                        >
+                        {stacks.map(stack => (
+                            <li key={stack.id}>
+                                <button>
+                                    <Image src={'/noun-books-3239771-f5f0f0.svg'} 
+                                        alt="Notebook icon"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    {stack.title}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+            <div>
                 {error && (
                     <p className="text-red-400">Error occurred</p>
                 )}
-                <ul className="m-4 flex flex-col gap-4">
+                <ul className="m-4 flex flex-col gap-4"
+                    aria-labelledby="notebooks-list"
+                >
                     {notebooks === null ? (
                         <p>Loading...</p>
                     ) : notebooks.length === 0 ? (
