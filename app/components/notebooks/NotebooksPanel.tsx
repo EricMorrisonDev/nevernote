@@ -43,6 +43,7 @@ export function NotebooksPanel({
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [newStackTitle, setNewStackTitle] = useState('')
     const [stacks, setStacks] = useState<Stack[]>([])
+    const [openStackId, setOpenStackId] = useState('')
     const [notebooksToAddToStack, setNotebooksToAddToStack] = useState<string[]>([])
 
     const openModal = (type: Exclude<ModalType, null>) => {
@@ -152,6 +153,9 @@ export function NotebooksPanel({
             case "create-stack":
                 return (
                     <form
+                        onSubmit={() => {
+                            handleCreateStack()
+                        }}
                         >
                         <h4>Name your new stack</h4>
                         <input 
@@ -224,8 +228,7 @@ export function NotebooksPanel({
         const list = parsed.data
 
         if(Array.isArray(list)){
-          const notebooks = list.filter((n) => !n.stackId)
-          setNotebooks(notebooks)
+          setNotebooks(list)
         } else {
           throw new Error('Invalid data type received')
         }
@@ -373,7 +376,11 @@ export function NotebooksPanel({
                         >
                         {stacks.map(stack => (
                             <li key={stack.id}>
-                                <button>
+                                <button 
+                                className="flex gap-2"
+                                onClick={() => {
+                                    setOpenStackId(prev => prev === stack.id ? '' : stack.id)
+                                }}>
                                     <Image src={'/noun-books-3239771-f5f0f0.svg'} 
                                         alt="Notebook icon"
                                         width={20}
@@ -381,6 +388,30 @@ export function NotebooksPanel({
                                     />
                                     {stack.title}
                                 </button>
+                                {stack.id === openStackId && (
+                                    <ul className="mt-2 ml-2 flex flex-col gap-2">
+                                        {notebooks?.filter(
+                                            (n) => n.stackId === stack.id
+                                        ).map((notebook) => (
+                                            <li key={notebook.id}
+                                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : ""}>
+                                                <button
+                                                onClick={() => {
+                                                    setSelectedNotebookId(notebook.id)
+                                                }}
+                                                className={"rounded-md p-1 w-[100px] text-left flex gap-2 text-foreground hover:text-accent"}
+                                                >
+                                                <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                                    alt="Notebook icon"
+                                                    width={20}
+                                                    height={20}
+                                                    />
+                                                    {notebook.title}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </li>
                         ))}
                     </ul>
@@ -393,7 +424,7 @@ export function NotebooksPanel({
                 {error && (
                     <p className="text-red-400">Error occurred</p>
                 )}
-                <ul className="m-4 flex flex-col gap-4"
+                <ul className="ml-4 flex flex-col gap-4"
                     aria-labelledby="notebooks-list"
                 >
                     {notebooks === null ? (
@@ -401,7 +432,9 @@ export function NotebooksPanel({
                     ) : notebooks.length === 0 ? (
                         <p>No notebooks currently.</p>
                     ) : (
-                        notebooks.map((notebook) => (
+                        notebooks.filter(
+                            (n) => !n.stackId
+                        ).map((notebook) => (
                             <li key={notebook.id}
                             className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : ""}>
                                 <button
