@@ -43,6 +43,7 @@ export function NotebooksPanel({
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [newStackTitle, setNewStackTitle] = useState('')
     const [stacks, setStacks] = useState<Stack[]>([])
+    const [notebooksToAddToStack, setNotebooksToAddToStack] = useState<string[]>([])
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -135,6 +136,30 @@ export function NotebooksPanel({
                                 setNewStackTitle(e.target.value)
                             }}
                         />
+                        <div>
+                            <ul>
+                                {notebooks?.filter(
+                                    notebook => !notebook.stackId
+                                ).map(notebook => (
+                                    <li key={notebook.id}>
+                                        <button
+                                        type="button"
+                                        onClick={() => {
+                                            setNotebooksToAddToStack((prev: string[]) => {
+                                                const alreadySelected = prev.some((id) =>id === notebook.id)
+                                                if(alreadySelected){
+                                                    return prev.filter((id) => id !== notebook.id)
+                                                }
+                                                return [...prev, notebook.id]
+                                            })
+                                        }}
+                                        >
+                                            {notebook.title}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                         <div className="flex justify-between mt-4">
                             <button
                                 type="submit"
@@ -194,7 +219,6 @@ export function NotebooksPanel({
         }
     }
 
-    // we are refactoring this to invoke both fetchStacks and fetchNotebooks with Promise.all()
     useEffect(() => {
         const run = async() => {
             try {

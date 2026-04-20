@@ -6,27 +6,55 @@ import { handleApiError } from "@/lib/errorResponse"
 import { requireUser } from "@/lib/session"
 
 export async function POST(request: Request) {
-    // Need to update this so that an array of notebooks must be included
+
     try{
         const body = await request.json()
         const validated = requireValidation(createStackSchema, body)
         if(validated instanceof NextResponse) return validated
     
         const user = await requireUser()
-        if(user instanceof NextResponse) return user 
-    
-        const newStack = await prisma.stack.create({
-            data: {
-                title: validated.data.title,
-                userId: user.id
+        if(user instanceof NextResponse) return user
+
+        const { title, notebooks } = validated.data
+        const notebookIds = [...new Set(notebooks)]
+
+        const newStack = await prisma.$transaction(async (tx) => {
+            const stack = await tx.stack.create({
+                data: {
+                    title,
+                    userId: user.id,
+                },
+            })
+
+            const attached = await tx.notebook.updateMany({
+                where: {
+                    id: { in: notebookIds },
+                    userId: user.id,
+                    stackId: null,
+                },
+                data: { stackId: stack.id },
+            })
+
+            if (attached.count !== notebookIds.length) {
+                throw new Error("NOTEBOOK_ATTACH_FAILED")
             }
+
+            return stack
         })
-    
+
         return NextResponse.json(
-            {data: newStack},
-            {status: 201}
+            { data: newStack },
+            { status: 201 }
         )
     } catch (e) {
+        if (e instanceof Error && e.message === "NOTEBOOK_ATTACH_FAILED") {
+            return NextResponse.json(
+                {
+                    error: "One or more notebooks could not be added. They must exist, belong to you, and not already be in a stack.",
+                },
+                { status: 400 }
+            )
+        }
         return handleApiError(e)
     }
 }
