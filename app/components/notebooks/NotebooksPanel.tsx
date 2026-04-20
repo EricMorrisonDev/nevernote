@@ -136,29 +136,36 @@ export function NotebooksPanel({
                                 setNewStackTitle(e.target.value)
                             }}
                         />
-                        <div>
-                            <ul>
-                                {notebooks?.filter(
-                                    notebook => !notebook.stackId
-                                ).map(notebook => (
-                                    <li key={notebook.id}>
-                                        <button
-                                        type="button"
-                                        onClick={() => {
-                                            setNotebooksToAddToStack((prev: string[]) => {
-                                                const alreadySelected = prev.some((id) =>id === notebook.id)
-                                                if(alreadySelected){
-                                                    return prev.filter((id) => id !== notebook.id)
-                                                }
-                                                return [...prev, notebook.id]
-                                            })
-                                        }}
-                                        >
-                                            {notebook.title}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                        <div className="">
+                            <p className="my-4">Choose at least one notebook to add to your new stack</p>
+                            <div className="bg-background p-2 rounded-md">
+                                <ul>
+                                    {notebooks?.filter(
+                                        notebook => !notebook.stackId
+                                    ).map(notebook => (
+                                        <li key={notebook.id}>
+                                            <label
+                                                className="flex items-center gap-2"
+                                            >
+                                                <input 
+                                                    type="checkbox"
+                                                    checked={notebooksToAddToStack.includes(notebook.id)}
+                                                    onChange={() => {
+                                                        setNotebooksToAddToStack((prev) => 
+                                                            prev.includes(notebook.id) ?
+                                                            prev.filter((id) => id !== notebook.id)
+                                                            : [...prev, notebook.id]
+                                                        )
+                                                    }}
+                                                />
+                                                <span>
+                                                    {notebook.title}
+                                                </span>
+                                            </label>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                         <div className="flex justify-between mt-4">
                             <button
