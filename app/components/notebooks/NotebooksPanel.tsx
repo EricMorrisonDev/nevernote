@@ -57,6 +57,33 @@ export function NotebooksPanel({
         setModalTitle('')
     }
 
+    const handleCreateStack = async() => {
+
+        try{
+            setLoading(true)
+            const res = await fetch('/api/stacks', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title: newStackTitle, notebooks: notebooksToAddToStack })
+            })
+
+            if(!res.ok){
+                throw new Error('Error creating stack')
+            }
+
+            setRefetchNotebooksKey(prev => prev + 1)
+            setNewStackTitle('')
+            setNotebooksToAddToStack([])
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
+            closeModal()
+        }
+    }
+
     const renderModalContent = () => {
         switch (modalType) {
             case "delete":
@@ -197,7 +224,8 @@ export function NotebooksPanel({
         const list = parsed.data
 
         if(Array.isArray(list)){
-          setNotebooks(list)
+          const notebooks = list.filter((n) => !n.stackId)
+          setNotebooks(notebooks)
         } else {
           throw new Error('Invalid data type received')
         }
@@ -335,6 +363,9 @@ export function NotebooksPanel({
                         Delete Notebook
                     </button>)}
             </div>
+
+            {/* render stacks */}
+
             <div>
                 {stacks.length > 0 && (
                     <ul className="m-4 flex flex-col gap-4"
@@ -355,6 +386,9 @@ export function NotebooksPanel({
                     </ul>
                 )}
             </div>
+
+            {/* render notebooks */}
+
             <div>
                 {error && (
                     <p className="text-red-400">Error occurred</p>
