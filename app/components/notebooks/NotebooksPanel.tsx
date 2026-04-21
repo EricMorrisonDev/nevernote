@@ -1,10 +1,12 @@
 "use client"
 
-import { Dispatch, useEffect, useState, SetStateAction } from "react";
+import { Dispatch, useEffect, useRef, useState, SetStateAction } from "react";
 import type { Notebook, Stack } from "@/lib/types/api";
 import { Modal } from "../Modal";
 import { initializeNote } from "@/app/lib/InitializeNote";
-import Image from "next/image"
+import Image from "next/image";
+import { NotebooksMenu } from "./panelComponents/NotebooksMenu";
+import { StacksMenu } from "./panelComponents/StacksMenu";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -25,6 +27,11 @@ type ModalType = "delete" | "create-notebook" | "create-stack" | null;
 type MenuType = 
     | { kind: "stack"; id: string; x: number, y: number }
     | { kind: "notebook"; id: string; x: number, y: number }
+    | null
+
+type EditState =
+    | { kind: "stack"; id: string; value: string }
+    | { kind: "notebook"; id: string; value: string }
     | null
 
 export function NotebooksPanel({
@@ -51,6 +58,8 @@ export function NotebooksPanel({
     const [openStackId, setOpenStackId] = useState('')
     const [notebooksToAddToStack, setNotebooksToAddToStack] = useState<string[]>([])
     const [menuState, setMenuState] = useState<MenuType | null>(null)
+    const [editState, setEditState] = useState<EditState>(null)
+    const menuRef = useRef<HTMLDivElement | null>(null)
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -96,39 +105,43 @@ export function NotebooksPanel({
 
         return(
             <div
-            className="fixed z-50"
-            style={{ left: menuState.x, top: menuState.y }}>
+            ref={menuRef}
+            className="fixed z-50 w-[200px]"
+            style={{ left: menuState.x, top: menuState.y }}
+            >
                 {menuState.kind === "notebook" ? (
-                    <>
-                        <button type="button">
-                            Rename stack
-                        </button>
-                        <button type="button">
-                            Delete stack
-                        </button>
-                        <button type="button">
-                            Add notebooks
-                        </button>
-                    </>
+                    // Put new notebooks menu component here
+                    <NotebooksMenu
+                        notebooks={notebooks}
+                        setEditState={setEditState}
+                        menuState={menuState}
+                    />
                 ) : (
-                    <>
-                        <button type="button">
-                            Rename notebook
-                        </button>
-                        <button type="button">
-                            Delete notebook
-                        </button>
-                        <button type="button">
-                            Remove from stack
-                        </button>
-                        <button type="button">
-                            Move to...
-                        </button>
-                    </>
+                    <StacksMenu
+                        stacks={stacks}
+                        setEditState={setEditState}
+                        menuState={menuState}
+                    />
                 )}
             </div>
         )
     }
+
+    useEffect(() => {
+        if (!menuState) return
+
+        const handleClickOutside = (event: PointerEvent) => {
+            const target = event.target as Node | null
+            if (menuRef.current && target && !menuRef.current.contains(target)) {
+                setMenuState(null)
+            }
+        }
+
+        document.addEventListener("pointerdown", handleClickOutside)
+        return () => {
+            document.removeEventListener("pointerdown", handleClickOutside)
+        }
+    }, [menuState])
 
     const renderModalContent = () => {
         switch (modalType) {
@@ -434,7 +447,22 @@ export function NotebooksPanel({
                                             height={20}
                                             className="shrink-0"
                                             />
-                                        <span className="min-w-0 flex-1 truncate">{stack.title}</span>
+                                        {editState?.kind === "stack" && editState.id === stack.id ? (
+                                            <input
+                                                type="text"
+                                                value={editState.value}
+                                                onChange={(e) => {
+                                                    setEditState((prev) =>
+                                                        prev?.kind === "stack" && prev.id === stack.id
+                                                            ? { ...prev, value: e.target.value }
+                                                            : prev
+                                                    )
+                                                }}
+                                                className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
+                                            />
+                                        ) : (
+                                            <span className="min-w-0 flex-1 truncate">{stack.title}</span>
+                                        )}
                                     </button>
                                     <button>
                                         <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
@@ -471,7 +499,22 @@ export function NotebooksPanel({
                                                         height={20}
                                                         className="shrink-0"
                                                         />
-                                                        <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                                        {editState?.kind === "notebook" && editState.id === notebook.id ? (
+                                                            <input
+                                                                type="text"
+                                                                value={editState.value}
+                                                                onChange={(e) => {
+                                                                    setEditState((prev) =>
+                                                                        prev?.kind === "notebook" && prev.id === notebook.id
+                                                                            ? { ...prev, value: e.target.value }
+                                                                            : prev
+                                                                    )
+                                                                }}
+                                                                className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
+                                                            />
+                                                        ) : (
+                                                            <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                                        )}
                                                     </button>
                                                     <button
                                                         type="button"
@@ -534,7 +577,22 @@ export function NotebooksPanel({
                                         height={20}
                                         className="shrink-0"
                                         />
-                                        <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                        {editState?.kind === "notebook" && editState.id === notebook.id ? (
+                                            <input
+                                                type="text"
+                                                value={editState.value}
+                                                onChange={(e) => {
+                                                    setEditState((prev) =>
+                                                        prev?.kind === "notebook" && prev.id === notebook.id
+                                                            ? { ...prev, value: e.target.value }
+                                                            : prev
+                                                    )
+                                                }}
+                                                className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
+                                            />
+                                        ) : (
+                                            <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                        )}
                                     </button>
                                     <button
                                         type="button"
@@ -568,6 +626,7 @@ export function NotebooksPanel({
                 >
                     {renderModalContent()}
                 </Modal>
+                {renderMenu()}
         </div>
     )
 }
