@@ -22,6 +22,11 @@ interface NotebooksPanelProps {
 
 type ModalType = "delete" | "create-notebook" | "create-stack" | null;
 
+type MenuType = 
+    | { kind: "stack"; id: string; x: number, y: number }
+    | { kind: "notebook"; id: string; x: number, y: number }
+    | null
+
 export function NotebooksPanel({
     selectedNotebookId,
     setSelectedNotebookId,
@@ -45,6 +50,7 @@ export function NotebooksPanel({
     const [stacks, setStacks] = useState<Stack[]>([])
     const [openStackId, setOpenStackId] = useState('')
     const [notebooksToAddToStack, setNotebooksToAddToStack] = useState<string[]>([])
+    const [menuState, setMenuState] = useState<MenuType | null>(null)
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -83,6 +89,45 @@ export function NotebooksPanel({
             setLoading(false)
             closeModal()
         }
+    }
+
+    const renderMenu = () => {
+        if(!menuState) return null
+
+        return(
+            <div
+            className="fixed z-50"
+            style={{ left: menuState.x, top: menuState.y }}>
+                {menuState.kind === "notebook" ? (
+                    <>
+                        <button type="button">
+                            Rename stack
+                        </button>
+                        <button type="button">
+                            Delete stack
+                        </button>
+                        <button type="button">
+                            Add notebooks
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button type="button">
+                            Rename notebook
+                        </button>
+                        <button type="button">
+                            Delete notebook
+                        </button>
+                        <button type="button">
+                            Remove from stack
+                        </button>
+                        <button type="button">
+                            Move to...
+                        </button>
+                    </>
+                )}
+            </div>
+        )
     }
 
     const renderModalContent = () => {
@@ -397,6 +442,12 @@ export function NotebooksPanel({
                                         width={15}
                                         height={15}
                                         className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setMenuState({ kind: "stack", id: stack.id,
+                                                x: e.clientX, y: e.clientY
+                                            })
+                                        }}
                                         />
                                     </button>                                  
                                 </div>
@@ -426,6 +477,12 @@ export function NotebooksPanel({
                                                         type="button"
                                                         className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
                                                         aria-label="Open notebook menu"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setMenuState({ kind: "notebook", id: notebook.id,
+                                                                x: e.clientX, y: e.clientY
+                                                            })
+                                                        }}
                                                     >
                                                         <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
                                                             alt="menu icon"
@@ -483,6 +540,12 @@ export function NotebooksPanel({
                                         type="button"
                                         className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
                                         aria-label="Open notebook menu"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setMenuState({ kind: "notebook", id: notebook.id,
+                                                x: e.clientX, y: e.clientY
+                                            })
+                                        }}
                                     >
                                         <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
                                             alt="menu icon"
@@ -490,6 +553,7 @@ export function NotebooksPanel({
                                             height={15}
                                             className="shrink-0"
                                         />
+                                        
                                     </button>
                                 </div>
                             </li>
