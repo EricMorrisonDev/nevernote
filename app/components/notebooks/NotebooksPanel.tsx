@@ -63,6 +63,7 @@ export function NotebooksPanel({
     const [menuState, setMenuState] = useState<MenuType | null>(null)
     const [editState, setEditState] = useState<EditState>(null)
     const menuRef = useRef<HTMLDivElement | null>(null)
+    const editInputRef = useRef<HTMLInputElement | null>(null)
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -260,6 +261,14 @@ export function NotebooksPanel({
         }
     }, [menuState])
 
+    const activeEditTarget = editState ? `${editState.kind}:${editState.id}` : null
+
+    useEffect(() => {
+        if (!activeEditTarget) return
+        editInputRef.current?.focus()
+        editInputRef.current?.select()
+    }, [activeEditTarget])
+
     const renderModalContent = () => {
         switch (modalType) {
             case "delete":
@@ -414,6 +423,7 @@ export function NotebooksPanel({
                                             />
                                         {editState?.kind === "stack" && editState.id === stack.id ? (
                                             <input
+                                                ref={editInputRef}
                                                 type="text"
                                                 value={editState.value}
                                                 onChange={(e) => {
@@ -477,6 +487,7 @@ export function NotebooksPanel({
                                                         />
                                                         {editState?.kind === "notebook" && editState.id === notebook.id ? (
                                                             <input
+                                                                ref={editInputRef}
                                                                 type="text"
                                                                 value={editState.value}
                                                                 onChange={(e) => {
@@ -566,6 +577,7 @@ export function NotebooksPanel({
                                         />
                                         {editState?.kind === "notebook" && editState.id === notebook.id ? (
                                             <input
+                                                ref={editInputRef}
                                                 type="text"
                                                 value={editState.value}
                                                 onChange={(e) => {

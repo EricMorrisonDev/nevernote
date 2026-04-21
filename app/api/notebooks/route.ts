@@ -82,6 +82,9 @@ export async function GET (request: Request) {
             where: {
                 userId: user.id,
                 stackId
+            },
+            orderBy: {
+                createdAt: "asc"
             }
         })
 
