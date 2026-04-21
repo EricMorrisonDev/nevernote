@@ -10,6 +10,7 @@ import { StacksMenu } from "./panelComponents/StacksMenu";
 import { DeleteNotebookModal } from "./panelComponents/DeleteNotebookModal";
 import { CreateStackModal } from "./panelComponents/CreateStackModal";
 import { CreateNotebookModal } from "./panelComponents/CreateNotebookModal";
+import { DeleteStackModal } from "./panelComponents/DeleteStackModal";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -53,6 +54,7 @@ export function NotebooksPanel({
     
     const [error, setError] = useState(false)
     const [notebookIdToBeDeleted, setNotebookIdToBeDeleted] = useState<string | null>(null)
+    const [stackIdToBeDeleted, setStackIdToBeDeleted] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [modalType, setModalType] = useState<ModalType>(null)
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
@@ -206,6 +208,27 @@ export function NotebooksPanel({
         }
     }
 
+    const handleDeleteStack = async (stackIdToBeDeleted: string | null) => {
+        if (!stackIdToBeDeleted) return
+        try {
+            setLoading(true)
+            const res = await fetch(`/api/stacks/${stackIdToBeDeleted}`, {
+                method: "DELETE"
+            })
+
+            if (!res.ok) {
+                throw new Error("Error deleting stack")
+            }
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
+            setRefetchNotebooksKey((prev) => prev + 1)
+            setStackIdToBeDeleted(null)
+            closeModal()
+        }
+    }
+
     const handleCreateNotebook = async (title: string) => {
         try{
             setLoading(true)
@@ -251,18 +274,33 @@ export function NotebooksPanel({
             style={{ left: menuState.x, top: menuState.y }}
             >
                 {menuState.kind === "notebook" ? (
-                    // Put new notebooks menu component here
                     <NotebooksMenu
                         notebooks={notebooks}
                         setEditState={setEditState}
                         menuState={menuState}
                         onRemoveFromStack={handleRemoveNotebookFromStack}
+                        onCloseMenu={() => {
+                            setMenuState(null)
+                        }}
+                        onDeleteNotebook={(id) => {
+                            setNotebookIdToBeDeleted(id)
+                            setMenuState(null)
+                            openModal("delete")
+                        }}
                     />
                 ) : (
                     <StacksMenu
                         stacks={stacks}
                         setEditState={setEditState}
                         menuState={menuState}
+                        onCloseMenu={() => {
+                            setMenuState(null)
+                        }}
+                        onDeleteStack={(id) => {
+                            setStackIdToBeDeleted(id)
+                            setMenuState(null)
+                            openModal("delete")
+                        }}
                     />
                 )}
             </div>
@@ -296,6 +334,20 @@ export function NotebooksPanel({
     const renderModalContent = () => {
         switch (modalType) {
             case "delete":
+                if (stackIdToBeDeleted) {
+                    return (
+                        <DeleteStackModal
+                            stackTitle={stackPendingDeletion?.title}
+                            onConfirmDelete={() => {
+                                handleDeleteStack(stackIdToBeDeleted)
+                            }}
+                            onCancel={() => {
+                                setStackIdToBeDeleted(null)
+                                closeModal()
+                            }}
+                        />
+                    )
+                }
                 return (
                     <DeleteNotebookModal
                         notebookTitle={notebookPendingDeletion?.title}
@@ -388,6 +440,9 @@ export function NotebooksPanel({
       const notebookPendingDeletion = notebookIdToBeDeleted && notebooks ?
         notebooks.find(nb => nb.id === notebookIdToBeDeleted) :
         undefined
+      const stackPendingDeletion = stackIdToBeDeleted && stacks ?
+        stacks.find(stack => stack.id === stackIdToBeDeleted) :
+        undefined
 
     
 
@@ -412,16 +467,6 @@ export function NotebooksPanel({
                 >
                     + Notebook
                 </button>
-                {selectedNotebookId && (
-                    <button
-                        className="rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-200 hover:bg-red-500/15"
-                        onClick={() => {
-                            setNotebookIdToBeDeleted(selectedNotebookId)
-                            openModal("delete")
-                        }}
-                    >
-                        Delete Notebook
-                    </button>)}
             </div>
 
             {/* render stacks */}

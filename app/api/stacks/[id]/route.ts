@@ -50,7 +50,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 }
 
 
-export async function DELETE(context: { params: Promise<{ id: string }>}) {
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }>}) {
 
     try{
         const { id } = await context.params

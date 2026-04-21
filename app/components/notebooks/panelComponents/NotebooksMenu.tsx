@@ -15,14 +15,18 @@ interface NotebooksMenuProps {
     notebooks: Notebook[] | null,
     setEditState: Dispatch<SetStateAction<EditState | null>>,
     menuState: MenuType,
-    onRemoveFromStack: (id: string) => void
+    onRemoveFromStack: (id: string) => void,
+    onDeleteNotebook: (id: string) => void,
+    onCloseMenu: () => void
 }
 
 export function NotebooksMenu({
     notebooks,
     setEditState,
     menuState,
-    onRemoveFromStack
+    onRemoveFromStack,
+    onDeleteNotebook,
+    onCloseMenu
 }: NotebooksMenuProps) {
 
     const activeNotebook = notebooks?.find((n) => n.id === menuState.id)
@@ -40,11 +44,18 @@ export function NotebooksMenu({
                     id: menuState.id,
                     value: notebook?.title ?? ""
                 })
+                onCloseMenu()
             }}
             >
                 Rename notebook
             </button>
-            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+            <button
+                type="button"
+                className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                onClick={() => {
+                    onDeleteNotebook(menuState.id)
+                }}
+            >
                 Delete notebook
             </button>
             {isInStack && (<button

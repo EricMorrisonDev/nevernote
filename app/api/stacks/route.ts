@@ -67,6 +67,9 @@ export async function GET() {
         const stacks = await prisma.stack.findMany({
             where: {
                 userId: user.id
+            },
+            orderBy: {
+                createdAt: "asc"
             }
         })
     

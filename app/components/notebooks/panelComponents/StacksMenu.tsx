@@ -13,13 +13,17 @@ type MenuType =
 interface StacksMenuProps {
     stacks: Stack[] | null,
     setEditState: Dispatch<SetStateAction<EditState | null>>,
-    menuState: MenuType
+    menuState: MenuType,
+    onCloseMenu: () => void,
+    onDeleteStack: (id: string) => void
 }
 
 export function StacksMenu({
     stacks,
     setEditState,
-    menuState
+    menuState,
+    onCloseMenu,
+    onDeleteStack
 }: StacksMenuProps) {
 
     return(
@@ -34,11 +38,18 @@ export function StacksMenu({
                     id: menuState.id,
                     value: stack?.title ?? ""
                 })
+                onCloseMenu()
             }}
             >
                 Rename stack
             </button>
-            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+            <button
+                type="button"
+                className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                onClick={() => {
+                    onDeleteStack(menuState.id)
+                }}
+            >
                 Delete stack
             </button>
             <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
