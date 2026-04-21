@@ -11,6 +11,7 @@ import { DeleteNotebookModal } from "./panelComponents/DeleteNotebookModal";
 import { CreateStackModal } from "./panelComponents/CreateStackModal";
 import { CreateNotebookModal } from "./panelComponents/CreateNotebookModal";
 import { DeleteStackModal } from "./panelComponents/DeleteStackModal";
+import { useNotebookPanelActions } from "./hooks/useNotebookPanelActions";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -79,32 +80,15 @@ export function NotebooksPanel({
         setModalTitle('')
     }
 
-    const handleCreateStack = async() => {
-
-        try{
-            setLoading(true)
-            const res = await fetch('/api/stacks', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title: newStackTitle, notebooks: notebooksToAddToStack })
-            })
-
-            if(!res.ok){
-                throw new Error('Error creating stack')
-            }
-
-            setRefetchNotebooksKey(prev => prev + 1)
-            setNewStackTitle('')
-            setNotebooksToAddToStack([])
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setLoading(false)
-            closeModal()
-        }
-    }
+    const { handleCreateStack } = useNotebookPanelActions({
+        newStackTitle,
+        notebooksToAddToStack,
+        setLoading,
+        setRefetchNotebooksKey,
+        setNewStackTitle,
+        setNotebooksToAddToStack,
+        closeModal,
+    })
 
     const handleEditStackTitle = async(id: string, newTitle: string) => {
 
