@@ -150,6 +150,29 @@ export function NotebooksPanel({
         }
     }
 
+    const handleRemoveNotebookFromStack = async (id: string) => {
+        if (!id) return
+        try {
+            const res = await fetch(`/api/notebooks/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ stackId: null })
+            })
+
+            if (!res.ok) {
+                throw new Error("Error removing notebook from stack")
+            }
+
+            setRefetchNotebooksKey((prev) => prev + 1)
+            setMenuState(null)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+
     const submitNotebookTitleEdit = async () => {
         if (!editState || editState.kind !== "notebook") return
         await handleEditNotebookTitle(editState.id, editState.value)
@@ -233,6 +256,7 @@ export function NotebooksPanel({
                         notebooks={notebooks}
                         setEditState={setEditState}
                         menuState={menuState}
+                        onRemoveFromStack={handleRemoveNotebookFromStack}
                     />
                 ) : (
                     <StacksMenu
