@@ -130,6 +130,32 @@ export function NotebooksPanel({
         setRefetchNotebooksKey((prev) => prev + 1)
     }
 
+    const handleEditNotebookTitle = async (id: string, newTitle: string) => {
+        if (!id || !newTitle.trim()) return
+        try {
+            const res = await fetch(`/api/notebooks/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title: newTitle })
+            })
+
+            if (!res.ok) {
+                throw new Error("Error updating notebook name")
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const submitNotebookTitleEdit = async () => {
+        if (!editState || editState.kind !== "notebook") return
+        await handleEditNotebookTitle(editState.id, editState.value)
+        setEditState(null)
+        setRefetchNotebooksKey((prev) => prev + 1)
+    }
+
     const handleDeleteNotebook = async (notebookIdToBeDeleted: string | null) => {
 
         if(!notebookIdToBeDeleted) return
@@ -460,6 +486,17 @@ export function NotebooksPanel({
                                                                             : prev
                                                                     )
                                                                 }}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault()
+                                                                        void submitNotebookTitleEdit()
+                                                                    } else if (e.key === "Escape") {
+                                                                        setEditState(null)
+                                                                    }
+                                                                }}
+                                                                onBlur={() => {
+                                                                    void submitNotebookTitleEdit()
+                                                                }}
                                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                                             />
                                                         ) : (
@@ -537,6 +574,17 @@ export function NotebooksPanel({
                                                             ? { ...prev, value: e.target.value }
                                                             : prev
                                                     )
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault()
+                                                        void submitNotebookTitleEdit()
+                                                    } else if (e.key === "Escape") {
+                                                        setEditState(null)
+                                                    }
+                                                }}
+                                                onBlur={() => {
+                                                    void submitNotebookTitleEdit()
                                                 }}
                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                             />
