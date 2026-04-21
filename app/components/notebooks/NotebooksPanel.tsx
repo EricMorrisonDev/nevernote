@@ -3,7 +3,6 @@
 import { Dispatch, useEffect, useRef, useState, SetStateAction } from "react";
 import type { Notebook, Stack } from "@/lib/types/api";
 import { Modal } from "../Modal";
-import { initializeNote } from "@/app/lib/InitializeNote";
 import Image from "next/image";
 import { NotebooksMenu } from "./panelComponents/NotebooksMenu";
 import { StacksMenu } from "./panelComponents/StacksMenu";
@@ -80,35 +79,28 @@ export function NotebooksPanel({
         setModalTitle('')
     }
 
-    const { handleCreateStack } = useNotebookPanelActions({
+    const {
+        handleCreateStack,
+        handleEditStackTitle,
+        handleEditNotebookTitle,
+        handleRemoveNotebookFromStack,
+        handleDeleteStack,
+        handleCreateNotebook,
+    } = useNotebookPanelActions({
         newStackTitle,
         notebooksToAddToStack,
         setLoading,
+        setError,
         setRefetchNotebooksKey,
         setNewStackTitle,
+        setNewNotebookTitle,
         setNotebooksToAddToStack,
+        setMenuState,
+        setStackIdToBeDeleted,
+        setSelectedNotebookId,
+        setSelectedNoteId,
         closeModal,
     })
-
-    const handleEditStackTitle = async(id: string, newTitle: string) => {
-
-        if(!id || !newTitle.trim()) return
-        try{
-            const res = await fetch(`/api/stacks/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title: newTitle })
-            })
-
-            if(!res.ok){
-                throw new Error('Error updating stack name')
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
 
     const submitStackTitleEdit = async () => {
         if (!editState || editState.kind !== "stack") return
@@ -116,48 +108,6 @@ export function NotebooksPanel({
         setEditState(null)
         setRefetchNotebooksKey((prev) => prev + 1)
     }
-
-    const handleEditNotebookTitle = async (id: string, newTitle: string) => {
-        if (!id || !newTitle.trim()) return
-        try {
-            const res = await fetch(`/api/notebooks/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title: newTitle })
-            })
-
-            if (!res.ok) {
-                throw new Error("Error updating notebook name")
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    const handleRemoveNotebookFromStack = async (id: string) => {
-        if (!id) return
-        try {
-            const res = await fetch(`/api/notebooks/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ stackId: null })
-            })
-
-            if (!res.ok) {
-                throw new Error("Error removing notebook from stack")
-            }
-
-            setRefetchNotebooksKey((prev) => prev + 1)
-            setMenuState(null)
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
 
     const submitNotebookTitleEdit = async () => {
         if (!editState || editState.kind !== "notebook") return
@@ -189,62 +139,6 @@ export function NotebooksPanel({
             setSelectedNotebookId(null)
             setSelectedNoteId(null)
             setModalOpen(false)
-        }
-    }
-
-    const handleDeleteStack = async (stackIdToBeDeleted: string | null) => {
-        if (!stackIdToBeDeleted) return
-        try {
-            setLoading(true)
-            const res = await fetch(`/api/stacks/${stackIdToBeDeleted}`, {
-                method: "DELETE"
-            })
-
-            if (!res.ok) {
-                throw new Error("Error deleting stack")
-            }
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setLoading(false)
-            setRefetchNotebooksKey((prev) => prev + 1)
-            setStackIdToBeDeleted(null)
-            closeModal()
-        }
-    }
-
-    const handleCreateNotebook = async (title: string) => {
-        try{
-            setLoading(true)
-            setError(false)
-
-            const res = await fetch('/api/notebooks', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title })
-            })
-
-            if(!res.ok){
-                setError(true)
-            }
-
-            const parsed = await res.json()
-            const newNotebookId = parsed.data.id
-
-            const result = await initializeNote(newNotebookId)
-            const newNoteId = result?.id
-            if(newNoteId) setSelectedNoteId(newNoteId)
-            setSelectedNotebookId(newNotebookId)
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-            setNewNotebookTitle('')
-            setRefetchNotebooksKey(prev => prev + 1)
-            closeModal()
-            
         }
     }
 
