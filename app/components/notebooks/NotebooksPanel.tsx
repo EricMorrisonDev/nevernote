@@ -295,6 +295,7 @@ export function NotebooksPanel({
             setRefetchNotebooksKey(prev => prev + 1)
             setNotebookIdToBeDeleted(null)
             setSelectedNotebookId(null)
+            setSelectedNoteId(null)
             setModalOpen(false)
         }
     }
@@ -376,38 +377,64 @@ export function NotebooksPanel({
                         >
                         {stacks.map(stack => (
                             <li key={stack.id}>
-                                <button 
-                                className="flex gap-2"
-                                onClick={() => {
-                                    setOpenStackId(prev => prev === stack.id ? '' : stack.id)
-                                }}>
-                                    <Image src={'/noun-books-3239771-f5f0f0.svg'} 
-                                        alt="Notebook icon"
-                                        width={20}
-                                        height={20}
-                                    />
-                                    {stack.title}
-                                </button>
+                                <div className="flex group">
+                                    <button 
+                                        className="flex w-full items-center gap-2 text-left"
+                                        onClick={() => {
+                                            setOpenStackId(prev => prev === stack.id ? '' : stack.id)
+                                        }}>
+                                        <Image src={'/noun-books-3239771-f5f0f0.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0"
+                                            />
+                                        <span className="min-w-0 flex-1 truncate">{stack.title}</span>
+                                    </button>
+                                    <button>
+                                        <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
+                                        alt="menu icon"
+                                        width={15}
+                                        height={15}
+                                        className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
+                                        />
+                                    </button>                                  
+                                </div>
                                 {stack.id === openStackId && (
                                     <ul className="mt-2 ml-2 flex flex-col gap-2">
                                         {notebooks?.filter(
                                             (n) => n.stackId === stack.id
                                         ).map((notebook) => (
                                             <li key={notebook.id}
-                                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : ""}>
-                                                <button
-                                                onClick={() => {
-                                                    setSelectedNotebookId(notebook.id)
-                                                }}
-                                                className={"rounded-md p-1 w-[100px] text-left flex gap-2 text-foreground hover:text-accent"}
-                                                >
-                                                <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
-                                                    alt="Notebook icon"
-                                                    width={20}
-                                                    height={20}
-                                                    />
-                                                    {notebook.title}
-                                                </button>
+                                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : "p-1"}>
+                                                <div className="flex group">
+                                                    <button
+                                                    onClick={() => {
+                                                        setSelectedNotebookId(notebook.id)
+                                                    }}
+                                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
+                                                    >
+                                                    <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                                        alt="Notebook icon"
+                                                        width={20}
+                                                        height={20}
+                                                        className="shrink-0"
+                                                        />
+                                                        <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
+                                                        aria-label="Open notebook menu"
+                                                    >
+                                                        <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
+                                                            alt="menu icon"
+                                                            width={15}
+                                                            height={15}
+                                                            className="shrink-0"
+                                                        />
+                                                    </button>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
@@ -436,20 +463,35 @@ export function NotebooksPanel({
                             (n) => !n.stackId
                         ).map((notebook) => (
                             <li key={notebook.id}
-                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : ""}>
-                                <button
-                                onClick={() => {
-                                    setSelectedNotebookId(notebook.id)
-                                }}
-                                className={"rounded-md p-1 w-[100px] text-left flex gap-2 text-foreground hover:text-accent"}
-                                >
-                                <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
-                                    alt="Notebook icon"
-                                    width={20}
-                                    height={20}
-                                    />
-                                    {notebook.title}
-                                </button>
+                            className={notebook.id === selectedNotebookId ? "rounded-xl border border-accent/50 bg-surface p-1" : "p-1"}>
+                                <div className="flex group">
+                                    <button
+                                    onClick={() => {
+                                        setSelectedNotebookId(notebook.id)
+                                    }}
+                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
+                                    >
+                                    <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                        alt="Notebook icon"
+                                        width={20}
+                                        height={20}
+                                        className="shrink-0"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto"
+                                        aria-label="Open notebook menu"
+                                    >
+                                        <Image src={'/noun-ellipsis-vertical-7182731-f5f0f0.svg'}
+                                            alt="menu icon"
+                                            width={15}
+                                            height={15}
+                                            className="shrink-0"
+                                        />
+                                    </button>
+                                </div>
                             </li>
                         ))
                     )}
