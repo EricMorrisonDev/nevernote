@@ -24,9 +24,10 @@ export function NotebooksMenu({
 }: NotebooksMenuProps) {
 
     return(
-        <div>
+        <div className="rounded-md border border-border bg-background p-2 flex flex-col gap-2 items-start">
             <button 
             type="button"
+            className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
             onClick={() => {
                 const notebook = notebooks?.find((n) => n.id === menuState.id)
                 setEditState({
@@ -38,13 +39,13 @@ export function NotebooksMenu({
             >
                 Rename notebook
             </button>
-            <button type="button">
+            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
                 Delete notebook
             </button>
-            <button type="button">
+            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
                 Remove from stack
             </button>
-            <button type="button">
+            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
                 Move to...
             </button>
         </div>

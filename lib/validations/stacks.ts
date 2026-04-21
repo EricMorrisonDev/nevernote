@@ -8,7 +8,6 @@ export const createStackSchema = z.object({
 })
 
 export const updateStackSchema = z.object({
-    id: z.string(),
     title: z.string().trim().min(1)
 })
 

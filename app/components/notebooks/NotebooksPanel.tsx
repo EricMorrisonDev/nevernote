@@ -103,6 +103,94 @@ export function NotebooksPanel({
         }
     }
 
+    const handleEditStackTitle = async(id: string, newTitle: string) => {
+
+        if(!id || !newTitle.trim()) return
+        try{
+            const res = await fetch(`/api/stacks/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title: newTitle })
+            })
+
+            if(!res.ok){
+                throw new Error('Error updating stack name')
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const submitStackTitleEdit = async () => {
+        if (!editState || editState.kind !== "stack") return
+        await handleEditStackTitle(editState.id, editState.value)
+        setEditState(null)
+        setRefetchNotebooksKey((prev) => prev + 1)
+    }
+
+    const handleDeleteNotebook = async (notebookIdToBeDeleted: string | null) => {
+
+        if(!notebookIdToBeDeleted) return
+
+        try{
+            setLoading(true)
+            const res = await fetch(`/api/notebooks/${notebookIdToBeDeleted}`, {
+                method: "DELETE"
+            })
+
+            if(!res.ok){
+                throw new Error('Error deleting notebook')
+            }
+
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+            setRefetchNotebooksKey(prev => prev + 1)
+            setNotebookIdToBeDeleted(null)
+            setSelectedNotebookId(null)
+            setSelectedNoteId(null)
+            setModalOpen(false)
+        }
+    }
+
+    const handleCreateNotebook = async (title: string) => {
+        try{
+            setLoading(true)
+            setError(false)
+
+            const res = await fetch('/api/notebooks', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title })
+            })
+
+            if(!res.ok){
+                setError(true)
+            }
+
+            const parsed = await res.json()
+            const newNotebookId = parsed.data.id
+
+            const result = await initializeNote(newNotebookId)
+            const newNoteId = result?.id
+            if(newNoteId) setSelectedNoteId(newNoteId)
+            setSelectedNotebookId(newNotebookId)
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+            setNewNotebookTitle('')
+            setRefetchNotebooksKey(prev => prev + 1)
+            closeModal()
+            
+        }
+    }
+
     const renderMenu = () => {
         if(!menuState) return null
 
@@ -242,66 +330,7 @@ export function NotebooksPanel({
         notebooks.find(nb => nb.id === notebookIdToBeDeleted) :
         undefined
 
-    const handleDeleteNotebook = async (notebookIdToBeDeleted: string | null) => {
-
-        if(!notebookIdToBeDeleted) return
-
-        try{
-            setLoading(true)
-            const res = await fetch(`/api/notebooks/${notebookIdToBeDeleted}`, {
-                method: "DELETE"
-            })
-
-            if(!res.ok){
-                throw new Error('Error deleting notebook')
-            }
-
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-            setRefetchNotebooksKey(prev => prev + 1)
-            setNotebookIdToBeDeleted(null)
-            setSelectedNotebookId(null)
-            setSelectedNoteId(null)
-            setModalOpen(false)
-        }
-    }
-
-    const handleCreateNotebook = async (title: string) => {
-        try{
-            setLoading(true)
-            setError(false)
-
-            const res = await fetch('/api/notebooks', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ title })
-            })
-
-            if(!res.ok){
-                setError(true)
-            }
-
-            const parsed = await res.json()
-            const newNotebookId = parsed.data.id
-
-            const result = await initializeNote(newNotebookId)
-            const newNoteId = result?.id
-            if(newNoteId) setSelectedNoteId(newNoteId)
-            setSelectedNotebookId(newNotebookId)
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-            setNewNotebookTitle('')
-            setRefetchNotebooksKey(prev => prev + 1)
-            closeModal()
-            
-        }
-    }
+    
 
     return(
         <div>
@@ -367,6 +396,17 @@ export function NotebooksPanel({
                                                             ? { ...prev, value: e.target.value }
                                                             : prev
                                                     )
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault()
+                                                        void submitStackTitleEdit()
+                                                    } else if (e.key === "Escape") {
+                                                        setEditState(null)
+                                                    }
+                                                }}
+                                                onBlur={() => {
+                                                    void submitStackTitleEdit()
                                                 }}
                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                             />
