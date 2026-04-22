@@ -7,6 +7,7 @@ import Image from "next/image";
 import { NotebooksMenu } from "./panelComponents/NotebooksMenu";
 import { StacksMenu } from "./panelComponents/StacksMenu";
 import { DeleteNotebookModal } from "./panelComponents/DeleteNotebookModal";
+import { MoveNotebookModal } from "./panelComponents/MoveNotebookModal";
 import { CreateStackModal } from "./panelComponents/CreateStackModal";
 import { CreateNotebookModal } from "./panelComponents/CreateNotebookModal";
 import { DeleteStackModal } from "./panelComponents/DeleteStackModal";
@@ -26,7 +27,7 @@ interface NotebooksPanelProps {
     setModalTitle: Dispatch<SetStateAction<string>>
 }
 
-type ModalType = "delete" | "create-notebook" | "create-stack" | null;
+type ModalType = "delete" | "create-notebook" | "create-stack" | "moveNotebook" | null;
 
 type MenuType = 
     | { kind: "stack"; id: string; x: number, y: number }
@@ -54,6 +55,7 @@ export function NotebooksPanel({
     
     const [error, setError] = useState(false)
     const [notebookIdToBeDeleted, setNotebookIdToBeDeleted] = useState<string | null>(null)
+    const [notebookIdToMove, setNotebookIdToMove] = useState<string | null>(null)
     const [stackIdToBeDeleted, setStackIdToBeDeleted] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [modalType, setModalType] = useState<ModalType>(null)
@@ -158,6 +160,11 @@ export function NotebooksPanel({
                         setEditState={setEditState}
                         menuState={menuState}
                         onRemoveFromStack={handleRemoveNotebookFromStack}
+                        onMoveNotebook={(id) => {
+                            setNotebookIdToMove(id)
+                            setMenuState(null)
+                            openModal("moveNotebook")
+                        }}
                         onCloseMenu={() => {
                             setMenuState(null)
                         }}
@@ -249,7 +256,6 @@ export function NotebooksPanel({
                         onCancel={closeModal}
                     />
                 )
-                // come back and finish this
             case "create-stack":
                 return (
                     <CreateStackModal
@@ -261,6 +267,19 @@ export function NotebooksPanel({
                         loading={loading}
                         onSubmit={handleCreateStack}
                         onCancel={closeModal}
+                    />
+                )
+            case "moveNotebook":
+                return (
+                    <MoveNotebookModal 
+                        notebook={notebooks?.find((nb) => nb.id === notebookIdToMove) ?? undefined}
+                        stacks={stacks}
+                        loading={loading}
+                        onSubmit={handleMoveNotebook}
+                        onCancel={() => {
+                            setNotebookIdToMove(null)
+                            closeModal()
+                        }}
                     />
                 )
         }

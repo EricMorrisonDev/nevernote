@@ -17,6 +17,7 @@ interface NotebooksMenuProps {
     menuState: MenuType,
     onRemoveFromStack: (id: string) => void,
     onDeleteNotebook: (id: string) => void,
+    onMoveNotebook: (notebookId: string, targetStackId: string) => void,
     onCloseMenu: () => void
 }
 
@@ -25,6 +26,7 @@ export function NotebooksMenu({
     setEditState,
     menuState,
     onRemoveFromStack,
+    onMoveNotebook,
     onDeleteNotebook,
     onCloseMenu
 }: NotebooksMenuProps) {
@@ -67,7 +69,13 @@ export function NotebooksMenu({
             >
                 Remove from stack
             </button>)}
-            <button type="button" className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+            <button 
+                type="button" 
+                className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                onClick={() => {
+                    onMoveNotebook(menuState.id, )
+                }}
+                >
                 Move to...
             </button>
         </div>
