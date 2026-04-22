@@ -86,6 +86,7 @@ export function NotebooksPanel({
         handleRemoveNotebookFromStack,
         handleDeleteStack,
         handleCreateNotebook,
+        handleMoveNotebook
     } = useNotebookPanelActions({
         newStackTitle,
         notebooksToAddToStack,

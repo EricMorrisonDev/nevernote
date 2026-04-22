@@ -181,6 +181,34 @@ export function useNotebookPanelActions({
         }
     }
 
+    const handleMoveNotebook = async(notebookId: string, targetStackId: string | null) => {
+
+        if(!notebookId) return 
+
+        try{
+            setLoading(true)
+            setError(false)
+
+            const res = await fetch(`/api/notebooks/${notebookId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ stackId: targetStackId })
+            })
+
+            if(!res.ok){
+                throw new Error("Error moving notebook")
+            }
+            setRefetchNotebooksKey(prev => prev + 1)
+            closeModal()
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return {
         handleCreateStack,
         handleEditStackTitle,
@@ -188,5 +216,6 @@ export function useNotebookPanelActions({
         handleRemoveNotebookFromStack,
         handleDeleteStack,
         handleCreateNotebook,
+        handleMoveNotebook
     }
 }

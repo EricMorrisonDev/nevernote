@@ -36,7 +36,7 @@ export async function PUT (request: Request, context: { params: Promise<{ id: st
         if (user instanceof NextResponse) return user
 
         if(validatedBody.data.stackId){
-            const match = ensureStackMatchesUser(validatedBody.data.stackId, user.id)
+            const match = await ensureStackMatchesUser(validatedBody.data.stackId, user.id)
             if(match instanceof NextResponse) return match
         }
 
