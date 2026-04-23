@@ -1,4 +1,5 @@
 import type { Notebook, Stack } from "@/lib/types/api"
+import type { FormEvent } from "react"
 import { useMemo, useState } from "react"
 
 interface MoveNotebookModalProps {
@@ -25,7 +26,7 @@ export function MoveNotebookModal({
     const effectiveSelectedStackId =
         selectedStackId || availableStacks[0]?.id || ""
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!notebook?.id || !effectiveSelectedStackId) return
         onSubmit(notebook.id, effectiveSelectedStackId)
@@ -46,19 +47,36 @@ export function MoveNotebookModal({
                     No destination stacks available.
                 </p>
             ) : (
-                <select
-                    className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none"
-                    value={effectiveSelectedStackId}
-                    onChange={(e) => {
-                        setSelectedStackId(e.target.value)
-                    }}
+                <div
+                    className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-border bg-background p-1"
+                    role="listbox"
+                    aria-label="Destination stacks"
                 >
-                    {availableStacks.map((stack) => (
-                        <option key={stack.id} value={stack.id}>
-                            {stack.title}
-                        </option>
-                    ))}
-                </select>
+                    <ul className="flex flex-col gap-1">
+                        {availableStacks.map((stack) => {
+                            const isSelected = effectiveSelectedStackId === stack.id
+                            return (
+                                <li key={stack.id}>
+                                    <button
+                                        type="button"
+                                        role="option"
+                                        aria-selected={isSelected}
+                                        className={`w-full rounded-md px-3 py-2 text-left text-sm text-foreground outline-none transition-colors ${
+                                            isSelected
+                                                ? "border border-accent/50 bg-surface"
+                                                : "border border-transparent hover:bg-surface-2"
+                                        }`}
+                                        onClick={() => {
+                                            setSelectedStackId(stack.id)
+                                        }}
+                                    >
+                                        <span className="block truncate">{stack.title}</span>
+                                    </button>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>
             )}
 
             <div className="mt-4 flex justify-between">

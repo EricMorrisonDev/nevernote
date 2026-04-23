@@ -81,7 +81,10 @@ export function CreateStackModal({
                 <button
                     type="button"
                     className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-2 w-[110px]"
-                    onClick={onCancel}
+                    onClick={() => {
+                        setNotebooksToAddToStack([])
+                        onCancel()
+                    }}
                     >
                         Cancel
                 </button>

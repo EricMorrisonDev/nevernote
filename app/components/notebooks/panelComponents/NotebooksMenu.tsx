@@ -17,7 +17,7 @@ interface NotebooksMenuProps {
     menuState: MenuType,
     onRemoveFromStack: (id: string) => void,
     onDeleteNotebook: (id: string) => void,
-    onMoveNotebook: (notebookId: string, targetStackId: string) => void,
+    onMoveNotebook: (id: string) => void,
     onCloseMenu: () => void
 }
 
@@ -73,7 +73,7 @@ export function NotebooksMenu({
                 type="button" 
                 className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
                 onClick={() => {
-                    onMoveNotebook(menuState.id, )
+                    onMoveNotebook(menuState.id)
                 }}
                 >
                 Move to...

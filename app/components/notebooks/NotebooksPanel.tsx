@@ -12,6 +12,7 @@ import { CreateStackModal } from "./panelComponents/CreateStackModal";
 import { CreateNotebookModal } from "./panelComponents/CreateNotebookModal";
 import { DeleteStackModal } from "./panelComponents/DeleteStackModal";
 import { useNotebookPanelActions } from "./hooks/useNotebookPanelActions";
+import { truncateTitle } from "@/app/lib/format/truncateTitle";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -24,7 +25,7 @@ interface NotebooksPanelProps {
     modalOpen: boolean,
     setModalOpen: Dispatch<SetStateAction<boolean>>
     modalTitle: string,
-    setModalTitle: Dispatch<SetStateAction<string>>
+    setModalTitle: Dispatch<SetStateAction<string>>,
 }
 
 type ModalType = "delete" | "create-notebook" | "create-stack" | "moveNotebook" | null;
@@ -79,6 +80,7 @@ export function NotebooksPanel({
         setModalOpen(false)
         setModalType(null)
         setModalTitle('')
+        setNewStackTitle('')
     }
 
     const {
@@ -414,7 +416,7 @@ export function NotebooksPanel({
                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                             />
                                         ) : (
-                                            <span className="min-w-0 flex-1 truncate">{stack.title}</span>
+                                            <span className="min-w-0 flex-1 truncate">{truncateTitle(stack.title)}</span>
                                         )}
                                     </button>
                                     <button>
@@ -478,7 +480,7 @@ export function NotebooksPanel({
                                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                                             />
                                                         ) : (
-                                                            <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                                            <span className="min-w-0 flex-1">{truncateTitle(notebook.title)}</span>
                                                         )}
                                                     </button>
                                                     <button
@@ -568,7 +570,7 @@ export function NotebooksPanel({
                                                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none"
                                             />
                                         ) : (
-                                            <span className="min-w-0 flex-1 truncate">{notebook.title}</span>
+                                            <span className="min-w-0 flex-1 truncate">{truncateTitle(notebook.title)}</span>
                                         )}
                                     </button>
                                     <button
