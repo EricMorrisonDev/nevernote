@@ -2,29 +2,7 @@ import { requireUser } from "@/lib/session"
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { handleApiError } from "@/lib/errorResponse"
-
-export type SearchHit =
-    | {
-          kind: "stack"
-          id: string
-          title: string
-          createdAt: string
-      }
-    | {
-          kind: "notebook"
-          id: string
-          title: string
-          stackId: string | null
-          createdAt: string
-      }
-    | {
-          kind: "note"
-          id: string
-          title: string
-          notebookId: string
-          match: "title" | "content"
-          createdAt: string
-      }
+import type { SearchHit } from "@/lib/types/search"
 
 export async function GET(request: Request) {
     try {

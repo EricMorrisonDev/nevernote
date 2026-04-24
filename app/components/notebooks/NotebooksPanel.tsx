@@ -2,8 +2,8 @@
 
 import { Dispatch, useEffect, useRef, useState, SetStateAction } from "react";
 import type { Notebook, Stack } from "@/lib/types/api";
-import { Modal } from "../Modal";
 import Image from "next/image";
+import { Modal } from '../Modal'
 import { NotebooksMenu } from "./panelComponents/NotebooksMenu";
 import { StacksMenu } from "./panelComponents/StacksMenu";
 import { DeleteNotebookModal } from "./panelComponents/DeleteNotebookModal";
@@ -598,7 +598,7 @@ export function NotebooksPanel({
                     )}
                 </ul>
             </div>
-                <Modal
+            <Modal
                     modalOpen={modalOpen}
                     setModalOpen={setModalOpen}
                     title={modalTitle}
