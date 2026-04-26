@@ -8,6 +8,7 @@ import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
+import Image from "next/image";
 
 export function Workspace() {
 
@@ -22,7 +23,6 @@ export function Workspace() {
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
     const [searchLoading, setSearchLoading] = useState(false)
-
     const [refetchNotes, setRefetchNotes] = useState({
         key: 0,
         reason: "notebook-change" as
@@ -51,6 +51,19 @@ export function Workspace() {
         }
     }
 
+    const setSearchModalOpenWithReset: React.Dispatch<React.SetStateAction<boolean>> = (
+        next
+      ) => {
+        setSearchModalOpen((prev) => {
+          const nextOpen = typeof next === "function" ? next(prev) : next
+          if (!nextOpen) {
+            setSearchQuery("")
+            setSearchResults([])
+          }
+          return nextOpen
+        })
+      }
+
     useEffect(() => {
         const term = searchQuery.trim()
 
@@ -70,6 +83,24 @@ export function Workspace() {
     return( 
         <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
             <div className="h-full min-h-0 left-0 w-[15%] border-r border-border mr-4 p-4">
+                <button 
+                    className="mb-4 mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                    aria-labelledby="search-button"
+                    onClick={() => {
+                        setSearchModalOpen(true)
+                    }}
+                    >
+                    <Image
+                        src="noun-search-icon-8300588-f5f0f0.svg"
+                        alt="search-icon"
+                        width={20}
+                        height={20}
+    
+                    />
+                    <div>
+
+                    </div>
+                </button>
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
@@ -111,18 +142,19 @@ export function Workspace() {
             </div>
             <div>
                 <Modal
-                    modalOpen={modalOpen}
-                    setModalOpen={setSearchModalOpen}
+                    modalOpen={searchModalOpen}
+                    setModalOpen={setSearchModalOpenWithReset}
                     title={modalTitle}
                 >
-                    <div>
+                    <div className="flex flex-col min-h-[400px]">
                         <input 
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value)
                             }}
+                            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                         />
-                        <ul>
+                        <ul className="flex flex-col gap-2">
                             {searchResults.filter((r) => r.kind === 'stack')
                             .map((s) => (
                                 <li key={s.id}>
