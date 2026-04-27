@@ -18,6 +18,8 @@ interface NotebooksPanelProps {
     selectedNotebookId: string | null,
     setSelectedNotebookId: Dispatch<SetStateAction<string | null>>
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
+    openStackId: string
+    setOpenStackId: Dispatch<SetStateAction<string>>
     notebooks: Notebook[] | null
     setNotebooks: Dispatch<SetStateAction<Notebook[] | null>>
     refetchNotebooksKey: number,
@@ -46,6 +48,8 @@ export function NotebooksPanel({
     refetchNotebooksKey,
     setRefetchNotebooksKey,
     setSelectedNoteId,
+    openStackId,
+    setOpenStackId,
     notebooks,
     setNotebooks,
     modalOpen,
@@ -63,7 +67,6 @@ export function NotebooksPanel({
     const [newNotebookTitle, setNewNotebookTitle] = useState('')
     const [newStackTitle, setNewStackTitle] = useState('')
     const [stacks, setStacks] = useState<Stack[]>([])
-    const [openStackId, setOpenStackId] = useState('')
     const [notebooksToAddToStack, setNotebooksToAddToStack] = useState<string[]>([])
     const [menuState, setMenuState] = useState<MenuType | null>(null)
     const [editState, setEditState] = useState<EditState>(null)

@@ -14,6 +14,7 @@ export function Workspace() {
 
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
+    const [openStackId, setOpenStackId] = useState('')
     const [notebooks, setNotebooks] = useState<Notebook[] | null>(null)
     const [notes, setNotes] = useState<Note[]>([])
     const [refetchNotebooksKey, setRefetchNotebooksKey] = useState(0)
@@ -115,6 +116,8 @@ export function Workspace() {
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
                     setSelectedNoteId={setSelectedNoteId}
+                    openStackId={openStackId}
+                    setOpenStackId={setOpenStackId}
                     notebooks={notebooks}
                     setNotebooks={setNotebooks}
                     refetchNotebooksKey={refetchNotebooksKey}
