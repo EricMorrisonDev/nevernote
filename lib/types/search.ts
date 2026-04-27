@@ -11,6 +11,7 @@ export type SearchHit =
           id: string
           title: string
           stackId: string | null
+          stackTitle: string | null
           createdAt: string
       }
     | {

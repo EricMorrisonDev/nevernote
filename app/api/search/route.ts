@@ -32,6 +32,14 @@ export async function GET(request: Request) {
                     title: { contains: term, mode: "insensitive" },
                 },
                 orderBy: { createdAt: "desc" },
+                include: {
+                    stack: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                },
             }),
 
             prisma.note.findMany({
@@ -66,6 +74,7 @@ export async function GET(request: Request) {
                 id: n.id,
                 title: n.title,
                 stackId: n.stackId,
+                stackTitle: n.stack?.title,
                 createdAt: n.createdAt.toISOString(),
             })),
             ...notesByTitle.map((n) => ({

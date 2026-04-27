@@ -32,6 +32,8 @@ export function Workspace() {
           | "note-deleted",
       })
 
+
+
     const handleSearch = async(query: string) => {
 
         const term = query.trim()
@@ -79,6 +81,14 @@ export function Workspace() {
         return () => clearTimeout(timer)
 
     }, [searchQuery])
+
+   
+
+    // const renderStackForNotebook = (notebook: NotebookSearchHit) => {
+    //     const stack = searchResults.find((r) => r.kind === 'stack' && r.id === notebook.stackId)
+    //     if(!stack) return null
+    //     return stack.title
+    // }
     
     return( 
         <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
@@ -152,9 +162,10 @@ export function Workspace() {
                             onChange={(e) => {
                                 setSearchQuery(e.target.value)
                             }}
+                            placeholder="enter search query"
                             className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                         />
-                        <ul className="flex flex-col gap-2">
+                        <ul className="flex flex-col gap-2 mt-4 pl-2">
                             {searchResults.filter((r) => r.kind === 'stack')
                             .map((s) => (
                                 <li key={s.id}>
@@ -165,10 +176,24 @@ export function Workspace() {
                             ))}
                             {searchResults.filter((r) => r.kind === 'notebook')
                             .map((nb) => (
-                                <li key={nb.id}>
+                                <li key={nb.id}
+                                    className="flex">
                                     <button>
                                         {nb.title}
                                     </button>
+                                    {nb.stackTitle && (
+                                        <div className="flex gap-2 ml-3">
+                                        <p>{'>'}</p>
+                                        <Image src={'/noun-gray-books-3239771-8c8a8a.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0"
+                                            />
+                                        <p className="text-[#8A8A8A]">{nb.stackTitle}</p>
+
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                             {searchResults.filter((r) => r.kind === 'note')
