@@ -48,6 +48,20 @@ export async function GET(request: Request) {
                     title: { contains: term, mode: "insensitive" },
                 },
                 orderBy: { createdAt: "desc" },
+                include: {
+                    notebook: {
+                        select: {
+                            id: true,
+                            title: true,
+                            stack: {
+                                select: {
+                                    id: true,
+                                    title: true
+                                }
+                            }
+                        }
+                    }
+                }
             }),
 
             prisma.note.findMany({
@@ -59,6 +73,20 @@ export async function GET(request: Request) {
                     },
                 },
                 orderBy: { createdAt: "desc" },
+                include: {
+                    notebook: {
+                        select: {
+                            id: true,
+                            title: true,
+                            stack: {
+                                select: {
+                                    id: true,
+                                    title: true
+                                }
+                            }
+                        }
+                    }
+                }
             }),
         ])
 
@@ -82,6 +110,9 @@ export async function GET(request: Request) {
                 id: n.id,
                 title: n.title,
                 notebookId: n.notebookId,
+                notebookTitle: n.notebook?.title,
+                stackId: n.notebook?.stack?.id,
+                stackTitle: n.notebook?.stack?.title,
                 match: "title" as const,
                 createdAt: n.createdAt.toISOString(),
             })),
@@ -89,7 +120,10 @@ export async function GET(request: Request) {
                 kind: "note" as const,
                 id: n.id,
                 title: n.title,
-                notebookId: n.notebookId,
+                notebookId: n.notebook?.id,
+                notebookTitle: n.notebook?.title,
+                stackId: n.notebook?.stack?.id,
+                stackTitle: n.notebook?.stack?.title,
                 match: "content" as const,
                 createdAt: n.createdAt.toISOString(),
             })),

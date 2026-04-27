@@ -19,6 +19,9 @@ export type SearchHit =
           id: string
           title: string
           notebookId: string
+          notebookTitle: string
+          stackId: string | null
+          stackTitle: string | null
           match: "title" | "content"
           createdAt: string
       }

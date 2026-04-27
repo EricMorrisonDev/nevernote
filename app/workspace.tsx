@@ -178,6 +178,12 @@ export function Workspace() {
                             .map((nb) => (
                                 <li key={nb.id}
                                     className="flex">
+                                    <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0 mr-1"
+                                            />
                                     <button>
                                         {nb.title}
                                     </button>
@@ -198,10 +204,33 @@ export function Workspace() {
                             ))}
                             {searchResults.filter((r) => r.kind === 'note')
                             .map((n) => (
-                                <li key={n.id}>
+                                <li key={n.id}
+                                className="flex">
                                     <button>
                                         {n.title}
                                     </button>
+                                    {n.stackTitle && (
+                                        <div className="flex gap-2 ml-3">
+                                        <Image src={'/noun-gray-books-3239771-8c8a8a.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0"
+                                            />
+                                        <p className="text-[#8A8A8A]">{n.stackTitle}</p>
+                                        <p className="text-[#8A8A8A]">{'>'}</p>
+                                        </div>
+                                    )}
+                                    <div className="flex gap-2 ml-3">
+                                    <Image src={'/noun-notebook-gray-8289864-8c8a8a.svg'} 
+                                        alt="Notebook icon"
+                                        width={20}
+                                        height={20}
+                                        className="shrink-0"
+                                        />
+                                    <p className="text-[#8A8A8A]">{n.notebookTitle}</p>
+                                    </div>
+                                    
                                 </li>
                             ))}
                             
