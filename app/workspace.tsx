@@ -6,6 +6,7 @@ import { Notebook, Note } from "@/lib/types/api";
 import { useEffect, useState } from "react";
 import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
+import { RichTextEditor } from "./components/notes/RichTextEditor";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
 import { RefetchReason, RefetchNotesState } from "./lib/types"
@@ -24,6 +25,7 @@ export function Workspace() {
     const [modalTitle, setModalTitle] = useState('')
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
+    const [draft, setDraft] = useState('')
     const [refetchNotes, setRefetchNotes] = useState<RefetchNotesState>({
         key: 0,
         reason: "notebook-change"
@@ -160,13 +162,22 @@ export function Workspace() {
                     setNotes={setNotes}
                 />
             </div>
-            <div className="flex-1 min-h-0 h-full flex flex-col">
+            {/* <div className="flex-1 min-h-0 h-full flex flex-col">
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchNotes={setRefetchNotes}
                     notes={notes}
+                />
+            </div> */}
+            <div className="flex-1 min-h-0 h-full flex flex-col">
+                <RichTextEditor 
+                    value={draft}
+                    onChange={() => {
+                        setDraft('')
+                    }}
+                    placeholder="start writing dude"
                 />
             </div>
             <div
