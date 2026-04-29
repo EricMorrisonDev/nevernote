@@ -189,67 +189,76 @@ export function Workspace() {
                             placeholder="enter search query"
                             className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
                         />
-                        <ul className="flex flex-col gap-2 mt-4 pl-2">
+                        <ul className="flex flex-col gap-4 mt-4 pl-2">
                             {searchResults.filter((r) => r.kind === 'stack')
                             .map((s) => (
-                                <li key={s.id}>
+                                <li key={s.id}
+                                >
+                                    
                                     <button
                                     onClick={() => {
                                         setSearchModalOpenWithReset(false)
                                         handleSearchNavigation(s)
                                     }}
+                                    className="flex gap-2 rounded-md px-2 py-1 transition-colors hover:bg-surface-2/60"
                                     >
+                                        <Image src={'/noun-books-3239771-f5f0f0.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0 mr-1"
+                                            />
                                         {s.title}
                                     </button>
                                 </li>
                             ))}
                             {searchResults.filter((r) => r.kind === 'notebook')
                             .map((nb) => (
-                                <li key={nb.id}
-                                    className="flex">
+                                <li key={nb.id}>
+                                    <button
+                                    onClick={() => {
+                                        setSearchModalOpenWithReset(false)
+                                        handleSearchNavigation(nb)
+                                    }}
+                                    className="flex gap-2 rounded-md px-2 py-1 transition-colors hover:bg-surface-2/60"
+                                    >
                                     <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
                                             alt="Notebook icon"
                                             width={20}
                                             height={20}
                                             className="shrink-0 mr-1"
                                             />
-                                    <button
-                                    onClick={() => {
-                                        setSearchModalOpenWithReset(false)
-                                        handleSearchNavigation(nb)
-                                    }}
-                                    >
                                         {nb.title}
-                                    </button>
-                                    {nb.stackTitle && (
-                                        <div className="flex gap-2 ml-3">
-                                        <p>{'>'}</p>
-                                        <Image src={'/noun-gray-books-3239771-8c8a8a.svg'} 
-                                            alt="Notebook icon"
-                                            width={20}
-                                            height={20}
-                                            className="shrink-0"
-                                            />
-                                        <p className="text-[#8A8A8A]">{nb.stackTitle}</p>
+                                        {nb.stackTitle && (
+                                            <div className="flex gap-2 ml-4">
+                                            <p>{'>'}</p>
+                                            <Image src={'/noun-gray-books-3239771-8c8a8a.svg'} 
+                                                alt="Notebook icon"
+                                                width={20}
+                                                height={20}
+                                                className="shrink-0"
+                                                />
+                                            <p className="text-[#8A8A8A]">{nb.stackTitle}</p>
 
-                                        </div>
-                                    )}
+                                            </div>
+                                        )}
+                                    </button>
                                 </li>
                             ))}
                             {searchResults.filter((r) => r.kind === 'note')
                             .map((n) => (
                                 <li key={n.id}
-                                className="flex">
+                                >
                                     <button
                                     onClick={() => {
                                         setSearchModalOpenWithReset(false)
                                         handleSearchNavigation(n)
                                     }}
+                                    className="flex rounded-md px-2 py-1 transition-colors hover:bg-surface-2/60"
                                     >
-                                        {n.title}
-                                    </button>
+                                    {n.title}
                                     {n.stackTitle && (
-                                        <div className="flex gap-2 ml-3">
+                                        <div className="flex gap-2 ml-4">
                                         <Image src={'/noun-gray-books-3239771-8c8a8a.svg'} 
                                             alt="Notebook icon"
                                             width={20}
@@ -260,7 +269,7 @@ export function Workspace() {
                                         <p className="text-[#8A8A8A]">{'>'}</p>
                                         </div>
                                     )}
-                                    <div className="flex gap-2 ml-3">
+                                    <div className="flex gap-2 ml-4">
                                     <Image src={'/noun-notebook-gray-8289864-8c8a8a.svg'} 
                                         alt="Notebook icon"
                                         width={20}
@@ -269,6 +278,7 @@ export function Workspace() {
                                         />
                                     <p className="text-[#8A8A8A]">{n.notebookTitle}</p>
                                     </div>
+                                    </button>
                                     
                                 </li>
                             ))}

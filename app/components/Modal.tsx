@@ -27,7 +27,7 @@ export function Modal ({
             }}
         >
             <div
-                className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xl"
+                className="w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-xl"
                 role="dialog"
                 aria-modal="true"
                 aria-label={title}
