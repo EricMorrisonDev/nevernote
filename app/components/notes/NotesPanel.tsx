@@ -66,9 +66,15 @@ export function NotesPanel ({
                 }
                 setNotes(parsed.data)
 
+                if(refetchReason === 'searchHit-note-selected') {
+                    return
+                }
+
                 if (refetchReason === 'notebook-change') {
                     setSelectedNoteId(parsed.data[0]?.id ?? null)
                 } 
+
+
             } catch (err) {
                 if (err instanceof DOMException && err.name === 'AbortError') {
                     return

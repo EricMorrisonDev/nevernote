@@ -8,6 +8,7 @@ import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
+import { RefetchReason, RefetchNotesState } from "./lib/types"
 import Image from "next/image";
 
 export function Workspace() {
@@ -24,13 +25,9 @@ export function Workspace() {
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
     const [searchLoading, setSearchLoading] = useState(false)
-    const [refetchNotes, setRefetchNotes] = useState({
+    const [refetchNotes, setRefetchNotes] = useState<RefetchNotesState>({
         key: 0,
-        reason: "notebook-change" as
-          | "notebook-change"
-          | "note-updated"
-          | "note-created"
-          | "note-deleted",
+        reason: "notebook-change"
       })
 
 
@@ -83,13 +80,37 @@ export function Workspace() {
 
     }, [searchQuery])
 
-   
+    const bumpRefetchNotes = (reason: RefetchReason = "notebook-change") => {
+        setRefetchNotes((prev) => ({ key: prev.key + 1, reason }) )
+    }
 
-    // const renderStackForNotebook = (notebook: NotebookSearchHit) => {
-    //     const stack = searchResults.find((r) => r.kind === 'stack' && r.id === notebook.stackId)
-    //     if(!stack) return null
-    //     return stack.title
-    // }
+    const handleSearchNavigation = (searchHit: SearchHit) => {
+        const kind = searchHit.kind
+
+        switch(kind) {
+            case "stack":
+                setOpenStackId(searchHit.id)
+                break
+
+            case "notebook":
+                if(searchHit.kind === "notebook" && searchHit.stackId){
+                    setOpenStackId(searchHit.stackId)
+                }
+                setSelectedNotebookId(searchHit.id)
+                break
+
+            case "note":
+                if(searchHit.kind === "note" && searchHit.stackId && searchHit.notebookId){
+                    setOpenStackId(searchHit.stackId)
+                    setSelectedNotebookId(searchHit.notebookId)
+                } else if(searchHit.kind === "note" && searchHit.notebookId) {
+                    setSelectedNotebookId(searchHit.notebookId)
+                }
+                bumpRefetchNotes("searchHit-note-selected")
+                setSelectedNoteId(searchHit.id)
+                break
+        }
+    }
     
     return( 
         <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
@@ -172,7 +193,12 @@ export function Workspace() {
                             {searchResults.filter((r) => r.kind === 'stack')
                             .map((s) => (
                                 <li key={s.id}>
-                                    <button>
+                                    <button
+                                    onClick={() => {
+                                        setSearchModalOpenWithReset(false)
+                                        handleSearchNavigation(s)
+                                    }}
+                                    >
                                         {s.title}
                                     </button>
                                 </li>
@@ -187,7 +213,12 @@ export function Workspace() {
                                             height={20}
                                             className="shrink-0 mr-1"
                                             />
-                                    <button>
+                                    <button
+                                    onClick={() => {
+                                        setSearchModalOpenWithReset(false)
+                                        handleSearchNavigation(nb)
+                                    }}
+                                    >
                                         {nb.title}
                                     </button>
                                     {nb.stackTitle && (
@@ -209,7 +240,12 @@ export function Workspace() {
                             .map((n) => (
                                 <li key={n.id}
                                 className="flex">
-                                    <button>
+                                    <button
+                                    onClick={() => {
+                                        setSearchModalOpenWithReset(false)
+                                        handleSearchNavigation(n)
+                                    }}
+                                    >
                                         {n.title}
                                     </button>
                                     {n.stackTitle && (
