@@ -24,7 +24,6 @@ export function Workspace() {
     const [modalTitle, setModalTitle] = useState('')
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
-    const [searchLoading, setSearchLoading] = useState(false)
     const [refetchNotes, setRefetchNotes] = useState<RefetchNotesState>({
         key: 0,
         reason: "notebook-change"
