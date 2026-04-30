@@ -1,7 +1,8 @@
 "use client"
 
-import { SetStateAction, useState, Dispatch, useEffect } from "react"
+import { SetStateAction, useState, Dispatch, useEffect, useRef } from "react"
 import { Note } from "@/lib/types/api"
+import { RichTextEditor } from "./RichTextEditor"
 import type { RefetchNotesState } from "@/app/lib/types"
 
 
@@ -27,7 +28,8 @@ export function EditNotePanel ({
     const[content, setContent] = useState('')
     const[message, setMessage] = useState('')
     const[loading, setLoading] = useState(false)
-
+    const lastSavedRef = useRef<string>("")
+    const lastHydratedNoteIdRef = useRef<string>("")
     
     const handleEditNote = async(
         title: string, 
@@ -53,14 +55,15 @@ export function EditNotePanel ({
             }
 
             void (await res.json())
+            setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-updated"}))
 
-           
-            
+            return true
+
         } catch(err) {
             console.error(err)
+            return false
         } finally {
             setLoading(false)
-            setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-updated"}))
         }
 
     }
@@ -90,9 +93,8 @@ export function EditNotePanel ({
         }
     }
 
+    // this is the use effect that will load the note content into the editor
     useEffect(() => {
-        setTitle('')
-        setContent('')
         if(!selectedNoteId) return 
 
         const note = notes.find(note => note.id === selectedNoteId)
@@ -100,15 +102,39 @@ export function EditNotePanel ({
             setMessage('Note not found')
             return
         }
+
+        if(selectedNoteId === lastHydratedNoteIdRef.current) return
+        setTitle('')
+        setContent('')
         setTitle(note.title)
         setContent(note.content)
+
+        lastHydratedNoteIdRef.current = selectedNoteId
     }, [selectedNoteId, notes])
 
+    // this sets a timer that will clear the message element after a few seconds
     useEffect(() => {
         if(!message) return
         const timer = window.setTimeout(() => setMessage(''), 5000)
         return () => window.clearTimeout(timer)
     }, [message])
+
+    useEffect(() => {
+        if(!selectedNoteId) return
+
+        const snapshot = JSON.stringify({ title, content, selectedNoteId })
+        if(snapshot === lastSavedRef.current) return 
+        
+        const timer = window.setTimeout(() => {
+            const success = handleEditNote(title, content, selectedNotebookId, selectedNoteId)
+            if(!success) return
+            lastSavedRef.current = snapshot
+            }
+        , 800)
+        
+        return () => window.clearTimeout(timer)
+
+    }, [title, content, selectedNoteId, selectedNotebookId])
 
     return(
 
@@ -129,30 +155,17 @@ export function EditNotePanel ({
                     onChange={(e) => {
                         setTitle(e.target.value)
                     }}
-                    onBlur={() => {
-                        if(!selectedNoteId || loading) return
-                        // update this later to only save if an actual change was made.
-                        // right now it will always save whenever a user clicks away.
-                        handleEditNote(title, content, selectedNotebookId, selectedNoteId )
-                    }}
                     placeholder="title"
                 />
-                <textarea
-                    id="content-input"
-                    className="border border-border bg-background rounded-xl p-4 m-2 flex-1 min-h-0 text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring/40"
-                    value={content}
-                    onChange={(e) => {
-                        setContent(e.target.value)
-                    }}
-                    onBlur={() => {
-                        if(!selectedNoteId || loading) return
-                        // update this later to only save if an actual change was made.
-                        // right now it will always save whenever a user clicks away.
-                        handleEditNote(title, content, selectedNotebookId, selectedNoteId )
-                    }}
-                    >
-                    Type your note here
-                </textarea>
+                <div className="flex-1 min-h-0">
+                    <RichTextEditor
+                        value={content}
+                        onChange={(nextValue) => {
+                            setContent(nextValue)
+                        }}
+                        
+                    />
+                </div>
                 <div className="flex justify-end w-full">
                     {selectedNoteId && (<button
                         className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:border-accent hover:text-accent w-[120px] mt-4"
@@ -164,11 +177,6 @@ export function EditNotePanel ({
                         Delete Note
                     </button>)}
                 </div>
-                {/* {message.length > 0 && (
-                    <p className="px-2 text-sm text-muted">
-                        {message}
-                    </p>
-                )} */}
             </form>)}
         </div>
     )

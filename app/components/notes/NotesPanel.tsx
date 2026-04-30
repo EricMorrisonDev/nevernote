@@ -86,11 +86,20 @@ export function NotesPanel ({
         return () => controller.abort()
     }, [selectedNotebookId, refetchNotes.key, refetchReason, notebooks, setNotes, setSelectedNoteId])
 
+    const htmlToPlainText = (html: string) => {
+        const el = document.createElement("div")
+        el.innerHTML = html;
+        return (el.textContent || "")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
     const renderNotePreview = (content: string) => {
+        const plain = htmlToPlainText(content)
         let preview = ''
         const limit = 150;
-        const chars = content.split('')
-        if(content.length <= limit) return content
+        const chars = plain.split('')
+        if(chars.length <= limit) return plain
         for(let i = 0; i < limit; i++){
             preview += chars[i]
         }

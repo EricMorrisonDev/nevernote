@@ -162,22 +162,13 @@ export function Workspace() {
                     setNotes={setNotes}
                 />
             </div>
-            {/* <div className="flex-1 min-h-0 h-full flex flex-col">
+            <div className="flex-1 min-h-0 h-full flex flex-col">
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchNotes={setRefetchNotes}
                     notes={notes}
-                />
-            </div> */}
-            <div className="flex-1 min-h-0 h-full flex flex-col">
-                <RichTextEditor 
-                    value={draft}
-                    onChange={() => {
-                        setDraft('')
-                    }}
-                    placeholder="start writing dude"
                 />
             </div>
             <div

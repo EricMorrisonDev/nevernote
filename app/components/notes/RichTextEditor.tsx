@@ -41,15 +41,46 @@ export function RichTextEditor({
   ];
 
   return (
-    <div className="h-full min-h-0">
+    <div className="h-full min-h-0 flex flex-col">
       <ReactQuill
+        className="h-full min-h-0 flex flex-col"
         theme="snow"
         value={value}
         onChange={onChange}
+        onBlur={() => onBlur()}
         modules={modules}
         formats={formats}
         placeholder={placeholder}
       />
+      <style jsx global>{`
+        .quill .ql-container {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .quill .ql-editor {
+          flex: 1;
+          min-height: 0;
+          overflow-y: auto;
+        }
+
+        .quill .ql-toolbar {
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+
+        .quill .ql-container {
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+
+        .quill {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 }
