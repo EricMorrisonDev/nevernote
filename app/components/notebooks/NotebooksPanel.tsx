@@ -28,6 +28,7 @@ interface NotebooksPanelProps {
     setModalOpen: Dispatch<SetStateAction<boolean>>
     modalTitle: string,
     setModalTitle: Dispatch<SetStateAction<string>>,
+    onSelectNotebook: Dispatch<SetStateAction<string>>
 }
 
 type ModalType = "delete" | "create-notebook" | "create-stack" | "moveNotebook" | null;
@@ -55,7 +56,8 @@ export function NotebooksPanel({
     modalOpen,
     setModalOpen,
     modalTitle,
-    setModalTitle
+    setModalTitle,
+    onSelectNotebook
 }: NotebooksPanelProps) {
     
     const [error, setError] = useState(false)
@@ -447,7 +449,7 @@ export function NotebooksPanel({
                                                 <div className="flex group">
                                                     <button
                                                     onClick={() => {
-                                                        setSelectedNotebookId(notebook.id)
+                                                        onSelectNotebook(notebook.id)
                                                     }}
                                                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
                                                     >
@@ -537,7 +539,7 @@ export function NotebooksPanel({
                                 <div className="flex group">
                                     <button
                                     onClick={() => {
-                                        setSelectedNotebookId(notebook.id)
+                                        onSelectNotebook(notebook.id)
                                     }}
                                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
                                     >

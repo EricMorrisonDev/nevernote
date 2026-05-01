@@ -6,7 +6,6 @@ import { Notebook, Note } from "@/lib/types/api";
 import { useEffect, useState } from "react";
 import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
-import { RichTextEditor } from "./components/notes/RichTextEditor";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
 import { RefetchReason, RefetchNotesState } from "./lib/types"
@@ -31,7 +30,11 @@ export function Workspace() {
         reason: "notebook-change"
       })
 
-
+    const onSelectNotebook = (notebookId: string) => {
+        setSelectedNotebookId(notebookId)
+        setSelectedNoteId(null)
+        bumpRefetchNotes()
+    }
 
     const handleSearch = async(query: string) => {
 
@@ -148,6 +151,7 @@ export function Workspace() {
                     setModalOpen={setModalOpen}
                     modalTitle={modalTitle}
                     setModalTitle={setModalTitle}
+                    onSelectNotebook={onSelectNotebook}
                 />
             </div>
             <div className="h-full min-h-0 flex flex-col left-0 w-[28%] p-4">
