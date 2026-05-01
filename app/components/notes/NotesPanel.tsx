@@ -54,7 +54,6 @@ export function NotesPanel ({
 
         ;(async () => {
             try {
-                setNotes([])
                 const params = new URLSearchParams({ notebookId: selectedNotebookId })
                 const result = await fetch(`/api/notes?${params.toString()}`, {
                     signal,

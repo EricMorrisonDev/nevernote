@@ -82,6 +82,75 @@ export function RichTextEditor({
             border-radius: 0.75rem;
             overflow: hidden;
         }
+
+        /* Toolbar: Snow theme assumes a light bar; tune for dark UI */
+        .quill .ql-toolbar.ql-snow {
+          background: var(--surface-2);
+          border-color: var(--border);
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-stroke {
+          stroke: var(--muted);
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-fill {
+          fill: var(--muted);
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-picker,
+        .quill .ql-toolbar.ql-snow .ql-picker-label,
+        .quill .ql-toolbar.ql-snow .ql-picker-item {
+          color: var(--foreground);
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-picker-label::before,
+        .quill .ql-toolbar.ql-snow .ql-picker-item::before {
+          color: var(--foreground);
+        }
+
+        .quill .ql-toolbar.ql-snow button:hover .ql-stroke,
+        .quill .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
+          stroke: var(--accent);
+        }
+
+        .quill .ql-toolbar.ql-snow button:hover .ql-fill,
+        .quill .ql-toolbar.ql-snow .ql-picker-label:hover .ql-fill {
+          fill: var(--accent);
+        }
+
+        .quill .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+        .quill .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
+          stroke: var(--accent);
+        }
+
+        .quill .ql-toolbar.ql-snow button.ql-active .ql-fill,
+        .quill .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-fill {
+          fill: var(--accent);
+        }
+
+        .quill .ql-toolbar.ql-snow button:hover,
+        .quill .ql-toolbar.ql-snow .ql-picker-label:hover {
+          color: var(--accent);
+        }
+
+        .quill .ql-container.ql-snow {
+          border-color: var(--border);
+          background: var(--surface);
+        }
+
+        .quill .ql-editor.ql-blank::before {
+          color: var(--muted);
+          font-style: normal;
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-picker-options {
+          background: var(--surface-2);
+          border-color: var(--border);
+        }
+
+        .quill .ql-toolbar.ql-snow .ql-picker-item:hover {
+          color: var(--accent);
+        }
       `}</style>
     </div>
   );
