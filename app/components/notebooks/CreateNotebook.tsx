@@ -64,7 +64,7 @@ export function CreateNotebook ({
             <h4>Create A Notebook</h4>
             {message ? (
                 <p
-                className={error ? "text-red-500" : "text-accent"}
+                className={error ? "text-red-500" : "text-control"}
                 >{message}</p>
             ) : (
                 null
@@ -77,7 +77,7 @@ export function CreateNotebook ({
                     type="text"
                     value={newNotebookTitle}
                     onChange={(e) => setNewNotebookTitle(e.target.value)}
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"
                     placeholder="My notebook"
                     disabled={loading}
                 />
@@ -85,7 +85,7 @@ export function CreateNotebook ({
             <button
                 type="submit"
                 disabled={loading || newNotebookTitle.trim().length === 0}
-                className="rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50"
+                className="rounded-lg border border-control-border bg-control-surface px-4 py-2 text-sm font-medium text-control hover:bg-control-surface-hover disabled:opacity-50"
             >
                 Create
             </button>

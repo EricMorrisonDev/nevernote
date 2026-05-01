@@ -24,7 +24,7 @@ export function CreateNotebookModal({
         >
             <h4>Name your new notebook</h4>
             <input 
-                className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"
                 type="text"
                 placeholder="title"
                 value={newNotebookTitle}
@@ -35,7 +35,7 @@ export function CreateNotebookModal({
             <div className="flex justify-between mt-4">
                 <button
                     type="submit"
-                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 w-[110px]"
+                    className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover w-[110px]"
                     disabled={loading}
                 >
                     Create

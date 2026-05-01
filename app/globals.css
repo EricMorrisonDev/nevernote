@@ -8,10 +8,18 @@
   --surface: #18181b;
   --surface-2: #27272a;
   --border: rgb(255 255 255 / 0.1);
+  /* Sky — reserved for selected notebook / note outlines */
   --accent: #38bdf8;
   --accent-hover: #7dd3fc;
   --accent-foreground: #0b1220;
   --ring: rgb(56 189 248 / 0.35);
+  /* Neutral controls (buttons, hovers, editor chrome) */
+  --control: #d4d4d8;
+  --control-hover: #e4e4e7;
+  --control-border: rgb(228 228 231 / 0.35);
+  --control-surface: rgb(244 244 245 / 0.06);
+  --control-surface-hover: rgb(244 244 245 / 0.1);
+  --focus-ring: rgb(255 255 255 / 0.22);
 }
 
 @theme inline {
@@ -25,6 +33,12 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
   --color-ring: var(--ring);
+  --color-control: var(--control);
+  --color-control-hover: var(--control-hover);
+  --color-control-border: var(--control-border);
+  --color-control-surface: var(--control-surface);
+  --color-control-surface-hover: var(--control-surface-hover);
+  --color-focus-ring: var(--focus-ring);
   --font-sans: var(--font-roboto);
   --font-mono: var(--font-geist-mono);
 }

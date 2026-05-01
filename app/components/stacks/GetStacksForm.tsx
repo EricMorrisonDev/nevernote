@@ -41,7 +41,7 @@ export function GetStacksForm () {
             onClick={() => {
                 handleGetStacks()
             }}
-            className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50">
+            className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover disabled:opacity-50">
                 Get stacks
             </button>
             

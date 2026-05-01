@@ -50,7 +50,7 @@ export function SignUpForm () {
                 <p className="text-red-500">{error}</p>
             )}
             {success && (
-                <p className="text-accent">{success}</p>
+                <p className="text-emerald-400">{success}</p>
             )}
             <label htmlFor="input-email"
             className="flex flex-col my-1">
@@ -62,7 +62,7 @@ export function SignUpForm () {
                 onChange={(e) => {
                     setEmail(e.target.value)
                 }}
-                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40" />
+                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50" />
             </label>
             <label htmlFor="input-password"
             className="flex flex-col my-1">
@@ -74,7 +74,7 @@ export function SignUpForm () {
                 onChange={(e) => {
                     setPassword(e.target.value)
                 }}
-                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40" />
+                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50" />
             </label>
             <label htmlFor="confirm-password"
             className="flex flex-col my-1">
@@ -86,12 +86,12 @@ export function SignUpForm () {
                 onChange={(e) => {
                     setConfirmPassword(e.target.value)
                 }}
-                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40" />
+                className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50" />
             </label>
             <button
             type="submit"
             disabled={isLoading}
-            className="my-2 rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:opacity-50">
+            className="my-2 rounded-lg border border-control-border bg-control-surface px-4 py-2 text-sm font-medium text-control hover:bg-control-surface-hover disabled:opacity-50">
                 Sign Up
             </button>
         </form>

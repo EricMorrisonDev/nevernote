@@ -71,13 +71,13 @@ export function CreateNote ({
             <h4>Create a new Note</h4>
             {message ? (
                 <p
-                className={error ? "text-red-500" : "text-accent"}
+                className={error ? "text-red-500" : "text-control"}
                 >{message}</p>
             ) : (
                 null
             )}
             <input 
-                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"
                 type="text"
                 placeholder="title"
                 value={title}
@@ -86,7 +86,7 @@ export function CreateNote ({
                 }}
             />
             <input 
-                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                className="rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"
                 type="text"
                 placeholder="content"
                 value={content}
@@ -97,7 +97,7 @@ export function CreateNote ({
             
             <button
                 type="submit"
-                className="rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+                className="rounded-lg border border-control-border bg-control-surface px-4 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
             >
                 Create Note
             </button>

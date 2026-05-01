@@ -120,7 +120,7 @@ export function Workspace() {
         <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
             <div className="h-full min-h-0 left-0 w-[15%] border-r border-border mr-4 p-4">
                 <button 
-                    className="mb-4 mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                    className="mb-4 mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
                     aria-labelledby="search-button"
                     onClick={() => {
                         setSearchModalOpen(true)
@@ -192,7 +192,7 @@ export function Workspace() {
                                 setSearchQuery(e.target.value)
                             }}
                             placeholder="enter search query"
-                            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"
+                            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"
                         />
                         <ul className="flex flex-col gap-4 mt-4 pl-2">
                             {searchResults.filter((r) => r.kind === 'stack')

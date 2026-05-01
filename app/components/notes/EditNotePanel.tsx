@@ -224,7 +224,7 @@ export function EditNotePanel ({
                 </div>
                 <div className="flex justify-end w-full">
                     {selectedNoteId && (<button
-                        className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:border-accent hover:text-accent w-[120px] mt-4"
+                        className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:border-control-border hover:text-control-hover w-[120px] mt-4"
                         onClick={() => {
                             if(!selectedNoteId) return
                             handleDeleteNote(selectedNoteId)

@@ -46,7 +46,7 @@ export function LoginForm () {
                     onChange={(e) => {
                         setEmail(e.target.value)
                     }} 
-                    className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"/>
+                    className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"/>
             </label>
             <label htmlFor="login-password"
             className="flex flex-col my-1">
@@ -58,11 +58,11 @@ export function LoginForm () {
                     onChange={(e) => {
                         setPassword(e.target.value)
                     }} 
-                    className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-ring/40"/>
+                    className="w-[80%] rounded-lg border border-border bg-background p-2 text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-focus-ring/50"/>
             </label>
             <button
             type="submit"
-            className="my-2 rounded-lg border border-accent bg-accent/10 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+            className="my-2 rounded-lg border border-control-border bg-control-surface px-4 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
             >
                 Login
             </button>

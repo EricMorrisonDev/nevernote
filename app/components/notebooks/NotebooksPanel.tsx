@@ -355,7 +355,7 @@ export function NotebooksPanel({
         <div>
             <div className="flex flex-col gap-2 px-4">
                 <button
-                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+                    className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
                     onClick={(e) => {
                         e.preventDefault()
                         openModal("create-stack")
@@ -364,7 +364,7 @@ export function NotebooksPanel({
                     + Stack
                 </button>
                 <button
-                    className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+                    className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
                     onClick={(e) => {
                         e.preventDefault()
                         openModal("create-notebook")
@@ -451,7 +451,7 @@ export function NotebooksPanel({
                                                     onClick={() => {
                                                         onSelectNotebook(notebook.id)
                                                     }}
-                                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
+                                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
                                                     >
                                                     <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
                                                         alt="Notebook icon"
@@ -523,7 +523,7 @@ export function NotebooksPanel({
                 {error && (
                     <p className="text-red-400">Error occurred</p>
                 )}
-                <ul className="ml-4 flex flex-col gap-4"
+                <ul className="ml-4 mt-4 flex flex-col gap-4"
                     aria-labelledby="notebooks-list"
                 >
                     {notebooks === null ? (
@@ -541,7 +541,7 @@ export function NotebooksPanel({
                                     onClick={() => {
                                         onSelectNotebook(notebook.id)
                                     }}
-                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-accent"
+                                    className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
                                     >
                                     <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
                                         alt="Notebook icon"

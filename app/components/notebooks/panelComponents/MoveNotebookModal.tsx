@@ -82,7 +82,7 @@ export function MoveNotebookModal({
             <div className="mt-4 flex justify-between">
                 <button
                     type="submit"
-                    className="w-[110px] rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-[110px] rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={loading || !notebook?.id || !effectiveSelectedStackId}
                 >
                     Move

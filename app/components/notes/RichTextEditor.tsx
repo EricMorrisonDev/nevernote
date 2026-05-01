@@ -110,27 +110,27 @@ export function RichTextEditor({
 
         .quill .ql-toolbar.ql-snow button:hover .ql-stroke,
         .quill .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
-          stroke: var(--accent);
+          stroke: var(--control);
         }
 
         .quill .ql-toolbar.ql-snow button:hover .ql-fill,
         .quill .ql-toolbar.ql-snow .ql-picker-label:hover .ql-fill {
-          fill: var(--accent);
+          fill: var(--control);
         }
 
         .quill .ql-toolbar.ql-snow button.ql-active .ql-stroke,
         .quill .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
-          stroke: var(--accent);
+          stroke: var(--control);
         }
 
         .quill .ql-toolbar.ql-snow button.ql-active .ql-fill,
         .quill .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-fill {
-          fill: var(--accent);
+          fill: var(--control);
         }
 
         .quill .ql-toolbar.ql-snow button:hover,
         .quill .ql-toolbar.ql-snow .ql-picker-label:hover {
-          color: var(--accent);
+          color: var(--control);
         }
 
         .quill .ql-container.ql-snow {
@@ -149,7 +149,7 @@ export function RichTextEditor({
         }
 
         .quill .ql-toolbar.ql-snow .ql-picker-item:hover {
-          color: var(--accent);
+          color: var(--control);
         }
       `}</style>
     </div>
