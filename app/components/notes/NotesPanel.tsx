@@ -32,12 +32,9 @@ export function NotesPanel ({
     const refetchReason = refetchNotes.reason
 
     useEffect(() => {
-        const controller = new AbortController()
-        const signal = controller.signal
-
-        if(selectedNotebookId && notebooks){
-            const notebook = notebooks.find(notebook => notebook.id === selectedNotebookId)
-            if(notebook){
+        if (selectedNotebookId && notebooks) {
+            const notebook = notebooks.find((nb) => nb.id === selectedNotebookId)
+            if (notebook) {
                 setSelectedNotebookTitle(notebook.title)
             } else {
                 setSelectedNotebookTitle('')
@@ -45,6 +42,11 @@ export function NotesPanel ({
         } else {
             setSelectedNotebookTitle('')
         }
+    }, [selectedNotebookId, notebooks])
+
+    useEffect(() => {
+        const controller = new AbortController()
+        const signal = controller.signal
 
         if (!selectedNotebookId) {
             return () => controller.abort()
@@ -66,15 +68,13 @@ export function NotesPanel ({
                 }
                 setNotes(parsed.data)
 
-                if(refetchReason === 'searchHit-note-selected') {
+                if (refetchReason === 'searchHit-note-selected') {
                     return
                 }
 
                 if (refetchReason === 'notebook-change') {
                     setSelectedNoteId(parsed.data[0]?.id ?? null)
-                } 
-
-
+                }
             } catch (err) {
                 if (err instanceof DOMException && err.name === 'AbortError') {
                     return
@@ -84,7 +84,7 @@ export function NotesPanel ({
         })()
 
         return () => controller.abort()
-    }, [selectedNotebookId, refetchNotes.key, refetchReason, notebooks, setNotes, setSelectedNoteId])
+    }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId])
 
     const htmlToPlainText = (html: string) => {
         const el = document.createElement("div")

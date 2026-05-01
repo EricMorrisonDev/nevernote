@@ -7,12 +7,14 @@ import "react-quill-new/dist/quill.snow.css";
 type RichTextEditorProps = {
   value: string;
   onChange: (nextValue: string) => void;
+  readOnly?: boolean;
   placeholder?: string;
 };
 
 export function RichTextEditor({
   value,
   onChange,
+  readOnly = false,
   placeholder = "Start writing...",
 }: RichTextEditorProps) {
   const modules = useMemo(
@@ -47,7 +49,7 @@ export function RichTextEditor({
         theme="snow"
         value={value}
         onChange={onChange}
-        onBlur={() => onBlur()}
+        readOnly={readOnly}
         modules={modules}
         formats={formats}
         placeholder={placeholder}
