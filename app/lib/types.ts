@@ -5,6 +5,7 @@ export type RefetchReason =
     | "note-created"
     | "note-deleted"
     | "searchHit-note-selected"
+    | "history-apply"
 
 export type RefetchNotesState = {
     key: number

@@ -71,7 +71,10 @@ export function NotesPanel ({
                 }
                 setNotes(parsed.data)
 
-                if (refetchReason === 'searchHit-note-selected') {
+                if (
+                    refetchReason === "searchHit-note-selected" ||
+                    refetchReason === "history-apply"
+                ) {
                     return
                 }
 

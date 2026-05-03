@@ -3,18 +3,20 @@
 import { NotebooksPanel } from "./components/notebooks/NotebooksPanel";
 import { NotesPanel } from "./components/notes/NotesPanel";
 import { Notebook, Note } from "@/lib/types/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
 import { RefetchReason, RefetchNotesState } from "./lib/types"
 import { useNoteHistory } from "@/lib/useNoteHistory"
+import type { HistoryEntry } from "@/lib/useNoteHistory"
 import Image from "next/image";
 
 export function Workspace() {
 
-    const { recordVisit } = useNoteHistory()
+    const { recordVisit, goBack, goForward, canGoBack, canGoForward } =
+        useNoteHistory()
 
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
@@ -118,12 +120,61 @@ export function Workspace() {
                 break
         }
     }
+
+    const applyHistoryEntry = useCallback((entry: HistoryEntry) => {
+        setOpenStackId(entry.stackId ?? "")
+        setSelectedNotebookId(entry.notebookId)
+        if (entry.noteId !== null) {
+            setRefetchNotes((prev) => ({
+                key: prev.key + 1,
+                reason: "searchHit-note-selected",
+            }))
+            setSelectedNoteId(entry.noteId)
+        } else {
+            setSelectedNoteId(null)
+            setRefetchNotes((prev) => ({
+                key: prev.key + 1,
+                reason: "history-apply",
+            }))
+        }
+    }, [])
+
+    const handleHistoryBack = () => {
+        const entry = goBack()
+        if (entry) applyHistoryEntry(entry)
+    }
+
+    const handleHistoryForward = () => {
+        const entry = goForward()
+        if (entry) applyHistoryEntry(entry)
+    }
     
     return( 
         <div className="flex min-w-screen p-4 bg-background h-screen overflow-hidden">
             <div className="h-full min-h-0 left-0 w-[15%] border-r border-border mr-4 p-4">
-                <button 
-                    className="mb-4 mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
+                <div className="mb-4 flex flex-col gap-2">
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            className="flex-1 rounded-lg border border-border px-2 py-2 text-sm text-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
+                            disabled={!canGoBack}
+                            onClick={handleHistoryBack}
+                            aria-label="Back in note history"
+                        >
+                            Back
+                        </button>
+                        <button
+                            type="button"
+                            className="flex-1 rounded-lg border border-border px-2 py-2 text-sm text-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
+                            disabled={!canGoForward}
+                            onClick={handleHistoryForward}
+                            aria-label="Forward in note history"
+                        >
+                            Forward
+                        </button>
+                    </div>
+                    <button 
+                    className="mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
                     aria-labelledby="search-button"
                     onClick={() => {
                         setSearchModalOpen(true)
@@ -140,6 +191,7 @@ export function Workspace() {
 
                     </div>
                 </button>
+                </div>
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNotebookId={setSelectedNotebookId}
