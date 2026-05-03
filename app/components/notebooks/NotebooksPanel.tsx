@@ -13,6 +13,7 @@ import { CreateNotebookModal } from "./panelComponents/CreateNotebookModal";
 import { DeleteStackModal } from "./panelComponents/DeleteStackModal";
 import { useNotebookPanelActions } from "./hooks/useNotebookPanelActions";
 import { truncateTitle } from "@/app/lib/format/truncateTitle";
+import type { HistoryEntry } from "@/lib/useNoteHistory";
 
 interface NotebooksPanelProps {
     selectedNotebookId: string | null,
@@ -28,7 +29,8 @@ interface NotebooksPanelProps {
     setModalOpen: Dispatch<SetStateAction<boolean>>
     modalTitle: string,
     setModalTitle: Dispatch<SetStateAction<string>>,
-    onSelectNotebook: Dispatch<SetStateAction<string>>
+    onSelectNotebook: (notebookId: string) => void,
+    recordVisit: (entry: HistoryEntry) => void,
 }
 
 type ModalType = "delete" | "create-notebook" | "create-stack" | "moveNotebook" | null;
@@ -57,7 +59,8 @@ export function NotebooksPanel({
     setModalOpen,
     modalTitle,
     setModalTitle,
-    onSelectNotebook
+    onSelectNotebook,
+    recordVisit,
 }: NotebooksPanelProps) {
     
     const [error, setError] = useState(false)
@@ -450,6 +453,11 @@ export function NotebooksPanel({
                                                     <button
                                                     onClick={() => {
                                                         onSelectNotebook(notebook.id)
+                                                        recordVisit({
+                                                            noteId: null,
+                                                            notebookId: notebook.id,
+                                                            stackId: stack.id,
+                                                        })
                                                     }}
                                                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
                                                     >
@@ -540,6 +548,11 @@ export function NotebooksPanel({
                                     <button
                                     onClick={() => {
                                         onSelectNotebook(notebook.id)
+                                        recordVisit({
+                                            noteId: null,
+                                            notebookId: notebook.id,
+                                            stackId: undefined,
+                                        })
                                     }}
                                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
                                     >

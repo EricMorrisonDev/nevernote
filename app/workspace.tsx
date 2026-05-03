@@ -9,9 +9,12 @@ import { EditNotePanel } from "./components/notes/EditNotePanel";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
 import { RefetchReason, RefetchNotesState } from "./lib/types"
+import { useNoteHistory } from "@/lib/useNoteHistory"
 import Image from "next/image";
 
 export function Workspace() {
+
+    const { recordVisit } = useNoteHistory()
 
     const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null)
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
@@ -152,6 +155,7 @@ export function Workspace() {
                     modalTitle={modalTitle}
                     setModalTitle={setModalTitle}
                     onSelectNotebook={onSelectNotebook}
+                    recordVisit={recordVisit}
                 />
             </div>
             <div className="h-full min-h-0 flex flex-col left-0 w-[28%] p-4">
@@ -159,6 +163,8 @@ export function Workspace() {
                     selectedNotebookId={selectedNotebookId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNoteId={selectedNoteId}
+                    openStackId={openStackId}
+                    recordVisit={recordVisit}
                     notebooks={notebooks}
                     refetchNotes={refetchNotes}
                     setRefetchNotes={setRefetchNotes}

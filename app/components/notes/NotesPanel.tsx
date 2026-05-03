@@ -4,12 +4,14 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import type { RefetchNotesState } from "@/app/lib/types";
-
+import type { HistoryEntry } from "@/lib/useNoteHistory";
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
     selectedNoteId: string | null
+    openStackId: string
+    recordVisit: (entry: HistoryEntry) => void
     refetchNotes: RefetchNotesState,
     setRefetchNotes: Dispatch<SetStateAction<RefetchNotesState>>
     notebooks: Notebook[] | null
@@ -21,6 +23,8 @@ export function NotesPanel ({
     selectedNotebookId,
     setSelectedNoteId,
     selectedNoteId,
+    openStackId,
+    recordVisit,
     refetchNotes,
     setRefetchNotes,
     notebooks,
@@ -72,7 +76,15 @@ export function NotesPanel ({
                 }
 
                 if (refetchReason === 'notebook-change') {
-                    setSelectedNoteId(parsed.data[0]?.id ?? null)
+                    const firstId = parsed.data[0]?.id ?? null
+                    setSelectedNoteId(firstId)
+                    if (firstId && selectedNotebookId) {
+                        recordVisit({
+                            noteId: firstId,
+                            notebookId: selectedNotebookId,
+                            stackId: openStackId || undefined,
+                        })
+                    }
                 }
             } catch (err) {
                 if (err instanceof DOMException && err.name === 'AbortError') {
@@ -83,7 +95,7 @@ export function NotesPanel ({
         })()
 
         return () => controller.abort()
-    }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId])
+    }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId, recordVisit, openStackId])
 
     const htmlToPlainText = (html: string) => {
         const el = document.createElement("div")
@@ -143,7 +155,14 @@ export function NotesPanel ({
                         const result = await initializeNote(selectedNotebookId)
                         setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
                         const newNoteId = result?.id
-                        if(newNoteId) setSelectedNoteId(newNoteId)
+                        if (newNoteId) {
+                            setSelectedNoteId(newNoteId)
+                            recordVisit({
+                                noteId: newNoteId,
+                                notebookId: selectedNotebookId,
+                                stackId: openStackId || undefined,
+                            })
+                        }
                     }}>
                     + Note
                 </button>
@@ -159,6 +178,11 @@ export function NotesPanel ({
                                     "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"}
                                 onClick={() => {
                                     setSelectedNoteId(note.id)
+                                    recordVisit({
+                                        noteId: note.id,
+                                        notebookId: selectedNotebookId,
+                                        stackId: openStackId || undefined,
+                                    })
                                 }}
                                 >
                                     <p className="font-bold text-base pl-2">
