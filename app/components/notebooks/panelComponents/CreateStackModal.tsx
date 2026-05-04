@@ -48,10 +48,11 @@ export function CreateStackModal({
                         ).map(notebook => (
                             <li key={notebook.id}>
                                 <label
-                                    className="flex items-center gap-2"
+                                    className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 hover:bg-surface-2/50"
                                 >
-                                    <input 
+                                    <input
                                         type="checkbox"
+                                        className="size-4 shrink-0 cursor-pointer rounded border border-border bg-background accent-control text-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
                                         checked={notebooksToAddToStack.includes(notebook.id)}
                                         onChange={() => {
                                             setNotebooksToAddToStack((prev) => 
