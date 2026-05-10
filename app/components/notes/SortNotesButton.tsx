@@ -1,14 +1,17 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from "react"
+import type { SortMode } from "@/app/lib/types"
 
 interface SortNotesButtonProps {
-    sortMenuOpen: boolean,
+    sortMenuOpen: boolean
     setSortMenuOpen: Dispatch<SetStateAction<boolean>>
+    onSelectSort: (mode: SortMode) => void
 }
 
 export function SortNotesButton({
     sortMenuOpen,
-    setSortMenuOpen
-} : SortNotesButtonProps) {
+    setSortMenuOpen,
+    onSelectSort,
+}: SortNotesButtonProps) {
 
     const rootRef = useRef<HTMLDivElement | null>(null)
 
@@ -40,16 +43,32 @@ export function SortNotesButton({
                 Sort
             </button>
             {sortMenuOpen && (<div className="absolute left-0 top-full z-50 mt-1 min-w-56 rounded-md border border-border bg-background p-2 flex flex-col gap-2 items-start shadow-md">
-                <button className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+                <button
+                    type="button"
+                    className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                    onClick={() => onSelectSort("created")}
+                >
                     By time created
                 </button>
-                <button className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+                <button
+                    type="button"
+                    className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                    onClick={() => onSelectSort("updated")}
+                >
                     By time updated
                 </button>
-                <button className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+                <button
+                    type="button"
+                    className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                    onClick={() => onSelectSort("alpha")}
+                >
                     Alphabetically
                 </button>
-                <button className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2">
+                <button
+                    type="button"
+                    className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                    onClick={() => onSelectSort("size")}
+                >
                     By size
                 </button>
             </div>)}

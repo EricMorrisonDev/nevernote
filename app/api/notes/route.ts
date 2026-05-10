@@ -69,8 +69,7 @@ export async function GET(request: Request) {
         if (notebookId) where.notebookId = notebookId
 
         const notes = await prisma.note.findMany({
-            where,
-            orderBy: { updatedAt: "desc" }
+            where
         })
 
         return NextResponse.json(

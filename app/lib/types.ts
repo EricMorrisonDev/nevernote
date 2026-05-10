@@ -1,3 +1,4 @@
+export type SortMode = "created" | "updated" | "alpha" | "size"
 
 export type RefetchReason =
     | "notebook-change"

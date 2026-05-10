@@ -4,7 +4,7 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import { SortNotesButton } from "./SortNotesButton";
-import type { RefetchNotesState } from "@/app/lib/types";
+import type { RefetchNotesState, SortMode } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
 
 interface NotesPanelProps {
@@ -19,13 +19,6 @@ interface NotesPanelProps {
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
 }
-
-type SortMode = 
-    | 'created'
-    | 'updated'
-    | 'alpha'
-    | 'size'
- 
 
 export function NotesPanel ({
     selectedNotebookId,
@@ -42,6 +35,7 @@ export function NotesPanel ({
 
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
     const [sortMenuOpen, setSortMenuOpen] = useState(false)
+    const [sortMode, setSortMode] = useState<SortMode>('created')
     const refetchReason = refetchNotes.reason
 
     // This grabs the notebook title for the currently selected notebook and updates state
@@ -147,16 +141,31 @@ export function NotesPanel ({
         }
     }
 
-    const sortNotes = (notes: Note[], mode: SortMode) => {
+    const sortNotes = (mode: SortMode): Note[] => {
+        if (!notes || notes.length === 0) {
+            return []
+        }
+
         switch (mode) {
             case "created":
+                return [...notes].sort((a, b) => 
+                    b.createdAt.localeCompare(a.createdAt)
+                )
 
             case "updated":
+                return [...notes].sort((a, b) => 
+                    b.updatedAt.localeCompare(a.updatedAt)
+                )
 
             case "alpha":
+                return [...notes].sort((a, b) =>
+                    a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+                  )
 
             case "size":
-                
+                return [...notes].sort((a, b) => 
+                    b.content.length - a.content.length 
+                )
         }
     }
 
@@ -176,9 +185,13 @@ export function NotesPanel ({
                     )}
                 </div>
                 <div className="flex gap-2">
-                    <SortNotesButton 
+                    <SortNotesButton
                         sortMenuOpen={sortMenuOpen}
                         setSortMenuOpen={setSortMenuOpen}
+                        onSelectSort={(mode) => {
+                            setSortMode(mode)
+                            setSortMenuOpen(false)
+                        }}
                     />
                     <button
                         className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
@@ -200,8 +213,8 @@ export function NotesPanel ({
                 </div>
             </div>
             <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2 gap-4 content-start">
-                { notes.length > 0 && (
-                    notes.map(note => (
+                {notes.length > 0 &&
+                    sortNotes(sortMode).map((note) => (
                         <li key={note.id}
                             className="max-w-[200px]">
                             <button
@@ -228,8 +241,7 @@ export function NotesPanel ({
                                     </p>
                             </button>
                         </li>
-                    ))
-                )}
+                    ))}
             </ul>
         </div>
     )
