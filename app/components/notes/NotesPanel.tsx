@@ -3,6 +3,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
+import { SortNotesButton } from "./SortNotesButton";
 import type { RefetchNotesState } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
 
@@ -33,6 +34,7 @@ export function NotesPanel ({
     }: NotesPanelProps){
 
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
+    const [sortMenuOpen, setSortMenuOpen] = useState(false)
     const refetchReason = refetchNotes.reason
 
     useEffect(() => {
@@ -152,23 +154,29 @@ export function NotesPanel ({
                         <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
                     )}
                 </div>
-                <button
-                    className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
-                    onClick={async () => {
-                        const result = await initializeNote(selectedNotebookId)
-                        setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
-                        const newNoteId = result?.id
-                        if (newNoteId) {
-                            setSelectedNoteId(newNoteId)
-                            recordVisit({
-                                noteId: newNoteId,
-                                notebookId: selectedNotebookId,
-                                stackId: openStackId || undefined,
-                            })
-                        }
-                    }}>
-                    + Note
-                </button>
+                <div className="flex gap-2">
+                    <SortNotesButton 
+                        sortMenuOpen={sortMenuOpen}
+                        setSortMenuOpen={setSortMenuOpen}
+                    />
+                    <button
+                        className="rounded-lg border border-control-border bg-control-surface px-3 py-2 text-sm font-medium text-control hover:bg-control-surface-hover"
+                        onClick={async () => {
+                            const result = await initializeNote(selectedNotebookId)
+                            setRefetchNotes(prev => ({ key: prev.key + 1, reason: "note-created"}))
+                            const newNoteId = result?.id
+                            if (newNoteId) {
+                                setSelectedNoteId(newNoteId)
+                                recordVisit({
+                                    noteId: newNoteId,
+                                    notebookId: selectedNotebookId,
+                                    stackId: openStackId || undefined,
+                                })
+                            }
+                        }}>
+                        + Note
+                    </button>
+                </div>
             </div>
             <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2 gap-4 content-start">
                 { notes.length > 0 && (
