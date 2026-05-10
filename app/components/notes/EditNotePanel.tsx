@@ -61,6 +61,7 @@ export function EditNotePanel ({
                 }
 
                 void (await res.json())
+                
                 setRefetchNotes((prev) => ({
                     key: prev.key + 1,
                     reason: "note-updated",

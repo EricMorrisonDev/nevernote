@@ -20,6 +20,13 @@ interface NotesPanelProps {
     setNotes: Dispatch<SetStateAction<Note[] | []>>
 }
 
+type SortMode = 
+    | 'created'
+    | 'updated'
+    | 'alpha'
+    | 'size'
+ 
+
 export function NotesPanel ({
     selectedNotebookId,
     setSelectedNoteId,
@@ -37,6 +44,7 @@ export function NotesPanel ({
     const [sortMenuOpen, setSortMenuOpen] = useState(false)
     const refetchReason = refetchNotes.reason
 
+    // This grabs the notebook title for the currently selected notebook and updates state
     useEffect(() => {
         if (selectedNotebookId && notebooks) {
             const notebook = notebooks.find((nb) => nb.id === selectedNotebookId)
@@ -50,6 +58,7 @@ export function NotesPanel ({
         }
     }, [selectedNotebookId, notebooks])
 
+    // This fetches notes and updates notes array state
     useEffect(() => {
         const controller = new AbortController()
         const signal = controller.signal
@@ -102,6 +111,7 @@ export function NotesPanel ({
         return () => controller.abort()
     }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId, recordVisit, openStackId])
 
+    // text editor saves content as html, so we use this to convert it to plain text for the preview tile
     const htmlToPlainText = (html: string) => {
         const el = document.createElement("div")
         el.innerHTML = html;
@@ -137,13 +147,24 @@ export function NotesPanel ({
         }
     }
 
+    const sortNotes = (notes: Note[], mode: SortMode) => {
+        switch (mode) {
+            case "created":
+
+            case "updated":
+
+            case "alpha":
+
+            case "size":
+                
+        }
+    }
+
     if(!selectedNotebookId){
         return  (
         <p className="text-muted">No notebook currently selected</p>
         )
     }
-
-    // remember to wire up the delete button with the new modal
 
     return(
         <div className="h-full w-full min-h-0 flex flex-col">
