@@ -12,10 +12,29 @@ import {
     useSensor,
     useSensors,
     closestCenter,
+    DragOverlay,
+    defaultDropAnimation,
 } from "@dnd-kit/core";
-import type { DragEndEvent } from "@dnd-kit/core";
+import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
+/** Same midpoint rules as PATCH /api/notes/[id] (neighbor customOrder values). */
+function computeCustomOrderAfterMove(
+    afterId: string | undefined,
+    beforeId: string | undefined,
+    byId: Map<string, Note>
+): number | null {
+    const pred = afterId ? byId.get(afterId) ?? null : null
+    const succ = beforeId ? byId.get(beforeId) ?? null : null
+    if (pred && succ) {
+        if (pred.customOrder >= succ.customOrder) return null
+        return (pred.customOrder + succ.customOrder) / 2
+    }
+    if (pred && !succ) return pred.customOrder + 1000
+    if (!pred && succ) return succ.customOrder - 1000
+    return null
+}
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
@@ -28,6 +47,52 @@ interface NotesPanelProps {
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
+}
+
+type NoteDragOverlayProps = {
+    note: Note
+    isSelected: boolean
+    renderNotePreview: (content: string) => string
+    renderNoteUpdatedTime: (time: string) => string
+}
+
+/** Visual copy of a note tile for DragOverlay (no sortable hooks). */
+function NoteDragOverlay({
+    note,
+    isSelected,
+    renderNotePreview,
+    renderNoteUpdatedTime,
+}: NoteDragOverlayProps) {
+    return (
+        <div
+            className={
+                isSelected
+                    ? "max-w-[200px] w-full cursor-grabbing rounded-xl border border-accent/60 bg-surface p-2 shadow-lg ring-1 ring-ring"
+                    : "max-w-[200px] w-full cursor-grabbing rounded-xl border border-border bg-surface p-2 shadow-lg"
+            }
+            style={{ height: 250 }}
+        >
+            <div className="flex h-full min-h-0 w-full flex-col items-start text-left">
+                <div className="flex w-full shrink-0 items-center justify-between gap-2">
+                    <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
+                        {note.title.trim().length === 0 ? "Untitled" : note.title}
+                    </p>
+                    <span
+                        className="shrink-0 rounded px-1 py-0.5 text-xs text-muted"
+                        aria-hidden
+                    >
+                        ⣿
+                    </span>
+                </div>
+                <p className="min-h-0 flex-1 overflow-hidden p-2 text-sm text-muted">
+                    {renderNotePreview(note.content)}
+                </p>
+                <p className="mt-auto shrink-0 text-xs text-muted/80">
+                    {renderNoteUpdatedTime(note.updatedAt)}
+                </p>
+            </div>
+        </div>
+    )
 }
 
 type SortableNoteItemProps = {
@@ -50,9 +115,9 @@ function SortableNoteItem({
     })
 
     const style = {
-        transform: CSS.Transform.toString(transform),
+        transform: isDragging ? undefined : CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 10 : undefined,
+        opacity: isDragging ? 0.25 : 1,
     }
 
     return (
@@ -106,6 +171,7 @@ export function NotesPanel ({
     const [selectedNotebookTitle, setSelectedNotebookTitle] = useState('')
     const [sortMenuOpen, setSortMenuOpen] = useState(false)
     const [sortMode, setSortMode] = useState<SortMode>('created')
+    const [activeDragNoteId, setActiveDragNoteId] = useState<string | null>(null)
     const refetchReason = refetchNotes.reason
 
     const sensors = useSensors(
@@ -256,15 +322,30 @@ export function NotesPanel ({
 
     const sortedNotes = useMemo(() => sortNotes(sortMode), [sortNotes, sortMode])
 
+    const handleDragStart = useCallback((event: DragStartEvent) => {
+        setActiveDragNoteId(String(event.active.id))
+    }, [])
+
+    const handleDragCancel = useCallback(() => {
+        setActiveDragNoteId(null)
+    }, [])
+
     const handleDragEnd = useCallback(
         async (event: DragEndEvent) => {
             const { active, over } = event
-            if (!over || active.id === over.id) return
+
+            if (!over || active.id === over.id) {
+                setActiveDragNoteId(null)
+                return
+            }
 
             const ids = sortedNotes.map((n) => n.id)
             const oldIndex = ids.indexOf(String(active.id))
             const newIndex = ids.indexOf(String(over.id))
-            if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return
+            if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
+                setActiveDragNoteId(null)
+                return
+            }
 
             const newIds = arrayMove(ids, oldIndex, newIndex)
             const byId = new Map(notes.map((n) => [n.id, n]))
@@ -274,6 +355,25 @@ export function NotesPanel ({
             const movedIdx = newIds.indexOf(movedId)
             const afterId = movedIdx > 0 ? newIds[movedIdx - 1] : undefined
             const beforeId = movedIdx < newIds.length - 1 ? newIds[movedIdx + 1] : undefined
+
+            const newCustomOrder = computeCustomOrderAfterMove(afterId, beforeId, byId)
+            if (newCustomOrder === null) {
+                setActiveDragNoteId(null)
+                return
+            }
+
+            const previousNotes = notes.map((n) => ({ ...n }))
+            const previousSortMode = sortMode
+
+            setSortMode("custom")
+            setNotes(
+                reorderedNotes.map((n) =>
+                    n.id === movedId ? { ...n, customOrder: newCustomOrder } : n
+                )
+            )
+            queueMicrotask(() => {
+                setActiveDragNoteId(null)
+            })
 
             const body: { afterId?: string; beforeId?: string } = {}
             if (afterId) body.afterId = afterId
@@ -287,22 +387,30 @@ export function NotesPanel ({
                 })
                 if (!res.ok) {
                     console.error("Reorder failed", await res.text())
+                    setNotes(previousNotes)
+                    setSortMode(previousSortMode)
                     return
                 }
                 const parsed = (await res.json()) as { data: Note }
                 const updated = parsed.data
-                setSortMode("custom")
-                setNotes(
-                    reorderedNotes.map((n) =>
+                setNotes((prev) =>
+                    prev.map((n) =>
                         n.id === movedId ? { ...n, customOrder: updated.customOrder } : n
                     )
                 )
             } catch (e) {
                 console.error(e)
+                setNotes(previousNotes)
+                setSortMode(previousSortMode)
             }
         },
-        [notes, sortedNotes, setNotes, setSortMode]
+        [notes, sortMode, sortedNotes, setNotes, setSortMode]
     )
+
+    const activeDragNote = useMemo(() => {
+        if (!activeDragNoteId) return null
+        return notes.find((n) => n.id === activeDragNoteId) ?? null
+    }, [notes, activeDragNoteId])
 
     if(!selectedNotebookId){
         return  (
@@ -350,6 +458,8 @@ export function NotesPanel ({
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragCancel={handleDragCancel}
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext
@@ -377,6 +487,16 @@ export function NotesPanel ({
                             ))}
                     </ul>
                 </SortableContext>
+                <DragOverlay dropAnimation={defaultDropAnimation}>
+                    {activeDragNote ? (
+                        <NoteDragOverlay
+                            note={activeDragNote}
+                            isSelected={activeDragNote.id === selectedNoteId}
+                            renderNotePreview={renderNotePreview}
+                            renderNoteUpdatedTime={renderNoteUpdatedTime}
+                        />
+                    ) : null}
+                </DragOverlay>
             </DndContext>
         </div>
     )
