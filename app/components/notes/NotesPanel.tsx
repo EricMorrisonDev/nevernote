@@ -64,28 +64,27 @@ function SortableNoteItem({
                         : "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
                 }
             >
-                <div className="flex w-full shrink-0 items-center justify-between gap-1 pl-1">
-                    <button
-                        type="button"
-                        className="min-w-0 flex-1 cursor-grab touch-none rounded px-1 py-0.5 text-left text-xs text-muted hover:text-foreground"
-                        aria-label="Drag to reorder"
-                        {...listeners}
-                        {...attributes}
+                    <div
+                        className="flex min-h-0 w-full flex-1 flex-col items-start text-left"
+                        onClick={onSelect}
                     >
-                        ⣿
-                    </button>
-                </div>
-                <button
-                    type="button"
-                    className="flex min-h-0 w-full flex-1 flex-col items-start text-left"
-                    onClick={onSelect}
-                >
-                    <p className="font-bold text-base pl-2">
-                        {note.title.trim().length === 0 ? "Untitled" : note.title}
-                    </p>
-                    <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
-                    <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
-                </button>
+                        <div className="flex w-full items-center justify-between gap-2">
+                            <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
+                                {note.title.trim().length === 0 ? "Untitled" : note.title}
+                            </p>
+                            <button
+                                type="button"
+                                className="shrink-0 cursor-grab touch-none rounded px-1 py-0.5 text-xs text-muted hover:text-foreground"
+                                aria-label="Drag to reorder"
+                                {...listeners}
+                                {...attributes}
+                            >
+                                ⣿
+                            </button>
+                        </div>
+                        <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
+                        <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
+                    </div>
             </div>
         </li>
     )
