@@ -1,11 +1,21 @@
 "use client"
 
-import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { useEffect, useState, Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import { SortNotesButton } from "./SortNotesButton";
 import type { RefetchNotesState, SortMode } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
+import {
+    DndContext,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    closestCenter,
+} from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
@@ -18,6 +28,67 @@ interface NotesPanelProps {
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
+}
+
+type SortableNoteItemProps = {
+    note: Note
+    isSelected: boolean
+    onSelect: () => void
+    renderNotePreview: (content: string) => string
+    renderNoteUpdatedTime: (time: string) => string
+}
+
+function SortableNoteItem({
+    note,
+    isSelected,
+    onSelect,
+    renderNotePreview,
+    renderNoteUpdatedTime,
+}: SortableNoteItemProps) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: note.id,
+    })
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 10 : undefined,
+    }
+
+    return (
+        <li ref={setNodeRef} style={style} className="max-w-[200px]">
+            <div
+                className={
+                    isSelected
+                        ? "bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
+                        : "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
+                }
+            >
+                <div className="flex w-full shrink-0 items-center justify-between gap-1 pl-1">
+                    <button
+                        type="button"
+                        className="min-w-0 flex-1 cursor-grab touch-none rounded px-1 py-0.5 text-left text-xs text-muted hover:text-foreground"
+                        aria-label="Drag to reorder"
+                        {...listeners}
+                        {...attributes}
+                    >
+                        ⣿
+                    </button>
+                </div>
+                <button
+                    type="button"
+                    className="flex min-h-0 w-full flex-1 flex-col items-start text-left"
+                    onClick={onSelect}
+                >
+                    <p className="font-bold text-base pl-2">
+                        {note.title.trim().length === 0 ? "Untitled" : note.title}
+                    </p>
+                    <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
+                    <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
+                </button>
+            </div>
+        </li>
+    )
 }
 
 export function NotesPanel ({
@@ -37,6 +108,12 @@ export function NotesPanel ({
     const [sortMenuOpen, setSortMenuOpen] = useState(false)
     const [sortMode, setSortMode] = useState<SortMode>('created')
     const refetchReason = refetchNotes.reason
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 8 },
+        })
+    )
 
     // This grabs the notebook title for the currently selected notebook and updates state
     useEffect(() => {
@@ -141,32 +218,32 @@ export function NotesPanel ({
         }
     }
 
-    const sortNotes = (mode: SortMode): Note[] => {
+    const sortNotes = useCallback((mode: SortMode): Note[] => {
         if (!notes || notes.length === 0) {
             return []
         }
 
         switch (mode) {
             case "created":
-                return [...notes].sort((a, b) => 
+                return [...notes].sort((a, b) =>
                     b.createdAt.localeCompare(a.createdAt)
                 )
 
             case "updated":
-                return [...notes].sort((a, b) => 
+                return [...notes].sort((a, b) =>
                     b.updatedAt.localeCompare(a.updatedAt)
                 )
 
             case "alpha":
                 return [...notes].sort((a, b) =>
                     a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
-                  )
+                )
 
             case "size":
-                return [...notes].sort((a, b) => 
-                    b.content.length - a.content.length 
+                return [...notes].sort((a, b) =>
+                    b.content.length - a.content.length
                 )
-            
+
             case "custom":
                 return [...notes].sort((a, b) => {
                     const orderDiff = a.customOrder - b.customOrder
@@ -176,7 +253,57 @@ export function NotesPanel ({
                     return a.id.localeCompare(b.id)
                 })
         }
-    }
+    }, [notes])
+
+    const sortedNotes = useMemo(() => sortNotes(sortMode), [sortNotes, sortMode])
+
+    const handleDragEnd = useCallback(
+        async (event: DragEndEvent) => {
+            const { active, over } = event
+            if (!over || active.id === over.id) return
+
+            const ids = sortedNotes.map((n) => n.id)
+            const oldIndex = ids.indexOf(String(active.id))
+            const newIndex = ids.indexOf(String(over.id))
+            if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return
+
+            const newIds = arrayMove(ids, oldIndex, newIndex)
+            const byId = new Map(notes.map((n) => [n.id, n]))
+            const reorderedNotes = newIds.map((id) => byId.get(id)).filter(Boolean) as Note[]
+
+            const movedId = String(active.id)
+            const movedIdx = newIds.indexOf(movedId)
+            const afterId = movedIdx > 0 ? newIds[movedIdx - 1] : undefined
+            const beforeId = movedIdx < newIds.length - 1 ? newIds[movedIdx + 1] : undefined
+
+            const body: { afterId?: string; beforeId?: string } = {}
+            if (afterId) body.afterId = afterId
+            if (beforeId) body.beforeId = beforeId
+
+            try {
+                const res = await fetch(`/api/notes/${movedId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body),
+                })
+                if (!res.ok) {
+                    console.error("Reorder failed", await res.text())
+                    return
+                }
+                const parsed = (await res.json()) as { data: Note }
+                const updated = parsed.data
+                setSortMode("custom")
+                setNotes(
+                    reorderedNotes.map((n) =>
+                        n.id === movedId ? { ...n, customOrder: updated.customOrder } : n
+                    )
+                )
+            } catch (e) {
+                console.error(e)
+            }
+        },
+        [notes, sortedNotes, setNotes, setSortMode]
+    )
 
     if(!selectedNotebookId){
         return  (
@@ -221,37 +348,37 @@ export function NotesPanel ({
                     </button>
                 </div>
             </div>
-            <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2 gap-4 content-start">
-                {notes.length > 0 &&
-                    sortNotes(sortMode).map((note) => (
-                        <li key={note.id}
-                            className="max-w-[200px]">
-                            <button
-                                className={note.id === selectedNoteId ? 
-                                    "bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2" : 
-                                    "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"}
-                                onClick={() => {
-                                    setSelectedNoteId(note.id)
-                                    recordVisit({
-                                        noteId: note.id,
-                                        notebookId: selectedNotebookId,
-                                        stackId: openStackId || undefined,
-                                    })
-                                }}
-                                >
-                                    <p className="font-bold text-base pl-2">
-                                        {note.title.trim().length === 0 ? 'Untitled' : note.title}
-                                    </p>
-                                    <p className="text-sm text-muted p-2">
-                                        {renderNotePreview(note.content)}
-                                    </p>
-                                    <p className="mt-auto text-xs text-muted/80">
-                                        {renderNoteUpdatedTime(note.updatedAt)}
-                                    </p>
-                            </button>
-                        </li>
-                    ))}
-            </ul>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <SortableContext
+                    items={sortedNotes.map((n) => n.id)}
+                    strategy={rectSortingStrategy}
+                >
+                    <ul className="flex-1 min-h-0 overflow-y-auto scrollbar-hide grid grid-cols-2 gap-4 content-start">
+                        {notes.length > 0 &&
+                            sortedNotes.map((note) => (
+                                <SortableNoteItem
+                                    key={note.id}
+                                    note={note}
+                                    isSelected={note.id === selectedNoteId}
+                                    onSelect={() => {
+                                        setSelectedNoteId(note.id)
+                                        recordVisit({
+                                            noteId: note.id,
+                                            notebookId: selectedNotebookId,
+                                            stackId: openStackId || undefined,
+                                        })
+                                    }}
+                                    renderNotePreview={renderNotePreview}
+                                    renderNoteUpdatedTime={renderNoteUpdatedTime}
+                                />
+                            ))}
+                    </ul>
+                </SortableContext>
+            </DndContext>
         </div>
     )
 }
