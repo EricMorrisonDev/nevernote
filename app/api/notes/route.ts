@@ -26,7 +26,13 @@ export async function POST(request: Request) {
         
         const match = await ensureNotebookBelongsToUser(notebookId, user.id)
         if(match instanceof NextResponse) return match
-        
+
+        const lastInNotebook = await prisma.note.findFirst({
+            where: { notebookId, userId: user.id },
+            orderBy: { customOrder: "desc" },
+            select: { customOrder: true },
+        })
+        const customOrder = (lastInNotebook?.customOrder ?? 0) + 1000
 
         // create the new note and return it
 
@@ -34,7 +40,8 @@ export async function POST(request: Request) {
             title,
             content,
             userId: user.id,
-            notebookId
+            notebookId,
+            customOrder,
         }
 
         const newNote = await prisma.note.create({

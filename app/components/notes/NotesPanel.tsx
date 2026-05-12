@@ -166,6 +166,15 @@ export function NotesPanel ({
                 return [...notes].sort((a, b) => 
                     b.content.length - a.content.length 
                 )
+            
+            case "custom":
+                return [...notes].sort((a, b) => {
+                    const orderDiff = a.customOrder - b.customOrder
+                    if (orderDiff !== 0) return orderDiff
+                    const createdDiff = a.createdAt.localeCompare(b.createdAt)
+                    if (createdDiff !== 0) return createdDiff
+                    return a.id.localeCompare(b.id)
+                })
         }
     }
 

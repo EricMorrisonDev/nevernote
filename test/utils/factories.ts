@@ -67,12 +67,17 @@ export async function createNote(
   overrides: Partial<Note> = {}
 ): Promise<Note> {
   const n = nextSeq()
+  const resolvedNotebookId = overrides.notebookId ?? notebookId
+  if (!resolvedNotebookId) {
+    throw new Error("createNote: notebookId is required")
+  }
   return prisma.note.create({
     data: {
       title: overrides.title ?? `Test Note ${n}`,
       content: overrides.content ?? `Test content ${n}`,
       userId,
-      notebookId: overrides.notebookId ?? notebookId,
+      notebookId: resolvedNotebookId,
+      customOrder: overrides.customOrder ?? n * 1000,
     },
   })
 }

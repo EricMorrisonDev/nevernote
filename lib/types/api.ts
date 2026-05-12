@@ -15,7 +15,8 @@ export interface Note {
     notebookId: string,
     userId: string,
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    customOrder: number
 }
 
 export interface Stack {

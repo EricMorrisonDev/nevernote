@@ -66,6 +66,7 @@ model Note {
   content     String   
   notebookId  String
   notebook    Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  customOrder Float
 
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
