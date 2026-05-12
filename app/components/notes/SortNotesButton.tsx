@@ -71,6 +71,13 @@ export function SortNotesButton({
                 >
                     By size
                 </button>
+                <button
+                    type="button"
+                    className="w-full rounded-md px-2 py-1 text-left text-foreground hover:bg-surface-2"
+                    onClick={() => onSelectSort("custom")}
+                >
+                    Custom
+                </button>
             </div>)}
         </div>
     )

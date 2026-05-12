@@ -143,9 +143,13 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
             return NextResponse.json({ error: "Invalid reorder request" }, { status: 400 })
         }
 
+        // Reorder must not bump `updatedAt` (@updatedAt otherwise runs on any update).
         const updatedNote = await prisma.note.update({
             where: { id: note.id, userId: user.id },
-            data: { customOrder: newOrder },
+            data: {
+                customOrder: newOrder,
+                updatedAt: note.updatedAt,
+            },
         })
 
         return NextResponse.json({ data: updatedNote }, { status: 200 })

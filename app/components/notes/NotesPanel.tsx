@@ -98,6 +98,7 @@ function NoteDragOverlay({
 type SortableNoteItemProps = {
     note: Note
     isSelected: boolean
+    sortMode: string
     onSelect: () => void
     renderNotePreview: (content: string) => string
     renderNoteUpdatedTime: (time: string) => string
@@ -107,6 +108,7 @@ function SortableNoteItem({
     note,
     isSelected,
     onSelect,
+    sortMode,
     renderNotePreview,
     renderNoteUpdatedTime,
 }: SortableNoteItemProps) {
@@ -125,8 +127,8 @@ function SortableNoteItem({
             <div
                 className={
                     isSelected
-                        ? "bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
-                        : "bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
+                        ? "cursor-default bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
+                        : "cursor-default bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
                 }
             >
                     <div
@@ -137,7 +139,7 @@ function SortableNoteItem({
                             <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
                                 {note.title.trim().length === 0 ? "Untitled" : note.title}
                             </p>
-                            <button
+                            { sortMode === "custom" && (<button
                                 type="button"
                                 className="shrink-0 cursor-grab touch-none rounded px-1 py-0.5 text-xs text-muted hover:text-foreground"
                                 aria-label="Drag to reorder"
@@ -145,7 +147,7 @@ function SortableNoteItem({
                                 {...attributes}
                             >
                                 ⣿
-                            </button>
+                            </button>)}
                         </div>
                         <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
                         <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
@@ -472,6 +474,7 @@ export function NotesPanel ({
                                 <SortableNoteItem
                                     key={note.id}
                                     note={note}
+                                    sortMode={sortMode}
                                     isSelected={note.id === selectedNoteId}
                                     onSelect={() => {
                                         setSelectedNoteId(note.id)
