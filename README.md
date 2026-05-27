@@ -2,6 +2,25 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Chroma (RAG vector store, local dev)
+
+From the repo root:
+
+```bash
+docker compose up -d
+```
+
+Chroma listens on [http://localhost:8000](http://localhost:8000). Add to your local `.env` (see `.env*` in gitignore):
+
+```bash
+CHROMA_URL=http://localhost:8000
+CHROMA_COLLECTION=nevernote-dev
+```
+
+Stop: `docker compose down`. Data is kept in the `chroma-data` Docker volume until you run `docker compose down -v`.
+
+### Next.js app
+
 First, run the development server:
 
 ```bash

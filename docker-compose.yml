@@ -1,0 +1,29 @@
+# Local Chroma for RAG (Phase 1). From repo root: docker compose up -d
+#
+# Next.js (on host) connects via http://localhost:8000
+# Suggested .env (not committed): CHROMA_URL=http://localhost:8000
+
+services:
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: nevernote-chroma
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      IS_PERSISTENT: "TRUE"
+      ANONYMIZED_TELEMETRY: "FALSE"
+      # Persist under /data (default for chromadb/chroma image)
+      PERSIST_DIRECTORY: /data
+    volumes:
+      - chroma-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  chroma-data:
+    driver: local
