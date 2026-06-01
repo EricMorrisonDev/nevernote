@@ -2,9 +2,16 @@ import "server-only"
 
 import { deleteRagDocumentsForNote, upsertRagDocuments } from "./chroma";
 import { chunkNote, chunkDocumentId } from "./chunk";
-import type { Note } from "../types/api";
 
-export async function ingestNote(note: Note): Promise<void>{
+type IngestInput = {
+    id: string,
+    title: string,
+    content: string,
+    notebookId: string,
+    userId: string,
+}
+
+export async function ingestNote(input: IngestInput): Promise<void>{
 
     const {
         userId,
@@ -12,9 +19,9 @@ export async function ingestNote(note: Note): Promise<void>{
         notebookId,
         title,
         content
-    } = note
-
-    await deleteRagDocumentsForNote(id, userId)
+    } = input
+ 
+    await deleteRagDocumentsForNote(id)
     const documents = await chunkNote({ userId, noteId: id, notebookId, title, content })
     if(documents.length === 0) return
     const documentIds = documents.map(doc => {
@@ -25,9 +32,6 @@ export async function ingestNote(note: Note): Promise<void>{
 
 }
 
-export async function deleteNoteChunks(
-    noteId: string,
-    userId?: string
-  ): Promise<void> {
-    await deleteRagDocumentsForNote(noteId, userId)
+export async function deleteNoteChunks(noteId: string): Promise<void> {
+    await deleteRagDocumentsForNote(noteId)
   }

@@ -6,6 +6,7 @@ import { createNoteSchema } from "@/lib/validations/notes";
 import { handleApiError } from "@/lib/errorResponse";
 import { requireValidation } from "@/lib/zodValidation";
 import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
+import { ingestNote } from "@/lib/RAG/ingest";
 
 export async function POST(request: Request) {
 
@@ -47,6 +48,9 @@ export async function POST(request: Request) {
         const newNote = await prisma.note.create({
             data: createData
         })
+
+        
+        await ingestNote(newNote)
 
         return NextResponse.json(
             {data: newNote},

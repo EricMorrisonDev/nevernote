@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { requireValidation } from "@/lib/zodValidation";
 import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
 import { handleApiError } from "@/lib/errorResponse";
+import { deleteNoteChunks, ingestNote } from "@/lib/RAG/ingest";
 
 async function ensureNoteMatchesUser(noteId: string, userId: string) {
     const match = await prisma.note.findFirst({
@@ -59,6 +60,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             },
             data: data
         })
+
+        await ingestNote(updatedNote)
 
         return NextResponse.json(
             {data: updatedNote},
@@ -208,6 +211,8 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
                 {status: 404}
             )
         }
+
+        await deleteNoteChunks(validatedId.data.id)
 
         return NextResponse.json(
             {message: "note deleted"},

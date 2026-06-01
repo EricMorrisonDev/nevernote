@@ -16,6 +16,8 @@ export const RAG_TOP_K_DEFAULT = 5
 
 const DEFAULT_CHROMA_URL = "http://localhost:8000"
 const DEFAULT_CHROMA_COLLECTION = "nevernote-dev"
+/** Bumped when collection embedding config changes; triggers one-time delete + recreate. */
+const RAG_COLLECTION_SCHEMA_VERSION = "byo-v1"
 
 let chromaClient: ChromaClient | null = null
 let collectionPromise: ReturnType<ChromaClient["getOrCreateCollection"]> | null =
@@ -48,18 +50,57 @@ function getChromaClient(): ChromaClient {
     return chromaClient
   }
 
+  const url = new URL(getChromaUrl())
+  const port =
+    url.port !== ""
+      ? Number(url.port)
+      : url.protocol === "https:"
+        ? 443
+        : 80
+
   chromaClient = new ChromaClient({
-    path: getChromaUrl(),
+    host: url.hostname,
+    port,
+    ssl: url.protocol === "https:",
   })
   return chromaClient
 }
 
-export async function getRagCollection() {
-  if (!collectionPromise) {
-    collectionPromise = getChromaClient().getOrCreateCollection({ 
-      name: getChromaCollectionName(),
-    })
+async function initRagCollection() {
+  const client = getChromaClient()
+  const name = getChromaCollectionName()
+
+  try {
+    const existing = await client.getCollection({ name })
+    const efConfig = existing.configuration?.embeddingFunction
+    const usesDefaultEmbedder =
+      efConfig != null &&
+      typeof efConfig === "object" &&
+      "type" in efConfig &&
+      efConfig.type === "known" &&
+      "name" in efConfig &&
+      efConfig.name === "default"
+    const schemaVersion = existing.metadata?.rag_schema_version
+
+    if (
+      schemaVersion !== RAG_COLLECTION_SCHEMA_VERSION ||
+      usesDefaultEmbedder
+    ) {
+      await client.deleteCollection({ name })
+    }
+  } catch {
+    // Collection does not exist yet.
   }
+
+  return client.getOrCreateCollection({
+    name,
+    embeddingFunction: null,
+    metadata: { rag_schema_version: RAG_COLLECTION_SCHEMA_VERSION },
+  })
+}
+
+export async function getRagCollection() {
+  collectionPromise ??= initRagCollection()
   return collectionPromise
 }
 
@@ -98,16 +139,11 @@ export async function upsertRagDocuments(
 /** Delete all chunks for a note (optionally scoped by userId). */
 export async function deleteRagDocumentsForNote(
   noteId: string,
-  userId?: string
 ): Promise<void> {
   const collection = await getRagCollection()
-  const where: Record<string, string> = { noteId }
-  if (userId) {
-    where.userId = userId
-  }
 
   await collection.delete({
-    where,
+    where: { noteId: { $eq: noteId } },
   })
 }
 
@@ -128,15 +164,19 @@ export async function queryRagSimilarChunks(
   const k = input.k ?? RAG_TOP_K_DEFAULT
 
   const queryEmbedding = await embeddingClient.embedQuery(input.query)
-  const where: Record<string, string> = { userId: input.userId }
-  if (input.notebookId) {
-    where.notebookId = input.notebookId
-  }
+  const where: Record<string, unknown> = input.notebookId
+    ? {
+        $and: [
+          { userId: { $eq: input.userId } },
+          { notebookId: { $eq: input.notebookId } },
+        ],
+      }
+    : { userId: { $eq: input.userId } }
 
   const response = await collection.query({
     queryEmbeddings: [queryEmbedding],
     nResults: k,
-    where,
+    where: where as Parameters<typeof collection.query>[0]["where"],
     include: ["documents", "metadatas", "distances"],
   })
 
