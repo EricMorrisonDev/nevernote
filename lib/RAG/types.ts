@@ -15,3 +15,19 @@ export type RagChunkMetadata = {
   title: string
   notebookId: string
 }
+
+/** Input for similarity search over indexed note chunks. */
+export type RagQueryInput = {
+  query: string
+  userId: string
+  notebookId?: string
+  k?: number
+}
+
+/** One retrieved chunk from Chroma similarity search. */
+export type RagQueryResult = {
+  id: string
+  text: string
+  metadata: RagChunkMetadata
+  distance: number | null
+}

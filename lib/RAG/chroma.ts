@@ -4,7 +4,11 @@ import { Document } from "@langchain/core/documents"
 import { OpenAIEmbeddings } from "@langchain/openai"
 import { ChromaClient } from "chromadb"
 
-import type { RagChunkMetadata } from "@/lib/RAG/types"
+import type {
+  RagChunkMetadata,
+  RagQueryInput,
+  RagQueryResult,
+} from "@/lib/RAG/types"
 
 export const RAG_EMBEDDING_MODEL = "text-embedding-3-small"
 export const RAG_EMBEDDING_DIMENSIONS = 1536
@@ -52,7 +56,7 @@ function getChromaClient(): ChromaClient {
 
 export async function getRagCollection() {
   if (!collectionPromise) {
-    collectionPromise = getChromaClient().getOrCreateCollection({
+    collectionPromise = getChromaClient().getOrCreateCollection({ 
       name: getChromaCollectionName(),
     })
   }
@@ -116,24 +120,6 @@ export async function deleteRagDocumentsByIds(ids: string[]): Promise<void> {
   await collection.delete({ ids })
 }
 
-export type RagQueryInput = {
-  query: string
-  userId: string
-  notebookId?: string
-  k?: number
-}
-
-export type RagQueryResult = {
-  id: string
-  text: string
-  metadata: RagChunkMetadata
-  distance: number | null
-}
-
-/**
- * Raw Chroma similarity query helper for retrieval.
- * Higher-level RAG prompt orchestration lives outside this module.
- */
 export async function queryRagSimilarChunks(
   input: RagQueryInput
 ): Promise<RagQueryResult[]> {

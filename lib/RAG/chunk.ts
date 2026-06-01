@@ -52,7 +52,7 @@ function toChunkMetadata(
  * Split a note into LangChain documents for embedding.
  * Returns an empty array when title and content are both empty/whitespace.
  */
-export async function chunkNote(input: NoteChunkInput): Promise<Document[]> {
+export async function chunkNote(input: NoteChunkInput): Promise<Document<RagChunkMetadata>[]> {
   const text = buildNoteEmbedText(input.title, input.content)
   if (!text) {
     return []
