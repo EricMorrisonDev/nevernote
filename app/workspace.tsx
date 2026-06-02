@@ -6,6 +6,7 @@ import { Notebook, Note } from "@/lib/types/api";
 import { useCallback, useEffect, useState } from "react";
 import { LogoutButton } from "./components/auth/LogoutButton";
 import { EditNotePanel } from "./components/notes/EditNotePanel";
+import { ChatPanel } from "./components/RAG/ChatPanel";
 import { Modal } from "./components/Modal";
 import { SearchHit } from "@/lib/types/search";
 import { RefetchReason, RefetchNotesState } from "./lib/types"
@@ -224,13 +225,27 @@ export function Workspace() {
                     setNotes={setNotes}
                 />
             </div>
-            <div className="flex-1 min-h-0 h-full flex flex-col">
+            <div className="flex-1 min-h-0 h-full flex flex-col min-w-0">
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
                     selectedNotebookId={selectedNotebookId}
                     setRefetchNotes={setRefetchNotes}
                     notes={notes}
+                />
+            </div>
+            <div className="h-full min-h-0 w-[22%] min-w-[240px] border-l border-border p-4">
+                <ChatPanel
+                    onOpenSource={(source) => {
+                        setSelectedNotebookId(source.notebookId)
+                        bumpRefetchNotes("searchHit-note-selected")
+                        setSelectedNoteId(source.noteId)
+                        recordVisit({
+                            noteId: source.noteId,
+                            notebookId: source.notebookId,
+                            stackId: openStackId || undefined,
+                        })
+                    }}
                 />
             </div>
             <div
