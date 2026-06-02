@@ -16,7 +16,7 @@ export const RAG_TOP_K_DEFAULT = 5
 
 const DEFAULT_CHROMA_URL = "http://localhost:8000"
 const DEFAULT_CHROMA_COLLECTION = "nevernote-dev"
-/** Bumped when collection embedding config changes; triggers one-time delete + recreate. */
+/** Stored on the collection for identification (BYO OpenAI embeddings). */
 const RAG_COLLECTION_SCHEMA_VERSION = "byo-v1"
 
 let chromaClient: ChromaClient | null = null
@@ -69,28 +69,6 @@ function getChromaClient(): ChromaClient {
 async function initRagCollection() {
   const client = getChromaClient()
   const name = getChromaCollectionName()
-
-  try {
-    const existing = await client.getCollection({ name })
-    const efConfig = existing.configuration?.embeddingFunction
-    const usesDefaultEmbedder =
-      efConfig != null &&
-      typeof efConfig === "object" &&
-      "type" in efConfig &&
-      efConfig.type === "known" &&
-      "name" in efConfig &&
-      efConfig.name === "default"
-    const schemaVersion = existing.metadata?.rag_schema_version
-
-    if (
-      schemaVersion !== RAG_COLLECTION_SCHEMA_VERSION ||
-      usesDefaultEmbedder
-    ) {
-      await client.deleteCollection({ name })
-    }
-  } catch {
-    // Collection does not exist yet.
-  }
 
   return client.getOrCreateCollection({
     name,
