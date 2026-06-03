@@ -27,6 +27,7 @@ export function Workspace() {
     const [refetchNotebooksKey, setRefetchNotebooksKey] = useState(0)
     const [modalOpen, setModalOpen] = useState(false)
     const [searchModalOpen, setSearchModalOpen] = useState(false)
+    const [chatModalOpen, setChatModalOpen] = useState(false)
     const [modalTitle, setModalTitle] = useState('')
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
@@ -176,7 +177,7 @@ export function Workspace() {
                     </div>
                     <button 
                     className="mx-auto w-full flex justify-between rounded-lg border border-border px-3 py-2 text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
-                    aria-labelledby="search-button"
+                    aria-label="Search notes"
                     onClick={() => {
                         setSearchModalOpen(true)
                     }}
@@ -192,6 +193,13 @@ export function Workspace() {
 
                     </div>
                 </button>
+                    <button
+                        type="button"
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/50"
+                        onClick={() => setChatModalOpen(true)}
+                    >
+                        Ask your notes
+                    </button>
                 </div>
                 <NotebooksPanel 
                     selectedNotebookId={selectedNotebookId}
@@ -225,7 +233,7 @@ export function Workspace() {
                     setNotes={setNotes}
                 />
             </div>
-            <div className="flex-1 min-h-0 h-full flex flex-col min-w-0">
+            <div className="flex-1 min-h-0 h-full flex flex-col">
                 <EditNotePanel 
                     selectedNoteId={selectedNoteId}
                     setSelectedNoteId={setSelectedNoteId}
@@ -234,25 +242,31 @@ export function Workspace() {
                     notes={notes}
                 />
             </div>
-            <div className="h-full min-h-0 w-[22%] min-w-[240px] border-l border-border p-4">
-                <ChatPanel
-                    onOpenSource={(source) => {
-                        setSelectedNotebookId(source.notebookId)
-                        bumpRefetchNotes("searchHit-note-selected")
-                        setSelectedNoteId(source.noteId)
-                        recordVisit({
-                            noteId: source.noteId,
-                            notebookId: source.notebookId,
-                            stackId: openStackId || undefined,
-                        })
-                    }}
-                />
-            </div>
             <div
                 className="fixed right-8 top-8">
                 <LogoutButton />
             </div>
             <div>
+                <Modal
+                    modalOpen={chatModalOpen}
+                    setModalOpen={setChatModalOpen}
+                    title="Ask your notes"
+                    panelClassName="flex h-[min(80vh,720px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface p-0 shadow-xl"
+                >
+                    <ChatPanel
+                        onOpenSource={(source) => {
+                            setChatModalOpen(false)
+                            setSelectedNotebookId(source.notebookId)
+                            bumpRefetchNotes("searchHit-note-selected")
+                            setSelectedNoteId(source.noteId)
+                            recordVisit({
+                                noteId: source.noteId,
+                                notebookId: source.notebookId,
+                                stackId: openStackId || undefined,
+                            })
+                        }}
+                    />
+                </Modal>
                 <Modal
                     modalOpen={searchModalOpen}
                     setModalOpen={setSearchModalOpenWithReset}

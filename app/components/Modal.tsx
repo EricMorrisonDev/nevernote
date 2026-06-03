@@ -1,10 +1,14 @@
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 
+const defaultPanelClassName =
+    "w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-xl"
+
 interface ModalProps {
     children: ReactNode
     modalOpen: boolean,
     title: string,
     setModalOpen: Dispatch<SetStateAction<boolean>>
+    panelClassName?: string
 }
 
 // later on look into passing a wrapper function instead of passing the setter function for isOpen
@@ -13,6 +17,7 @@ export function Modal ({
     children,
     modalOpen,
     setModalOpen,
+    panelClassName = defaultPanelClassName,
 }: ModalProps) {
 
     if(!modalOpen) return null
@@ -27,7 +32,7 @@ export function Modal ({
             }}
         >
             <div
-                className="w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-xl"
+                className={panelClassName}
                 role="dialog"
                 aria-modal="true"
                 aria-label={title}

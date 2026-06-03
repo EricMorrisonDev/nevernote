@@ -87,7 +87,7 @@ export function ChatPanel({ onOpenSource, notebookId }: ChatPanelProps) {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-2xl border border-border bg-surface">
+    <div className="flex h-full min-h-0 flex-col bg-surface">
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold text-foreground">Ask your notes</h2>
         <p className="mt-1 text-xs text-muted">
