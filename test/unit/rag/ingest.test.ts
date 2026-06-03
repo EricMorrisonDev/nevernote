@@ -119,6 +119,28 @@ describe("ingestNote", () => {
 
     expect(order).toEqual(["delete", "chunk", "upsert"])
   })
+
+  it("is idempotent: re-ingest deletes then upserts with the same stable chunk ids", async () => {
+    const docs = [sampleDocument(0), sampleDocument(1)]
+    mockChunkNote.mockResolvedValue(docs)
+
+    await ingestNote(baseInput)
+    await ingestNote(baseInput)
+
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledTimes(2)
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenNthCalledWith(1, "note-1")
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenNthCalledWith(2, "note-1")
+
+    expect(mockUpsertRagDocuments).toHaveBeenCalledTimes(2)
+    expect(mockUpsertRagDocuments).toHaveBeenNthCalledWith(1, docs, [
+      "note-1:0",
+      "note-1:1",
+    ])
+    expect(mockUpsertRagDocuments).toHaveBeenNthCalledWith(2, docs, [
+      "note-1:0",
+      "note-1:1",
+    ])
+  })
 })
 
 describe("deleteNoteChunks", () => {
