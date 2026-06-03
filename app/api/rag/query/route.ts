@@ -66,12 +66,31 @@ function toSources(chunks: Awaited<ReturnType<typeof queryRagSimilarChunks>>): R
   }))
 }
 
+type RagQueryAuditLog = {
+  queryId: string
+  userId?: string
+  latencyMs: number
+  chunkIds: string[]
+  emptyRetrieval: boolean
+  notebookId?: string
+  status: "ok" | "error"
+  error?: string
+}
+
+/** Phase 2.3: audit metadata only — no query text or chunk bodies. */
+function logRagQuery(event: RagQueryAuditLog): void {
+  console.info("[rag.query]", JSON.stringify(event))
+}
 
 export async function POST(request: Request) {
+  const queryId = crypto.randomUUID()
+  const startedAt = Date.now()
+  let userId: string | undefined
+
   try {
-    // authenticate user
     const user = await requireUser()
     if (user instanceof NextResponse) return user
+    userId = user.id
 
     // parse json and validate with zod
     const body = await request.json()
@@ -97,6 +116,16 @@ export async function POST(request: Request) {
 
     // if no relevant chunks, return error message
     if (chunks.length === 0) {
+      logRagQuery({
+        queryId,
+        userId,
+        latencyMs: Date.now() - startedAt,
+        chunkIds: [],
+        emptyRetrieval: true,
+        notebookId,
+        status: "ok",
+      })
+
       return NextResponse.json(
         {
           data: {
@@ -136,17 +165,37 @@ export async function POST(request: Request) {
         ? response.content.trim()
         : response.text.trim()
 
-    // return answer and sources to the client
+    const sources = toSources(chunks)
+
+    logRagQuery({
+      queryId,
+      userId,
+      latencyMs: Date.now() - startedAt,
+      chunkIds: sources.map((source) => source.chunkId),
+      emptyRetrieval: false,
+      notebookId,
+      status: "ok",
+    })
+
     return NextResponse.json(
       {
         data: {
           answer,
-          sources: toSources(chunks),
+          sources,
         },
       },
       { status: 200 }
     )
   } catch (e) {
+    logRagQuery({
+      queryId,
+      userId,
+      latencyMs: Date.now() - startedAt,
+      chunkIds: [],
+      emptyRetrieval: false,
+      status: "error",
+      error: e instanceof Error ? e.message : "Unknown error",
+    })
     return handleApiError(e)
   }
 }
