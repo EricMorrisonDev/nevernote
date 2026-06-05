@@ -8,6 +8,9 @@ const {
   mockUpsertRagDocuments,
   mockChunkNote,
   mockChunkDocumentId,
+  mockToContentHash,
+  mockFindUnique,
+  mockUpdate,
 } = vi.hoisted(() => ({
   mockDeleteRagDocumentsForNote: vi.fn().mockResolvedValue(undefined),
   mockUpsertRagDocuments: vi.fn().mockResolvedValue(undefined),
@@ -15,6 +18,9 @@ const {
   mockChunkDocumentId: vi.fn(
     (noteId: string, chunkIndex: number) => `${noteId}:${chunkIndex}`
   ),
+  mockToContentHash: vi.fn().mockReturnValue("hash-1"),
+  mockFindUnique: vi.fn(),
+  mockUpdate: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock("@/lib/RAG/chroma", () => ({
@@ -25,6 +31,16 @@ vi.mock("@/lib/RAG/chroma", () => ({
 vi.mock("@/lib/RAG/chunk", () => ({
   chunkNote: mockChunkNote,
   chunkDocumentId: mockChunkDocumentId,
+  toContentHash: mockToContentHash,
+}))
+
+vi.mock("@/lib/db", () => ({
+  prisma: {
+    note: {
+      findUnique: mockFindUnique,
+      update: mockUpdate,
+    },
+  },
 }))
 
 import { deleteNoteChunks, ingestNote } from "@/lib/RAG/ingest"
@@ -57,6 +73,67 @@ describe("ingestNote", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockChunkNote.mockResolvedValue([sampleDocument()])
+    mockToContentHash.mockReturnValue("hash-1")
+    mockFindUnique.mockResolvedValue({ contentHash: null })
+  })
+
+  it("skips ingest when stored contentHash matches computed hash", async () => {
+    mockFindUnique.mockResolvedValue({ contentHash: "hash-1" })
+
+    await ingestNote(baseInput)
+
+    expect(mockToContentHash).toHaveBeenCalledWith(
+      baseInput.title,
+      baseInput.content
+    )
+    expect(mockFindUnique).toHaveBeenCalledWith({
+      where: { id: "note-1" },
+      select: { contentHash: true },
+    })
+    expect(mockDeleteRagDocumentsForNote).not.toHaveBeenCalled()
+    expect(mockChunkNote).not.toHaveBeenCalled()
+    expect(mockUpsertRagDocuments).not.toHaveBeenCalled()
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it("runs ingest when stored contentHash is null", async () => {
+    mockFindUnique.mockResolvedValue({ contentHash: null })
+
+    await ingestNote(baseInput)
+
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledWith("note-1")
+    expect(mockUpsertRagDocuments).toHaveBeenCalled()
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "note-1" },
+      data: { contentHash: "hash-1" },
+    })
+  })
+
+  it("runs ingest when stored contentHash differs from computed hash", async () => {
+    mockFindUnique.mockResolvedValue({ contentHash: "old-hash" })
+    mockToContentHash.mockReturnValue("new-hash")
+
+    await ingestNote(baseInput)
+
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledWith("note-1")
+    expect(mockUpsertRagDocuments).toHaveBeenCalled()
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "note-1" },
+      data: { contentHash: "new-hash" },
+    })
+  })
+
+  it("persists contentHash for empty notes without upserting", async () => {
+    mockChunkNote.mockResolvedValue([])
+
+    await ingestNote({ ...baseInput, title: "", content: "" })
+
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledWith("note-1")
+    expect(mockUpsertRagDocuments).not.toHaveBeenCalled()
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "note-1" },
+      data: { contentHash: "hash-1" },
+    })
   })
 
   it("deletes existing chunks for the note before chunking", async () => {
@@ -76,14 +153,6 @@ describe("ingestNote", () => {
       title: "Test note",
       content: "Some content.",
     })
-  })
-
-  it("does not upsert when chunking returns no documents", async () => {
-    mockChunkNote.mockResolvedValue([])
-
-    await ingestNote({ ...baseInput, title: "", content: "" })
-
-    expect(mockUpsertRagDocuments).not.toHaveBeenCalled()
   })
 
   it("upserts chunked documents with stable chunk ids", async () => {
@@ -120,9 +189,10 @@ describe("ingestNote", () => {
     expect(order).toEqual(["delete", "chunk", "upsert"])
   })
 
-  it("is idempotent: re-ingest deletes then upserts with the same stable chunk ids", async () => {
+  it("is idempotent: re-ingest deletes then upserts with the same stable chunk ids when hash is not stored", async () => {
     const docs = [sampleDocument(0), sampleDocument(1)]
     mockChunkNote.mockResolvedValue(docs)
+    mockFindUnique.mockResolvedValue({ contentHash: null })
 
     await ingestNote(baseInput)
     await ingestNote(baseInput)
@@ -140,6 +210,19 @@ describe("ingestNote", () => {
       "note-1:0",
       "note-1:1",
     ])
+  })
+
+  it("skips second ingest when contentHash was persisted after the first run", async () => {
+    mockFindUnique
+      .mockResolvedValueOnce({ contentHash: null })
+      .mockResolvedValueOnce({ contentHash: "hash-1" })
+
+    await ingestNote(baseInput)
+    await ingestNote(baseInput)
+
+    expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledTimes(1)
+    expect(mockUpsertRagDocuments).toHaveBeenCalledTimes(1)
+    expect(mockUpdate).toHaveBeenCalledTimes(1)
   })
 })
 

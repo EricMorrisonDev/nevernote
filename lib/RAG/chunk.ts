@@ -2,6 +2,7 @@ import "server-only"
 
 import { Document } from "@langchain/core/documents"
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters"
+import { createHash } from "crypto"
 
 import type { NoteChunkInput, RagChunkMetadata } from "@/lib/RAG/types"
 
@@ -46,6 +47,14 @@ function toChunkMetadata(
     title: input.title,
     notebookId: input.notebookId,
   }
+}
+
+export function toContentHash (
+  title: string,
+  content: string
+): string {
+  const trimmed = buildNoteEmbedText(title, content)
+  return createHash("sha256").update(trimmed).digest("hex")
 }
 
 /**

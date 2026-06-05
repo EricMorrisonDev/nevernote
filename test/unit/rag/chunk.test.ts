@@ -1,3 +1,4 @@
+import { createHash } from "crypto"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("server-only", () => ({}))
@@ -6,6 +7,7 @@ import {
   buildNoteEmbedText,
   chunkDocumentId,
   chunkNote,
+  toContentHash,
 } from "@/lib/RAG/chunk"
 
 describe("buildNoteEmbedText", () => {
@@ -17,6 +19,37 @@ describe("buildNoteEmbedText", () => {
 
   it("returns empty string when title and content are blank", () => {
     expect(buildNoteEmbedText("  ", "\n")).toBe("")
+  })
+})
+
+describe("toContentHash", () => {
+  it("returns a stable sha256 hex digest for the same title and content", () => {
+    const first = toContentHash("My Note", "Hello world")
+    const second = toContentHash("My Note", "Hello world")
+
+    expect(first).toBe(second)
+    expect(first).toMatch(/^[a-f0-9]{64}$/)
+  })
+
+  it("hashes buildNoteEmbedText output so trimming matches chunking", () => {
+    const fromHelper = toContentHash("My Note", "Hello world")
+    const embedText = buildNoteEmbedText("My Note", "Hello world")
+    const expected = createHash("sha256").update(embedText).digest("hex")
+
+    expect(fromHelper).toBe(expected)
+  })
+
+  it("changes when content changes", () => {
+    expect(toContentHash("My Note", "Hello world")).not.toBe(
+      toContentHash("My Note", "Goodbye world")
+    )
+  })
+
+  it("hashes empty embed text for blank notes", () => {
+    const emptyHash = createHash("sha256").update("").digest("hex")
+
+    expect(toContentHash("", "")).toBe(emptyHash)
+    expect(toContentHash("  ", "\n")).toBe(emptyHash)
   })
 })
 
