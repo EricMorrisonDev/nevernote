@@ -91,4 +91,52 @@ describe("chunkNote", () => {
 
     expect(docs).toEqual([])
   })
+
+  it("splits markdown on heading boundaries when content exceeds chunk size", async () => {
+    const sectionBody = "word ".repeat(350).trim()
+    const content = `## Section A\n\n${sectionBody}\n\n## Section B\n\n${sectionBody}`
+    const docs = await chunkNote({ ...baseInput, title: "Note", content })
+
+    expect(docs.length).toBeGreaterThan(1)
+    const sectionAOnly = docs.some(
+      (doc) => doc.pageContent.includes("Section A") && !doc.pageContent.includes("Section B")
+    )
+    const sectionBOnly = docs.some(
+      (doc) => doc.pageContent.includes("Section B") && !doc.pageContent.includes("Section A")
+    )
+    expect(sectionAOnly).toBe(true)
+    expect(sectionBOnly).toBe(true)
+    docs.forEach((doc) => {
+      expect(doc.pageContent.startsWith("Title: Note")).toBe(true)
+    })
+  })
+
+  it("splits quill html on heading tags when content exceeds chunk size", async () => {
+    const sectionBody = "word ".repeat(350).trim()
+    const content = `<h2>Section A</h2><p>${sectionBody}</p><h2>Section B</h2><p>${sectionBody}</p>`
+    const docs = await chunkNote({ ...baseInput, title: "Note", content })
+
+    expect(docs.length).toBeGreaterThan(1)
+    expect(
+      docs.some(
+        (doc) => doc.pageContent.includes("Section A") && !doc.pageContent.includes("Section B")
+      )
+    ).toBe(true)
+    expect(
+      docs.some(
+        (doc) => doc.pageContent.includes("Section B") && !doc.pageContent.includes("Section A")
+      )
+    ).toBe(true)
+  })
+
+  it("keeps a small html code block in one chunk", async () => {
+    const code = "const answer = 42;"
+    const content = `<p>Intro.</p><pre class="ql-syntax">${code}</pre><p>Outro.</p>`
+    const docs = await chunkNote({ ...baseInput, title: "Note", content })
+
+    const codeChunk = docs.find((doc) => doc.pageContent.includes(code))
+    expect(codeChunk).toBeDefined()
+    expect(codeChunk?.pageContent).toContain("<pre")
+    expect(codeChunk?.pageContent).toContain(code)
+  })
 })

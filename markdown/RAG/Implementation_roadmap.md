@@ -178,7 +178,7 @@ Chunk **content** (for embedding and citations) still lives in the document `pag
 
 | Step | Description |
 |------|-------------|
-| **4.1 Markdown-aware chunking** | Custom or LangChain markdown header splitter; prefer splits on headings and paragraphs; preserve code blocks as single chunks where possible. |
+| **4.1 Structure-aware chunking** | Custom or LangChain markdown header splitter; prefer splits on headings and paragraphs; preserve code blocks as single chunks where possible. |
 | **4.2 Hybrid search** | Combine Postgres full-text (notes table) with Chroma vector search if “exact phrase” queries are common; merge/rank in application code. |
 | **4.3 Re-ranking** | Retrieve larger `k`, then re-rank with a cross-encoder or a lightweight model; trim to final context budget. |
 | **4.4 Query rewriting (optional)** | Step-back or multi-query expansion for vague questions; keep behind a flag at first. |
