@@ -43,7 +43,7 @@ vi.mock("@/lib/db", () => ({
   },
 }))
 
-import { deleteNoteChunks, ingestNote } from "@/lib/RAG/ingest"
+import { deleteNoteDocuments, ingestNote } from "@/lib/RAG/ingest"
 import type { RagChunkMetadata } from "@/lib/RAG/types"
 
 const baseInput = {
@@ -226,13 +226,13 @@ describe("ingestNote", () => {
   })
 })
 
-describe("deleteNoteChunks", () => {
+describe("deleteNoteDocuments", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it("delegates to deleteRagDocumentsForNote", async () => {
-    await deleteNoteChunks("note-99")
+    await deleteNoteDocuments("note-99")
 
     expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledTimes(1)
     expect(mockDeleteRagDocumentsForNote).toHaveBeenCalledWith("note-99")

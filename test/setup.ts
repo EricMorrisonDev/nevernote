@@ -4,7 +4,7 @@ import { prisma } from "./utils/prisma"
 
 afterEach(async (ctx) => {
   const file = ctx.task.file?.filepath ?? ""
-  if (file.includes("test/unit/rag/")) {
+  if (file.includes("test/unit/")) {
     return
   }
   await clearDb()

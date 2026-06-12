@@ -2,7 +2,7 @@
 
 import { SetStateAction, useState, Dispatch, useEffect, useRef, useCallback } from "react"
 import { Note } from "@/lib/types/api"
-import { RichTextEditor } from "./RichTextEditor"
+import { RichTextEditor, type RichTextEditorHandle } from "./RichTextEditor"
 import type { RefetchNotesState } from "@/app/lib/types"
 
 
@@ -24,14 +24,15 @@ export function EditNotePanel ({
     setSelectedNoteId,
 }: EditNotePanelProps) {
 
-    const[title, setTitle] = useState('')
-    const[content, setContent] = useState('')
-    const[message, setMessage] = useState('')
+    const [title, setTitle] = useState('')
+    const [content, setContent] = useState('')
+    const [message, setMessage] = useState('')
     const [, setLoading] = useState(false)
     const [isLoadingNote, setIsLoadingNote] = useState(false)
     const lastSavedRef = useRef<string>("")
     const lastHydratedNoteIdRef = useRef<string>("")
     const suppressRteOnChangeRef = useRef(false)
+    const editorRef = useRef<RichTextEditorHandle>(null)
     
     const handleEditNote = useCallback(
         async (
@@ -210,10 +211,16 @@ export function EditNotePanel ({
                     onChange={(e) => {
                         setTitle(e.target.value)
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key !== "Enter" || isLoadingNote) return
+                        e.preventDefault()
+                        editorRef.current?.focus()
+                    }}
                     placeholder="title"
                 />
                 <div className="flex-1 min-h-0">
                     <RichTextEditor
+                        ref={editorRef}
                         key={selectedNoteId}
                         value={content}
                         readOnly={isLoadingNote}

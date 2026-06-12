@@ -49,7 +49,7 @@ export async function POST(request: Request) {
             data: createData
         })
 
-        
+        // pass new note to RAG ingest
         await ingestNote(newNote)
 
         return NextResponse.json(

@@ -36,7 +36,7 @@ export async function ingestNote(input: IngestInput): Promise<void>{
     if(storedHash?.contentHash === hash) return
  
     // delete old chunks
-    await deleteRagDocumentsForNote(id)
+    await deleteNoteDocuments(id)
 
     // create new documents with chunks and metadata
     const documents = await chunkNote({ userId, noteId: id, notebookId, title, content })
@@ -60,6 +60,6 @@ export async function ingestNote(input: IngestInput): Promise<void>{
     })
 }
 
-export async function deleteNoteChunks(noteId: string): Promise<void> {
+export async function deleteNoteDocuments(noteId: string): Promise<void> {
     await deleteRagDocumentsForNote(noteId)
   }

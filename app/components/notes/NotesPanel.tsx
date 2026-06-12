@@ -426,7 +426,7 @@ export function NotesPanel ({
                 <div
                 className="mt-4">
                     {selectedNotebookTitle.length > 0 && (
-                        <p className="text-[2rem] text-bold">{selectedNotebookTitle}</p>
+                        <p className="text-[1rem] text-bold">{selectedNotebookTitle}</p>
                     )}
                 </div>
                 <div className="flex gap-2">

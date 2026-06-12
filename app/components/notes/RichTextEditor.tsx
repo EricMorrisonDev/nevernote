@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import "react-quill-new/dist/quill.snow.css";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -13,6 +13,10 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
   ),
 });
 
+export type RichTextEditorHandle = {
+  focus: () => void;
+};
+
 type RichTextEditorProps = {
   value: string;
   onChange: (nextValue: string) => void;
@@ -20,12 +24,27 @@ type RichTextEditorProps = {
   placeholder?: string;
 };
 
-export function RichTextEditor({
-  value,
-  onChange,
-  readOnly = false,
-  placeholder = "Start writing...",
-}: RichTextEditorProps) {
+export const RichTextEditor = forwardRef<
+  RichTextEditorHandle,
+  RichTextEditorProps
+>(function RichTextEditor(
+  {
+    value,
+    onChange,
+    readOnly = false,
+    placeholder = "Start writing...",
+  },
+  ref
+) {
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      editorContainerRef.current
+        ?.querySelector<HTMLElement>(".ql-editor")
+        ?.focus();
+    },
+  }));
   const modules = useMemo(
     () => ({
       toolbar: [
@@ -52,7 +71,7 @@ export function RichTextEditor({
   ];
 
   return (
-    <div className="h-full min-h-0 flex flex-col">
+    <div ref={editorContainerRef} className="h-full min-h-0 flex flex-col">
       <ReactQuill
         className="h-full min-h-0 flex flex-col"
         theme="snow"
@@ -163,4 +182,4 @@ export function RichTextEditor({
       `}</style>
     </div>
   );
-}
+});
