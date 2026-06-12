@@ -3,6 +3,7 @@
 import { useEffect, useState, Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
+import { htmlToPlainText } from "@/app/lib/format/htmlToPlainText";
 import { SortNotesButton } from "./SortNotesButton";
 import type { RefetchNotesState, SortMode } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
@@ -248,15 +249,6 @@ export function NotesPanel ({
 
         return () => controller.abort()
     }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId, recordVisit, openStackId])
-
-    // text editor saves content as html, so we use this to convert it to plain text for the preview tile
-    const htmlToPlainText = (html: string) => {
-        const el = document.createElement("div")
-        el.innerHTML = html;
-        return (el.textContent || "")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
 
     const renderNotePreview = (content: string) => {
         const plain = htmlToPlainText(content)

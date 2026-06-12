@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, useRef, useState } from "react"
+import { htmlToPlainText } from "@/app/lib/format/htmlToPlainText"
 
 type RagQuerySource = {
   id: string
@@ -137,7 +138,7 @@ export function ChatPanel({ onOpenSource, notebookId }: ChatPanelProps) {
                             {source.title}
                           </span>
                           <span className="mt-1 block text-xs text-muted line-clamp-2">
-                            {source.excerpt}
+                            {htmlToPlainText(source.excerpt)}
                           </span>
                         </button>
                       </li>
