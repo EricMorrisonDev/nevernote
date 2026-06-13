@@ -212,7 +212,7 @@ export function EditNotePanel ({
                         setTitle(e.target.value)
                     }}
                     onKeyDown={(e) => {
-                        if (e.key !== "Enter" || isLoadingNote) return
+                        if (e.key !== "Enter" || isLoadingNote) return 
                         e.preventDefault()
                         editorRef.current?.focus()
                     }}
