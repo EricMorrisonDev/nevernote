@@ -20,19 +20,27 @@ import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-/** Same midpoint rules as PATCH /api/notes/[id] (neighbor customOrder values). */
+
 function computeCustomOrderAfterMove(
     afterId: string | undefined,
     beforeId: string | undefined,
     byId: Map<string, Note>
 ): number | null {
+    // if an arg is passed for afterId, check if it is in byId. If it isn't there, pass null
+    // same for beforeId
     const pred = afterId ? byId.get(afterId) ?? null : null
     const succ = beforeId ? byId.get(beforeId) ?? null : null
+
+    // if there are notes before and after
     if (pred && succ) {
+        // check that the customOrders are correctly ordered ascending
         if (pred.customOrder >= succ.customOrder) return null
+        // calculate new customOrder value between left and right
         return (pred.customOrder + succ.customOrder) / 2
     }
+    // if note is at the end of the list...
     if (pred && !succ) return pred.customOrder + 1000
+    // if note is at the start of the list...
     if (!pred && succ) return succ.customOrder - 1000
     return null
 }
@@ -57,7 +65,7 @@ type NoteDragOverlayProps = {
     renderNoteUpdatedTime: (time: string) => string
 }
 
-/** Visual copy of a note tile for DragOverlay (no sortable hooks). */
+// this is a functional component that renders a copy of a note tile
 function NoteDragOverlay({
     note,
     isSelected,
@@ -105,6 +113,7 @@ type SortableNoteItemProps = {
     renderNoteUpdatedTime: (time: string) => string
 }
 
+// this renders the actual notes that we see in the ui
 function SortableNoteItem({
     note,
     isSelected,
