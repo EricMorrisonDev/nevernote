@@ -5,6 +5,8 @@ import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import { htmlToPlainText } from "@/app/lib/format/htmlToPlainText";
 import { SortNotesButton } from "./SortNotesButton";
+import { SortableNoteItem } from "./SortableNoteItem";
+import { NoteDragOverlay } from "./NoteDragOverlay";
 import { computeCustomOrderAfterMove } from "@/app/lib/customOrder";
 import type { RefetchNotesState, SortMode } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
@@ -18,11 +20,7 @@ import {
     defaultDropAnimation,
 } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
-import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-
-
-
+import { arrayMove, SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
@@ -35,102 +33,6 @@ interface NotesPanelProps {
     notebooks: Notebook[] | null
     notes: Note[] | []
     setNotes: Dispatch<SetStateAction<Note[] | []>>
-}
-
-type NoteDragOverlayProps = {
-    note: Note
-    isSelected: boolean
-    renderNotePreview: (content: string) => string
-    renderNoteUpdatedTime: (time: string) => string
-}
-
-// this is a functional component that renders a copy of a note tile
-function NoteDragOverlay({
-    note,
-    isSelected,
-    renderNotePreview,
-    renderNoteUpdatedTime,
-}: NoteDragOverlayProps) {
-    return (
-        <div
-            className={
-                isSelected
-                    ? "max-w-[200px] w-full cursor-grabbing rounded-xl border border-accent/60 bg-surface p-2 shadow-lg ring-1 ring-ring"
-                    : "max-w-[200px] w-full cursor-grabbing rounded-xl border border-border bg-surface p-2 shadow-lg"
-            }
-            style={{ height: 250 }}
-        >
-            <div className="flex h-full min-h-0 w-full flex-col items-start text-left">
-                <div className="flex w-full shrink-0 items-center justify-between gap-2">
-                    <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
-                        {note.title.trim().length === 0 ? "Untitled" : note.title}
-                    </p>
-                    
-                </div>
-                <p className="min-h-0 flex-1 overflow-hidden p-2 text-sm text-muted">
-                    {renderNotePreview(note.content)}
-                </p>
-                <p className="mt-auto shrink-0 text-xs text-muted/80">
-                    {renderNoteUpdatedTime(note.updatedAt)}
-                </p>
-            </div>
-        </div>
-    )
-}
-
-type SortableNoteItemProps = {
-    note: Note
-    isSelected: boolean
-    sortMode: string
-    onSelect: () => void
-    renderNotePreview: (content: string) => string
-    renderNoteUpdatedTime: (time: string) => string
-}
-
-// this renders the actual notes that we see in the ui
-function SortableNoteItem({
-    note,
-    isSelected,
-    onSelect,
-    sortMode,
-    renderNotePreview,
-    renderNoteUpdatedTime,
-}: SortableNoteItemProps) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-        id: note.id,
-    })
-
-    const style = {
-        transform: isDragging ? undefined : CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.25 : 1,
-    }
-
-    const isCustomSort = sortMode === "custom"
-
-    return (
-        <li ref={setNodeRef} style={style} className="max-w-[200px]">
-            <div
-                className={
-                    isSelected
-                        ? "cursor-default bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
-                        : "cursor-default bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
-                }
-                onClick={onSelect}
-                {...(isCustomSort ? listeners : {})}
-                {...(isCustomSort ? attributes : {})}
-            >
-                        <div className="flex w-full items-center justify-between gap-2">
-                            <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
-                                {note.title.trim().length === 0 ? "Untitled" : note.title}
-                            </p>
-                        </div>
-                        <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
-                        <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
-                    
-            </div>
-        </li>
-    )
 }
 
 export function NotesPanel ({
