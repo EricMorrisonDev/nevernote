@@ -5,6 +5,7 @@ import { Note, Notebook } from "@/lib/types/api";
 import { initializeNote } from "@/app/lib/InitializeNote";
 import { htmlToPlainText } from "@/app/lib/format/htmlToPlainText";
 import { SortNotesButton } from "./SortNotesButton";
+import { computeCustomOrderAfterMove } from "@/app/lib/customOrder";
 import type { RefetchNotesState, SortMode } from "@/app/lib/types";
 import type { HistoryEntry } from "@/lib/useNoteHistory";
 import {
@@ -21,29 +22,7 @@ import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from "@d
 import { CSS } from "@dnd-kit/utilities";
 
 
-function computeCustomOrderAfterMove(
-    afterId: string | undefined,
-    beforeId: string | undefined,
-    byId: Map<string, Note>
-): number | null {
-    // if an arg is passed for afterId, check if it is in byId. If it isn't there, pass null
-    // same for beforeId
-    const pred = afterId ? byId.get(afterId) ?? null : null
-    const succ = beforeId ? byId.get(beforeId) ?? null : null
 
-    // if there are notes before and after
-    if (pred && succ) {
-        // check that the customOrders are correctly ordered ascending
-        if (pred.customOrder >= succ.customOrder) return null
-        // calculate new customOrder value between left and right
-        return (pred.customOrder + succ.customOrder) / 2
-    }
-    // if note is at the end of the list...
-    if (pred && !succ) return pred.customOrder + 1000
-    // if note is at the start of the list...
-    if (!pred && succ) return succ.customOrder - 1000
-    return null
-}
 
 interface NotesPanelProps {
     selectedNotebookId: string | null;
@@ -86,12 +65,7 @@ function NoteDragOverlay({
                     <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
                         {note.title.trim().length === 0 ? "Untitled" : note.title}
                     </p>
-                    <span
-                        className="shrink-0 rounded px-1 py-0.5 text-xs text-muted"
-                        aria-hidden
-                    >
-                        ⣿
-                    </span>
+                    
                 </div>
                 <p className="min-h-0 flex-1 overflow-hidden p-2 text-sm text-muted">
                     {renderNotePreview(note.content)}
@@ -132,6 +106,8 @@ function SortableNoteItem({
         opacity: isDragging ? 0.25 : 1,
     }
 
+    const isCustomSort = sortMode === "custom"
+
     return (
         <li ref={setNodeRef} style={style} className="max-w-[200px]">
             <div
@@ -140,28 +116,18 @@ function SortableNoteItem({
                         ? "cursor-default bg-surface border border-accent/60 ring-1 ring-ring rounded-xl p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
                         : "cursor-default bg-surface border border-border rounded-xl min-w-[100px] p-2 overflow-hidden h-[250px] w-full text-left flex flex-col items-start justify-start mt-2 hover:bg-surface-2"
                 }
+                onClick={onSelect}
+                {...(isCustomSort ? listeners : {})}
+                {...(isCustomSort ? attributes : {})}
             >
-                    <div
-                        className="flex min-h-0 w-full flex-1 flex-col items-start text-left"
-                        onClick={onSelect}
-                    >
                         <div className="flex w-full items-center justify-between gap-2">
                             <p className="min-w-0 flex-1 truncate pl-2 text-base font-bold">
                                 {note.title.trim().length === 0 ? "Untitled" : note.title}
                             </p>
-                            { sortMode === "custom" && (<button
-                                type="button"
-                                className="shrink-0 cursor-grab touch-none rounded px-1 py-0.5 text-xs text-muted hover:text-foreground"
-                                aria-label="Drag to reorder"
-                                {...listeners}
-                                {...attributes}
-                            >
-                                ⣿
-                            </button>)}
                         </div>
                         <p className="text-sm text-muted p-2">{renderNotePreview(note.content)}</p>
                         <p className="mt-auto text-xs text-muted/80">{renderNoteUpdatedTime(note.updatedAt)}</p>
-                    </div>
+                    
             </div>
         </li>
     )
@@ -259,6 +225,7 @@ export function NotesPanel ({
         return () => controller.abort()
     }, [selectedNotebookId, refetchNotes.key, refetchReason, setNotes, setSelectedNoteId, recordVisit, openStackId])
 
+    // this renders the preview text in the note tile, converting html to plain text first
     const renderNotePreview = (content: string) => {
         const plain = htmlToPlainText(content)
         let preview = ''
@@ -272,6 +239,7 @@ export function NotesPanel ({
         return preview
     }
 
+    // this renders the updated at time shown at the bottom of the note tile
     const renderNoteUpdatedTime = (time: string) => {
         const timeDiff = (new Date().getTime()) - (new Date(time).getTime())
 
@@ -316,8 +284,10 @@ export function NotesPanel ({
                 return [...notes].sort((a, b) => {
                     const orderDiff = a.customOrder - b.customOrder
                     if (orderDiff !== 0) return orderDiff
+                    // if a and b are the same, sort by created at
                     const createdDiff = a.createdAt.localeCompare(b.createdAt)
                     if (createdDiff !== 0) return createdDiff
+                    // if created at are the same, sort by id
                     return a.id.localeCompare(b.id)
                 })
         }
@@ -337,10 +307,12 @@ export function NotesPanel ({
         async (event: DragEndEvent) => {
             const { active, over } = event
 
+            // if note was not dropped on a valid target or it was dropped on its original position, return
             if (!over || active.id === over.id) {
                 setActiveDragNoteId(null)
                 return
             }
+
 
             const ids = sortedNotes.map((n) => n.id)
             const oldIndex = ids.indexOf(String(active.id))
@@ -368,12 +340,12 @@ export function NotesPanel ({
             const previousNotes = notes.map((n) => ({ ...n }))
             const previousSortMode = sortMode
 
-            setSortMode("custom")
             setNotes(
                 reorderedNotes.map((n) =>
                     n.id === movedId ? { ...n, customOrder: newCustomOrder } : n
                 )
             )
+
             queueMicrotask(() => {
                 setActiveDragNoteId(null)
             })
@@ -394,7 +366,15 @@ export function NotesPanel ({
                     setSortMode(previousSortMode)
                     return
                 }
-                const parsed = (await res.json()) as { data: Note }
+                const parsed = (await res.json()) as {
+                    data: Note
+                    rebalanced?: boolean
+                    notes?: Note[]
+                }
+                if (parsed.rebalanced && parsed.notes) {
+                    setNotes(parsed.notes)
+                    return
+                }
                 const updated = parsed.data
                 setNotes((prev) =>
                     prev.map((n) =>

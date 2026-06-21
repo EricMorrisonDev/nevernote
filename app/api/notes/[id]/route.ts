@@ -7,6 +7,7 @@ import { requireValidation } from "@/lib/zodValidation";
 import { ensureNotebookBelongsToUser } from "@/lib/notebookMatch";
 import { handleApiError } from "@/lib/errorResponse";
 import { deleteNoteDocuments, ingestNote } from "@/lib/RAG/ingest";
+import { resolveCustomOrderForMove } from "@/app/lib/customOrder.server";
 
 async function ensureNoteMatchesUser(noteId: string, userId: string) {
     const match = await prisma.note.findFirst({
@@ -73,8 +74,6 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     }
 }
 
-// PATCH: persist custom order — body `{ afterId?, beforeId? }` (at least one).
-// afterId = predecessor note (omit = move to start); beforeId = successor (omit = move to end).
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
@@ -101,61 +100,36 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
             )
         }
 
-        const notebookId = note.notebookId
+        const resolved = await resolveCustomOrderForMove({
+            notebookId: note.notebookId,
+            userId: user.id,
+            afterId,
+            beforeId,
+        })
 
-        const [predNote, succNote] = await Promise.all([
-            afterId
-                ? prisma.note.findFirst({
-                      where: { 
-                        id: afterId, 
-                        notebookId, 
-                        userId: user.id 
-                    },
-                      select: { customOrder: true },
-                  })
-                : null,
-            beforeId
-                ? prisma.note.findFirst({
-                      where: { id: beforeId, notebookId, userId: user.id },
-                      select: { customOrder: true },
-                  })
-                : null,
-        ])
-
-        if (afterId && !predNote) {
-            return NextResponse.json({ error: "afterId not found in this notebook" }, { status: 400 })
-        }
-        if (beforeId && !succNote) {
-            return NextResponse.json({ error: "beforeId not found in this notebook" }, { status: 400 })
+        if (!resolved.ok) {
+            return NextResponse.json({ error: resolved.error }, { status: 400 })
         }
 
-        let newOrder: number
-        if (predNote && succNote) {
-            if (predNote.customOrder >= succNote.customOrder) {
-                return NextResponse.json(
-                    { error: "Invalid neighbor ordering for reorder" },
-                    { status: 400 }
-                )
-            }
-            newOrder = (predNote.customOrder + succNote.customOrder) / 2
-        } else if (predNote && !succNote) {
-            newOrder = predNote.customOrder + 1000
-        } else if (!predNote && succNote) {
-            newOrder = succNote.customOrder - 1000
-        } else {
-            return NextResponse.json({ error: "Invalid reorder request" }, { status: 400 })
-        }
-
-        // Reorder must not bump `updatedAt` (@updatedAt otherwise runs on any update).
         const updatedNote = await prisma.note.update({
             where: { id: note.id, userId: user.id },
             data: {
-                customOrder: newOrder,
+                customOrder: resolved.newOrder,
                 updatedAt: note.updatedAt,
             },
         })
 
-        return NextResponse.json({ data: updatedNote }, { status: 200 })
+        if (resolved.rebalancedNotes) {
+            const notes = resolved.rebalancedNotes.map((n) =>
+                n.id === updatedNote.id ? updatedNote : n
+            )
+            return NextResponse.json(
+                { data: updatedNote, rebalanced: true, notes },
+                { status: 200 }
+            )
+        }
+
+        return NextResponse.json({ data: updatedNote, rebalanced: false }, { status: 200 })
     } catch (e) {
         return handleApiError(e)
     }
