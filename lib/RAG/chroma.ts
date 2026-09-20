@@ -1,6 +1,6 @@
 import "server-only"
 
-import { Document } from "@/lib/RAG/types"
+
 import { OpenAIEmbeddings } from "@langchain/openai"
 import { ChromaClient } from "chromadb"
 import type { Where } from "chromadb"
@@ -8,6 +8,7 @@ import type {
   RagChunkMetadata,
   RagQueryInput,
   RagQueryResult,
+  Document
 } from "@/lib/RAG/types"
 
 export const RAG_EMBEDDING_MODEL = "text-embedding-3-small"

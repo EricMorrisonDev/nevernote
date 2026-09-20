@@ -62,7 +62,15 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
             data: data
         })
 
-        await ingestNote(updatedNote)
+        const noteForChunking = {
+            userId: updatedNote.userId,
+            noteId: updatedNote.id,
+            notebookId: updatedNote.notebookId,
+            title: updatedNote.title,
+            content: updatedNote.content
+        }
+
+        await ingestNote(noteForChunking)
 
         return NextResponse.json(
             {data: updatedNote},
