@@ -180,10 +180,15 @@ export async function queryRagSimilarChunks(
   const distances = response.distances?.[0] ?? []
 
   // we take the arrays above and map them to a new array of objects
-  return ids.map((id, index) => ({
+  const data = ids.map((id, index) => ({
     id,
     text: docs[index] ?? "",
     metadata: metadatas[index] as RagChunkMetadata,
     distance: distances[index] ?? null,
   }))
+
+  console.log(data)
+
+  return data.filter((obj): obj is RagQueryResult & {distance: number} => 
+    obj.distance !== null && obj.distance < 1)
 }
