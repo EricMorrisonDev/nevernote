@@ -180,14 +180,19 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
         const user = await requireUser()
         if(user instanceof NextResponse) return user
 
-        const result = await prisma.note.deleteMany({
+        const deletedAt = new Date()
+
+        const result = await prisma.note.update({
             where: {
                 id: validatedId.data.id,
                 userId: user.id
+            },
+            data: {
+                deletedAt
             }
         })
 
-        if(result.count === 0){
+        if(!result){
             return NextResponse.json(
                 {error: "Note not found"},
                 {status: 404}

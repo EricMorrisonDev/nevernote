@@ -17,6 +17,7 @@ export interface Note {
     createdAt: string,
     updatedAt: string,
     customOrder: number
+    deletedAt: string | null
 }
 
 export interface Stack {
