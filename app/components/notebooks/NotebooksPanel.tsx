@@ -615,6 +615,19 @@ export function NotebooksPanel({
                         ))
                     )}
                 </ul>
+                <div className="flex group ml-6 mt-4">
+                    <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                        alt="Notebook icon"
+                                        width={20}
+                                        height={20}
+                                        className="shrink-0"
+                                        />
+                    <button 
+                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
+                    >
+                        <p className="min-w-0 flex-1 truncate">Deleted</p>
+                    </button>
+                </div>
             </div>
             <Modal
                     modalOpen={modalOpen}
