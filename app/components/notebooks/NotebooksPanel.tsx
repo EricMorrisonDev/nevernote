@@ -77,6 +77,7 @@ export function NotebooksPanel({
     const [editState, setEditState] = useState<EditState>(null)
     const menuRef = useRef<HTMLDivElement | null>(null)
     const editInputRef = useRef<HTMLInputElement | null>(null)
+    const [deletedNotesSelected, setDeletedNotesSelected] = useState(false)
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -615,16 +616,20 @@ export function NotebooksPanel({
                         ))
                     )}
                 </ul>
-                <div className="flex group ml-6 mt-4">
-                    <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
-                                        alt="Notebook icon"
-                                        width={20}
-                                        height={20}
-                                        className="shrink-0"
-                                        />
+                <div className={deletedNotesSelected ? "flex mt-3 ml-4 rounded-xl border border-accent/50 bg-surface p-2" : "flex group ml-6 mt-6"}>
                     <button 
-                     className="flex w-full items-center gap-2 text-left rounded-md p-1 text-foreground hover:text-control-hover"
+                     className="flex w-full items-center gap-2 text-left rounded-md  text-foreground hover:text-control-hover"
+                     onClick={ () => {
+                         setSelectedNotebookId(null)
+                         setDeletedNotesSelected( prev => !prev)
+                        }}
                     >
+                        <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
+                                            alt="Notebook icon"
+                                            width={20}
+                                            height={20}
+                                            className="shrink-0"
+                                            />
                         <p className="min-w-0 flex-1 truncate">Deleted</p>
                     </button>
                 </div>
