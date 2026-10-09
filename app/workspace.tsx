@@ -32,6 +32,7 @@ export function Workspace() {
     const [searchResults, setSearchResults] = useState<SearchHit[]>([])
     const [searchQuery, setSearchQuery] = useState('')
     const [draft, setDraft] = useState('')
+    const [deletedNotesSelected, setDeletedNotesSelected] = useState(false)
     const [refetchNotes, setRefetchNotes] = useState<RefetchNotesState>({
         key: 0,
         reason: "notebook-change"
@@ -217,6 +218,8 @@ export function Workspace() {
                     setModalTitle={setModalTitle}
                     onSelectNotebook={onSelectNotebook}
                     recordVisit={recordVisit}
+                    deletedNotesSelected={deletedNotesSelected}
+                    setDeletedNotesSelected={setDeletedNotesSelected}
                 />
             </div>
             <div className="h-full min-h-0 flex flex-col left-0 w-[28%] p-4">

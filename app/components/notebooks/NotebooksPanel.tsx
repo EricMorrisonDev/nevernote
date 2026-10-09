@@ -19,6 +19,8 @@ interface NotebooksPanelProps {
     selectedNotebookId: string | null,
     setSelectedNotebookId: Dispatch<SetStateAction<string | null>>
     setSelectedNoteId: Dispatch<SetStateAction<string | null>>
+    deletedNotesSelected: boolean
+    setDeletedNotesSelected: Dispatch<SetStateAction<boolean>>
     openStackId: string
     setOpenStackId: Dispatch<SetStateAction<string>>
     notebooks: Notebook[] | null
@@ -77,7 +79,7 @@ export function NotebooksPanel({
     const [editState, setEditState] = useState<EditState>(null)
     const menuRef = useRef<HTMLDivElement | null>(null)
     const editInputRef = useRef<HTMLInputElement | null>(null)
-    const [deletedNotesSelected, setDeletedNotesSelected] = useState(false)
+    
 
     const openModal = (type: Exclude<ModalType, null>) => {
         setModalOpen(true)
@@ -622,6 +624,7 @@ export function NotebooksPanel({
                      onClick={ () => {
                          setSelectedNotebookId(null)
                          setDeletedNotesSelected( prev => !prev)
+                         setSelectedNoteId(null)
                         }}
                     >
                         <Image src={'/noun-notebook-8289864-f5f0f0.svg'} 
